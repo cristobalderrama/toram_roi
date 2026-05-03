@@ -1,0 +1,2080 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Toram — Calculadora de Inversión v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js" onerror="void(0)"></script>
+<script>
+function getJsPDF() {
+  const lib = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
+  if (!lib) { alert('La librería PDF no cargó aún. Espera un momento e intenta de nuevo.'); return null; }
+  return lib;
+}
+</script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#1a2540;
+  --navy-mid:#22304f;
+  --navy-light:#2e3f63;
+  --steel:#3d5280;
+  --gold:#b8902e;
+  --gold-light:#d4a84b;
+  --gold-pale:#f5edd8;
+  --cream:#fdfaf4;
+  --white:#ffffff;
+  --text-primary:#1a2540;
+  --text-secondary:#4a5568;
+  --text-muted:#718096;
+  --text-light:#a0aec0;
+  --border:#dde2ec;
+  --border-strong:#c8d0e0;
+  --green:#1a7a4a;
+  --green-bg:#edf7f2;
+  --red:#c0392b;
+  --red-bg:#fdf2f0;
+  --blue:#1d5a96;
+  --blue-bg:#edf3fb;
+  --purple:#5b3fa5;
+  --purple-bg:#f2eefb;
+  --amber:#b45309;
+  --amber-bg:#fef3e2;
+  --shadow-sm:0 1px 3px rgba(26,37,64,0.08);
+  --shadow:0 2px 8px rgba(26,37,64,0.12);
+  --shadow-lg:0 4px 20px rgba(26,37,64,0.15);
+  --radius:6px;
+  --radius-lg:10px;
+  --radius-xl:14px;
+}
+body{font-family:'Source Sans 3',sans-serif;background:#f0f2f7;color:var(--text-primary);font-size:15px;line-height:1.6;min-height:100vh}
+h1,h2,h3,h4{font-family:'Playfair Display',serif;font-weight:600;line-height:1.25}
+
+/* Layout */
+.app-shell{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
+.sidebar{background:var(--navy);color:#e8edf5;padding:0;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
+.sidebar-logo{padding:28px 24px 20px;border-bottom:1px solid rgba(255,255,255,0.08)}
+.sidebar-logo h1{font-size:22px;color:var(--gold-light);letter-spacing:0.02em}
+.sidebar-logo p{font-size:11px;text-transform:uppercase;letter-spacing:0.12em;color:rgba(200,215,240,0.6);margin-top:4px}
+.sidebar-nav{padding:16px 0;flex:1}
+.nav-section{padding:8px 24px 4px;font-size:10px;text-transform:uppercase;letter-spacing:0.14em;color:rgba(200,215,240,0.45);margin-top:8px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 24px;cursor:pointer;transition:background 0.15s,color 0.15s;font-size:13.5px;color:rgba(220,230,248,0.75);border:none;background:none;width:100%;text-align:left}
+.nav-item:hover{background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.95)}
+.nav-item.active{background:rgba(184,144,46,0.18);color:var(--gold-light);border-right:3px solid var(--gold-light)}
+.nav-item .icon{width:18px;height:18px;opacity:0.7;flex-shrink:0}
+.nav-item.active .icon{opacity:1}
+.sidebar-footer{padding:20px 24px;border-top:1px solid rgba(255,255,255,0.08);font-size:11px;color:rgba(200,215,240,0.4)}
+
+.main{padding:32px 40px;overflow-y:auto}
+.page{display:none}
+.page.active{display:block}
+
+/* Header */
+.page-header{margin-bottom:28px}
+.page-header h2{font-size:26px;color:var(--navy)}
+.page-header p{font-size:14px;color:var(--text-muted);margin-top:4px}
+.breadcrumb{font-size:12px;color:var(--text-muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.08em}
+
+/* Cards */
+.card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;box-shadow:var(--shadow-sm)}
+.card-title{font-size:16px;font-weight:600;color:var(--navy);margin-bottom:16px;font-family:'Playfair Display',serif}
+.card-subtitle{font-size:12px;color:var(--text-muted);margin-top:-12px;margin-bottom:16px}
+.card + .card{margin-top:20px}
+
+/* Grid */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+
+/* Form */
+.field{display:flex;flex-direction:column;gap:5px}
+.label{font-size:12px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.06em}
+.label-hint{font-size:11px;color:var(--text-muted);font-weight:400;text-transform:none;letter-spacing:0}
+input[type=number],input[type=text],select{border:1px solid var(--border-strong);border-radius:var(--radius);padding:9px 12px;font-size:14px;font-family:'Source Sans 3',sans-serif;color:var(--text-primary);background:var(--white);width:100%;transition:border-color 0.15s,box-shadow 0.15s;outline:none}
+input:focus,select:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(184,144,46,0.12)}
+select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23718096' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 20px;border-radius:var(--radius);font-family:'Source Sans 3',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.15s;border:none;outline:none}
+.btn-primary{background:var(--navy);color:var(--white)}
+.btn-primary:hover{background:var(--navy-light)}
+.btn-gold{background:var(--gold);color:var(--white)}
+.btn-gold:hover{background:var(--gold-light)}
+.btn-outline{background:transparent;border:1.5px solid var(--border-strong);color:var(--text-secondary)}
+.btn-outline:hover{border-color:var(--navy);color:var(--navy)}
+.btn-sm{padding:7px 14px;font-size:13px}
+.btn-full{width:100%;margin-top:8px}
+.btn-icon{width:18px;height:18px}
+
+/* Metric cards */
+.metric{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px}
+.metric-label{font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted);margin-bottom:6px}
+.metric-value{font-size:26px;font-weight:600;font-family:'Playfair Display',serif;line-height:1.1}
+.metric-sub{font-size:11px;color:var(--text-muted);margin-top:4px}
+.metric.green .metric-value{color:var(--green)}
+.metric.red .metric-value{color:var(--red)}
+.metric.blue .metric-value{color:var(--blue)}
+.metric.purple .metric-value{color:var(--purple)}
+.metric.amber .metric-value{color:var(--amber)}
+.metric.accent{border-left:3px solid var(--gold)}
+
+/* Plans table */
+.plans-table{width:100%;border-collapse:collapse;font-size:13.5px}
+.plans-table th{background:#f4f6fb;padding:10px 14px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);font-weight:600;border-bottom:2px solid var(--border)}
+.plans-table td{padding:11px 14px;border-bottom:1px solid var(--border);color:var(--text-primary)}
+.plans-table tr:last-child td{border-bottom:none}
+.plans-table tr:hover td{background:#f8f9fd}
+.plans-table .num{text-align:right;font-variant-numeric:tabular-nums}
+.plans-table .badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600}
+.badge-green{background:var(--green-bg);color:var(--green)}
+.badge-gold{background:var(--gold-pale);color:var(--gold)}
+.badge-blue{background:var(--blue-bg);color:var(--blue)}
+
+/* Toggle */
+.toggle-wrap{display:flex;align-items:center;gap:10px;cursor:pointer}
+.toggle-track{width:40px;height:22px;border-radius:11px;background:var(--border-strong);position:relative;transition:background 0.2s;flex-shrink:0}
+.toggle-track.on{background:var(--gold)}
+.toggle-thumb{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:white;transition:left 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2)}
+.toggle-track.on .toggle-thumb{left:21px}
+.toggle-label{font-size:13.5px;color:var(--text-secondary)}
+
+/* Scenario toggle */
+.scenario-tabs{display:flex;gap:0;border:1.5px solid var(--border-strong);border-radius:var(--radius);overflow:hidden;margin-bottom:20px;width:fit-content}
+.scenario-tab{padding:8px 20px;font-size:13px;font-weight:600;cursor:pointer;background:var(--white);color:var(--text-muted);border:none;transition:all 0.15s;font-family:'Source Sans 3',sans-serif}
+.scenario-tab.active{background:var(--navy);color:var(--white)}
+
+/* Section divider */
+.divider{border:none;border-top:1px solid var(--border);margin:20px 0}
+.section-title{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted);margin-bottom:12px}
+
+/* Alert box */
+.alert{border-radius:var(--radius);padding:12px 16px;font-size:13px;line-height:1.5}
+.alert-info{background:var(--blue-bg);border-left:3px solid var(--blue);color:var(--blue)}
+.alert-success{background:var(--green-bg);border-left:3px solid var(--green);color:var(--green)}
+.alert-warning{background:var(--amber-bg);border-left:3px solid var(--amber);color:var(--amber)}
+.alert strong{font-weight:600}
+
+/* Amortization table */
+.amort-table{width:100%;border-collapse:collapse;font-size:12.5px}
+.amort-table th{background:#f4f6fb;padding:7px 10px;text-align:right;font-size:10px;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);font-weight:600;border-bottom:2px solid var(--border)}
+.amort-table th:first-child{text-align:left}
+.amort-table td{padding:6px 10px;border-bottom:1px solid var(--border);text-align:right;font-variant-numeric:tabular-nums;color:var(--text-secondary)}
+.amort-table td:first-child{text-align:left;color:var(--text-primary)}
+.amort-table tr.highlight td{background:var(--green-bg);color:var(--green);font-weight:600}
+.amort-table tr.income-applied td{background:var(--blue-bg)}
+
+/* Comparison table */
+.comp-table{width:100%;border-collapse:collapse;font-size:13px}
+.comp-table th{background:var(--navy);color:rgba(255,255,255,0.85);padding:10px 14px;text-align:center;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;font-weight:600}
+.comp-table th:first-child{text-align:left}
+.comp-table td{padding:10px 14px;border-bottom:1px solid var(--border);text-align:center;font-variant-numeric:tabular-nums}
+.comp-table td:first-child{text-align:left;font-weight:600;color:var(--navy)}
+.comp-table tr:hover td{background:#f8f9fd}
+.comp-table .pos{color:var(--green);font-weight:600}
+.comp-table .neg{color:var(--red);font-weight:600}
+.comp-table .highlight-row td{background:var(--gold-pale)}
+
+/* Timeline bar */
+.timeline{display:flex;height:32px;border-radius:var(--radius);overflow:hidden;margin:12px 0}
+.timeline-seg{display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:white;transition:width 0.3s;white-space:nowrap;overflow:hidden;padding:0 4px}
+.tl-pay{background:var(--navy)}
+.tl-gap{background:var(--steel)}
+.tl-income{background:var(--green)}
+.tl-income2{background:var(--blue)}
+.timeline-legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:6px}
+.tl-leg{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-muted)}
+.tl-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+
+/* Sensitivity bars */
+.sens-row{display:flex;align-items:center;gap:10px;font-size:12.5px;padding:5px 0}
+.sens-label{width:80px;color:var(--text-secondary);flex-shrink:0}
+.sens-bar-wrap{flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden}
+.sens-bar{height:100%;border-radius:4px;transition:width 0.3s}
+.sens-bar.pos{background:var(--green)}
+.sens-bar.neg{background:var(--red)}
+.sens-val{width:52px;text-align:right;font-weight:600;font-variant-numeric:tabular-nums}
+.sens-val.pos{color:var(--green)}
+.sens-val.neg{color:var(--red)}
+
+/* Scrollable container */
+.scroll-x{overflow-x:auto}
+.scroll-y-400{overflow-y:auto;max-height:400px}
+
+/* KPI diff badge */
+.diff-badge{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:600;padding:2px 7px;border-radius:999px}
+.diff-up{background:var(--green-bg);color:var(--green)}
+.diff-down{background:var(--red-bg);color:var(--red)}
+
+/* Print / no-screen */
+@media print{.sidebar,.btn{display:none}}
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <h1>TORAM</h1>
+    <p>Investment Calculator v2</p>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">Herramientas</div>
+    <button class="nav-item active" onclick="showPage('unit')">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+      Datos de Unidad
+    </button>
+    <button class="nav-item" onclick="showPage('plans')">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg>
+      Planes de Financiamiento
+    </button>
+    <button class="nav-item" onclick="showPage('roi')">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Análisis de ROI
+    </button>
+    <button class="nav-item" onclick="showPage('amort')">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>
+      Tabla de Amortización
+    </button>
+    <div class="nav-section" style="margin-top:16px">Comparativo</div>
+    <button class="nav-item" onclick="showPage('compare')">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l5.1 5.1"/></svg>
+      Tabla Comparativa
+    </button>
+    <button class="nav-item" onclick="showPage('sensitivity')">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg>
+      Sensibilidad
+    </button>
+  </nav>
+  <div class="sidebar-footer">
+    Datos actualizados en sesión.<br>Exportar PDF desde cada sección.
+  </div>
+</aside>
+
+<!-- Main Content -->
+<main class="main">
+
+  <!-- PAGE: Unit Data -->
+  <div id="page-unit" class="page active">
+    <div class="page-header">
+      <div class="breadcrumb">Configuración</div>
+      <h2>Datos de la Unidad</h2>
+      <p>Busca la unidad por número de departamento — el precio y torre se cargan automáticamente.</p>
+    </div>
+
+    <!-- Unit Search -->
+    <div class="card">
+      <div class="card-title">Buscar unidad en inventario</div>
+      <div style="position:relative;margin-bottom:12px">
+        <div class="field">
+          <span class="label">Número de departamento <span class="label-hint">ej: 507-B, T2-1603-A, 1201</span></span>
+          <input type="text" id="unitSearch" placeholder="Escribe el número de depto…" autocomplete="off"
+            oninput="onSearchInput()" onkeydown="onSearchKey(event)" style="font-size:15px;padding:10px 12px">
+        </div>
+        <div id="searchDropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--white);border:1px solid var(--border-strong);border-radius:var(--radius);box-shadow:var(--shadow);z-index:50;max-height:260px;overflow-y:auto"></div>
+      </div>
+      <!-- Unit info chip -->
+      <div id="unitChip" style="display:none;background:#f4f6fb;border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;margin-bottom:12px">
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <div id="chipTorreTag"></div>
+          <div style="font-size:15px;font-weight:600;color:var(--navy)" id="chipName"></div>
+          <div style="font-size:13px;color:var(--text-muted)" id="chipTipo"></div>
+          <div style="font-size:13px;color:var(--text-muted)" id="chipVista"></div>
+          <div style="font-size:13px;color:var(--text-muted)" id="chipM2"></div>
+          <div style="margin-left:auto;font-size:17px;font-weight:600;color:var(--navy)" id="chipPrecio"></div>
+        </div>
+      </div>
+      <div id="noUnitMsg" style="display:none;font-size:13px;color:var(--text-muted);margin-bottom:8px">Sin resultados. Prueba con T1-507-B o solo el número.</div>
+    </div>
+
+    <!-- Manual override + down payment -->
+    <div class="card" style="margin-top:16px">
+      <div class="card-title">Configuración de la cotización</div>
+      <div class="grid-2" style="gap:20px">
+        <div class="field">
+          <span class="label">Nombre / clave de unidad</span>
+          <input type="text" id="unitName" value="" placeholder="Se llena al seleccionar">
+        </div>
+        <div class="field">
+          <span class="label">Precio de lista <span class="label-hint">(MXN, editable)</span></span>
+          <input type="number" id="listPrice" value="" step="1000" placeholder="0.00" oninput="onPriceManualEdit()">
+        </div>
+        <div class="field">
+          <span class="label">Torre detectada</span>
+          <select id="tower">
+            <option value="1">Torre 1 — Entrega 24 meses</option>
+            <option value="2" selected>Torre 2 — Entrega 42 meses</option>
+          </select>
+        </div>
+        <!-- Down payment mode -->
+        <div class="field">
+          <span class="label">Modo de enganche</span>
+          <div style="display:flex;border:1px solid var(--border-strong);border-radius:var(--radius);overflow:hidden;margin-top:2px">
+            <button id="dpModePct" onclick="setDpMode('pct')" style="flex:1;padding:9px;font-size:13px;font-weight:600;border:none;cursor:pointer;background:var(--navy);color:white;font-family:inherit;transition:all 0.15s">Porcentaje %</button>
+            <button id="dpModeMxn" onclick="setDpMode('mxn')" style="flex:1;padding:9px;font-size:13px;font-weight:600;border:none;cursor:pointer;background:var(--white);color:var(--text-muted);font-family:inherit;transition:all 0.15s">Pesos $</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Down payment input row (dynamic) -->
+      <div style="margin-top:16px;background:#f8f9fd;border-radius:var(--radius);padding:16px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;align-items:end" id="dpRow">
+        <div class="field">
+          <span class="label" id="dpLabel">Enganche <span class="label-hint">(%)</span></span>
+          <input type="number" id="dpValue" value="15" min="0" step="0.5" oninput="syncDpDisplay()">
+        </div>
+        <div class="field">
+          <span class="label" id="dpEquivLabel">Equivale a</span>
+          <input type="text" id="dpEquiv" readonly style="background:#eef0f7;color:var(--text-secondary);cursor:default" placeholder="—">
+        </div>
+        <div class="field">
+          <span class="label">A financiar</span>
+          <input type="text" id="dpFinanced" readonly style="background:#eef0f7;color:var(--text-secondary);cursor:default" placeholder="—">
+        </div>
+      </div>
+
+      <div class="alert alert-info" style="margin-top:16px;margin-bottom:16px">
+        <strong>Torres:</strong> Torre 1 ofrece planes hasta 5 años (60 meses). Torre 2 incluye también planes de 6 y 7 años con tasas diferenciadas. El enganche mínimo para planes con intereses es 15%.
+      </div>
+      <button class="btn btn-gold btn-full" onclick="calculatePlans()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+        Calcular Planes de Financiamiento
+      </button>
+    </div>
+  </div>
+
+  <!-- PAGE: Plans -->
+  <div id="page-plans" class="page">
+    <div class="page-header">
+      <div class="breadcrumb">Calculadora</div>
+      <h2>Planes de Financiamiento</h2>
+      <p id="plansSubtitle">Configure la unidad primero para ver los planes disponibles.</p>
+    </div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <div class="card-title" style="margin-bottom:0">Opciones disponibles</div>
+        <button class="btn btn-outline btn-sm" onclick="exportPlansPDF()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Descargar PDF
+        </button>
+      </div>
+      <div class="scroll-x">
+        <table class="plans-table" id="plansTable">
+          <thead>
+            <tr>
+              <th>Plan</th>
+              <th class="num">Enganche</th>
+              <th class="num">Mensualidad</th>
+              <th class="num">Plazo</th>
+              <th class="num">Tasa</th>
+              <th class="num">Precio Final</th>
+              <th class="num">Total Pagado</th>
+            </tr>
+          </thead>
+          <tbody id="plansBody">
+            <tr><td colspan="7" style="padding:24px;text-align:center;color:var(--text-muted)">Configure la unidad y haga clic en "Calcular Planes".</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: ROI -->
+  <div id="page-roi" class="page">
+    <div class="page-header">
+      <div class="breadcrumb">Análisis de Inversión</div>
+      <h2>Análisis de ROI</h2>
+      <p>Proyección de retorno sobre la inversión con dos escenarios de flujo de caja.</p>
+    </div>
+
+    <!-- ROI Inputs -->
+    <div class="card" id="roiInputsCard">
+      <div class="card-title">Supuestos de Inversión</div>
+      <div class="grid-3" style="gap:16px;margin-bottom:16px">
+        <div class="field">
+          <span class="label">Plan a analizar</span>
+          <select id="roiPlanSelect"><option value="0">— Calcule planes primero —</option></select>
+        </div>
+        <div class="field">
+          <span class="label">Años de tenencia</span>
+          <input type="number" id="roiYears" value="5" min="1" max="20">
+        </div>
+        <div class="field">
+          <span class="label">Apreciación anual <span class="label-hint">(%)</span></span>
+          <input type="number" id="appreciationRate" value="5" min="0" max="25" step="0.5">
+        </div>
+        <div class="field">
+          <span class="label">Ingresos mensuales <span class="label-hint">($)</span></span>
+          <input type="number" id="monthlyIncome" value="45000" step="500">
+        </div>
+        <div class="field">
+          <span class="label">Gastos mensuales <span class="label-hint">($)</span></span>
+          <input type="number" id="monthlyExpenses" value="3000" step="100">
+        </div>
+        <div class="field">
+          <span class="label">Impuestos anuales <span class="label-hint">($)</span></span>
+          <input type="number" id="annualTaxes" value="3500" step="100">
+        </div>
+        <div class="field">
+          <span class="label">Gastos escrituración <span class="label-hint">(%)</span></span>
+          <input type="number" id="escrituraCost" value="6" min="0" max="15" step="0.5">
+        </div>
+        <div class="field">
+          <span class="label">Mes inicio operación</span>
+          <input type="number" id="operationStartMonth" value="42" min="1">
+        </div>
+      </div>
+      <button class="btn btn-gold btn-full" onclick="calculateROI()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Calcular ROI
+      </button>
+    </div>
+
+    <!-- ROI Results -->
+    <div id="roiResults" style="display:none">
+      <!-- Timeline -->
+      <div class="card" style="margin-top:20px">
+        <div class="card-title">Timeline de Flujo de Caja</div>
+        <div class="timeline" id="roiTimeline"></div>
+        <div class="timeline-legend" id="roiTimelineLegend"></div>
+      </div>
+
+      <!-- Scenario toggle -->
+      <div style="margin-top:20px">
+        <div class="scenario-tabs">
+          <button class="scenario-tab active" onclick="showScenario(1,this)">Escenario 1 — Sin abono</button>
+          <button class="scenario-tab" id="sc2tab" onclick="showScenario(2,this)">Escenario 2 — Con abono de ingresos</button>
+        </div>
+
+        <!-- Scenario 1 -->
+        <div id="sc1" class="card">
+          <div class="card-title">Escenario 1 — Flujo estándar (sin abono)</div>
+          <div class="card-subtitle">El inversionista paga la mensualidad con su propio capital. Los ingresos por renta se contabilizan a partir del mes de inicio de operación.</div>
+          
+          <div class="section-title">Métricas de Ingresos por Operación</div>
+          <div class="grid-4" style="margin-bottom:20px" id="sc1-income-metrics"></div>
+
+          <hr class="divider">
+          <div class="section-title">Métricas Totales (Ingresos + Plusvalía)</div>
+          <div class="grid-4" id="sc1-total-metrics"></div>
+
+          <hr class="divider">
+          <div class="section-title">Desglose de la Inversión</div>
+          <div id="sc1-breakdown" class="grid-4"></div>
+
+          <hr class="divider">
+          <div id="sc1-gain" class="grid-2" style="gap:16px"></div>
+        </div>
+
+        <!-- Scenario 2 -->
+        <div id="sc2" class="card" style="display:none;border-top:3px solid var(--gold)">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+            <div class="card-title" style="margin-bottom:0">Escenario 2 — Amortización acelerada con ingresos</div>
+            <span class="badge badge-gold" id="sc2badge">—</span>
+          </div>
+          <div class="card-subtitle">Los ingresos netos mensuales se aplican como pago adicional al capital desde el mes de inicio de operación. Sistema de amortización francés.</div>
+
+          <div id="sc2-notavail" class="alert alert-warning" style="margin-bottom:16px;display:none">
+            <strong>No aplicable:</strong> Este escenario requiere que el plazo de financiamiento sea mayor al período de entrega. El plan seleccionado no cumple esta condición.
+          </div>
+
+          <div id="sc2-content">
+            <div class="section-title">Comparativo vs. Escenario 1</div>
+            <div class="grid-4" id="sc2-compare-metrics" style="margin-bottom:20px"></div>
+
+            <hr class="divider">
+            <div class="section-title">Alivio de Flujo (Escenario A)</div>
+            <div class="card-subtitle" style="margin-top:-12px;margin-bottom:12px;font-size:12px;color:var(--text-muted)">Los ingresos cubren la mensualidad. Se mide el ahorro en desembolso de bolsillo.</div>
+            <div class="grid-4" id="sc2-flowrelief-metrics" style="margin-bottom:20px"></div>
+
+            <hr class="divider">
+            <div class="section-title">Amortización Acelerada (Escenario B)</div>
+            <div class="card-subtitle" style="margin-top:-12px;margin-bottom:12px;font-size:12px;color:var(--text-muted)">Los ingresos se aplican como abono extra al capital, reduciendo el saldo y los intereses generados.</div>
+            <div class="grid-4" id="sc2-accel-metrics" style="margin-bottom:20px"></div>
+
+            <div id="sc2-payoff-alert" class="alert" style="margin-bottom:20px"></div>
+
+            <hr class="divider">
+            <div class="section-title">Métricas ROI Ajustadas</div>
+            <div class="grid-4" id="sc2-roi-metrics"></div>
+
+            <hr class="divider">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+              <div class="section-title" style="margin-bottom:0">Tabla de Amortización Acelerada (primeros 60 meses)</div>
+              <button class="btn btn-outline btn-sm" onclick="showPage('amort')">Ver completa →</button>
+            </div>
+            <div class="scroll-x scroll-y-400">
+              <table class="amort-table" id="sc2-amort-preview">
+                <thead><tr><th>Mes</th><th>Saldo</th><th>Interés</th><th>Capital</th><th>Abono extra</th><th>Cuota</th><th>Saldo final</th></tr></thead>
+                <tbody id="sc2-amort-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: Amortization -->
+  <div id="page-amort" class="page">
+    <div class="page-header">
+      <div class="breadcrumb">Detalle</div>
+      <h2>Tabla de Amortización</h2>
+      <p>Tabla completa mes a mes del plan seleccionado.</p>
+    </div>
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;flex-wrap:wrap">
+        <div class="field" style="flex:1;min-width:200px">
+          <span class="label">Plan</span>
+          <select id="amortPlanSelect" onchange="renderAmortTable()"></select>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;flex-shrink:0">
+          <label class="toggle-wrap" onclick="toggleAmortScenario()">
+            <div class="toggle-track" id="amortToggle"><div class="toggle-thumb"></div></div>
+            <span class="toggle-label">Mostrar con abono de ingresos</span>
+          </label>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="exportAmortPDF()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          PDF
+        </button>
+      </div>
+      <div class="grid-4" id="amortKPIs" style="margin-bottom:16px"></div>
+      <div class="scroll-x" style="max-height:600px;overflow-y:auto">
+        <table class="amort-table" id="fullAmortTable">
+          <thead><tr><th>Mes</th><th>Saldo inicial</th><th>Interés</th><th>Capital</th><th>Abono extra</th><th>Cuota total</th><th>Saldo final</th><th>Estado</th></tr></thead>
+          <tbody id="fullAmortBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: Compare -->
+  <div id="page-compare" class="page">
+    <div class="page-header">
+      <div class="breadcrumb">Comparativo</div>
+      <h2>Tabla Comparativa de Planes</h2>
+      <p>Resumen ROI de todos los planes bajo los supuestos configurados.</p>
+    </div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <div class="card-title" style="margin-bottom:0">Todos los planes — <span id="compareYears">5</span> años de tenencia</div>
+        <button class="btn btn-outline btn-sm" onclick="exportComparePDF()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          PDF
+        </button>
+      </div>
+      <div class="scroll-x">
+        <table class="comp-table" id="compareTable">
+          <thead>
+            <tr>
+              <th style="text-align:left">Plan</th>
+              <th>Enganche</th>
+              <th>Mensualidad</th>
+              <th>Total Pagado</th>
+              <th>Intereses</th>
+              <th>Plusvalía</th>
+              <th>Ingresos Netos</th>
+              <th>Ganancia Neta</th>
+              <th>ROI Anualizado</th>
+              <th>Sc2 ROI Anual</th>
+            </tr>
+          </thead>
+          <tbody id="compareBody">
+            <tr><td colspan="10" style="padding:24px;text-align:center;color:var(--text-muted)">Calcule el ROI para ver la comparativa.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: Sensitivity -->
+  <div id="page-sensitivity" class="page">
+    <div class="page-header">
+      <div class="breadcrumb">Análisis</div>
+      <h2>Análisis de Sensibilidad</h2>
+      <p>Impacto de variables clave sobre el ROI anualizado del plan seleccionado.</p>
+    </div>
+    <div class="card">
+      <div class="field" style="max-width:300px;margin-bottom:20px">
+        <span class="label">Plan de referencia</span>
+        <select id="sensPlanSelect" onchange="renderSensitivity()"></select>
+      </div>
+      <div class="grid-2" style="gap:24px">
+        <div>
+          <div class="section-title">Tasa de apreciación anual (%)</div>
+          <div id="sensApprec"></div>
+        </div>
+        <div>
+          <div class="section-title">Ingresos mensuales ($)</div>
+          <div id="sensIncome"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+</div>
+
+<script>
+// ── State ──────────────────────────────────────────────────────────────────
+let plans = [];
+let roiData = [];
+let amortShowScenario2 = false;
+const deliveryMonths = () => document.getElementById('tower').value === '1' ? 24 : 42;
+
+// ── Navigation ─────────────────────────────────────────────────────────────
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  const items = document.querySelectorAll('.nav-item');
+  const labels = {unit:0,plans:1,roi:2,amort:3,compare:4,sensitivity:5};
+  if (labels[id] !== undefined) items[labels[id]].classList.add('active');
+}
+
+// ── Formatting ─────────────────────────────────────────────────────────────
+const fmt = (n, dec=0) => n == null ? '—' : n.toLocaleString('es-MX', {minimumFractionDigits:dec, maximumFractionDigits:dec});
+const fmtK = (n) => Math.abs(n) >= 1000000 ? '$' + (n/1000000).toFixed(2) + 'M' : '$' + Math.round(n/1000) + 'K';
+const fmtPct = (n, dec=1) => (n >= 0 ? '' : '') + n.toFixed(dec) + '%';
+const fmtMXN = (n) => '$' + fmt(n);
+
+// ── Plan Building ───────────────────────────────────────────────────────────
+function buildPlans() {
+  const price = parseFloat(document.getElementById('listPrice').value);
+  const tower = document.getElementById('tower').value;
+  const result = [];
+
+  function frenchPayment(financed, annualRate, months) {
+    if (annualRate === 0) return financed / months;
+    const r = annualRate / 12 / 100;
+    return (financed * r * Math.pow(1+r, months)) / (Math.pow(1+r, months) - 1);
+  }
+
+  const addPlan = (name, discPct, rate, months) => {
+    const fp = price * (1 - discPct/100);
+    const dp = fp * 0.15;
+    const fin = fp * 0.85;
+    const mp = frenchPayment(fin, rate, months);
+    result.push({name, downPayment:dp, finalPrice:fp, monthlyPayment:mp, months, interestRate:rate, financed:fin});
+  };
+
+  addPlan('Pago de Contado', 20, 0, 6);
+  addPlan('12 Meses Sin Intereses', 15, 0, 12);
+  addPlan('24 Meses Sin Intereses', 10, 0, 24);
+  addPlan('36 Meses Sin Intereses', 5, 0, 36);
+  addPlan('Financiamiento Directo — 4 Años', 20, 12, 48);
+  addPlan('Financiamiento Directo — 5 Años', 20, 13, 60);
+  if (tower === '2') {
+    addPlan('Financiamiento Directo — 6 Años', 20, 14, 72);
+    addPlan('Financiamiento Directo — 7 Años', 20, 15, 84);
+  }
+  return result;
+}
+
+// ── Calculate Plans ─────────────────────────────────────────────────────────
+function calculatePlans() {
+  plans = buildPlans();
+  const unit = document.getElementById('unitName').value || 'Unidad';
+  const price = parseFloat(document.getElementById('listPrice').value);
+
+  // Update subtitle
+  document.getElementById('plansSubtitle').textContent =
+    `${unit} — Precio de lista $${fmt(price)} — ${plans.length} opciones disponibles`;
+
+  // Populate table
+  const tbody = document.getElementById('plansBody');
+  tbody.innerHTML = '';
+  plans.forEach((p, i) => {
+    const totalPaid = p.downPayment + p.monthlyPayment * p.months;
+    const interests = totalPaid - p.finalPrice;
+    const badge = p.interestRate === 0
+      ? '<span class="badge badge-green">Sin intereses</span>'
+      : `<span class="badge badge-blue">${p.interestRate}% anual</span>`;
+    tbody.innerHTML += `<tr>
+      <td><strong>${p.name}</strong></td>
+      <td class="num">${fmtMXN(p.downPayment)}</td>
+      <td class="num">${fmtMXN(p.monthlyPayment)}</td>
+      <td class="num">${p.months} meses</td>
+      <td class="num">${badge}</td>
+      <td class="num">${fmtMXN(p.finalPrice)}</td>
+      <td class="num">${fmtMXN(totalPaid)}${interests > 0 ? ` <small style="color:var(--red)">(+${fmtMXN(interests)})</small>` : ''}</td>
+    </tr>`;
+  });
+
+  // Update plan selects
+  ['roiPlanSelect','amortPlanSelect','sensPlanSelect'].forEach(id => {
+    const sel = document.getElementById(id);
+    sel.innerHTML = plans.map((p,i) => `<option value="${i}">${p.name}</option>`).join('');
+  });
+
+  showPage('plans');
+}
+
+// ── Amortization Schedule ───────────────────────────────────────────────────
+function buildAmortSchedule(planIdx, applyIncome, incomePerMonth, startIncomeMonth) {
+  const p = plans[planIdx];
+  if (!p) return [];
+  const r = p.interestRate / 12 / 100;
+  const rows = [];
+  let balance = p.financed;
+  const basePayment = p.monthlyPayment;
+
+  for (let m = 1; m <= p.months; m++) {
+    if (balance <= 0) break;
+    const interest = balance * r;
+    const capitalInPayment = basePayment - interest;
+    let extraPayment = 0;
+
+    if (applyIncome && m >= startIncomeMonth) {
+      const netIncome = parseFloat(document.getElementById('monthlyIncome').value) -
+                        parseFloat(document.getElementById('monthlyExpenses').value);
+      extraPayment = Math.max(0, Math.min(netIncome, balance - capitalInPayment));
+    }
+
+    const totalPaid = basePayment + extraPayment;
+    const newBalance = Math.max(0, balance - capitalInPayment - extraPayment);
+
+    rows.push({
+      month: m,
+      balanceStart: balance,
+      interest,
+      capital: capitalInPayment,
+      extra: extraPayment,
+      totalPaid,
+      balanceEnd: newBalance,
+      incomeMonth: applyIncome && m >= startIncomeMonth
+    });
+
+    balance = newBalance;
+    if (balance <= 0.01) break;
+  }
+  return rows;
+}
+
+// ── French amortization KPIs for Scenario 2 ─────────────────────────────────
+function calcScenario2(planIdx) {
+  const p = plans[planIdx];
+  if (!p || !p.interestRate) return null;
+
+  const delivery = deliveryMonths();
+  if (p.months <= delivery) return {applicable: false};
+
+  const roiYears = parseInt(document.getElementById('roiYears').value);
+  const tenureMonths = roiYears * 12;
+  const apprRate = parseFloat(document.getElementById('appreciationRate').value) / 100;
+  const monthlyIncome = parseFloat(document.getElementById('monthlyIncome').value);
+  const monthlyExpenses = parseFloat(document.getElementById('monthlyExpenses').value);
+  const annualTaxes = parseFloat(document.getElementById('annualTaxes').value);
+  const escrituraPct = parseFloat(document.getElementById('escrituraCost').value) / 100;
+  const opStart = parseInt(document.getElementById('operationStartMonth').value);
+  const netMonthly = monthlyIncome - monthlyExpenses;
+
+  // Build accelerated schedule
+  const schedule = buildAmortSchedule(planIdx, true, netMonthly, opStart);
+  const payoffMonth = schedule[schedule.length - 1].balanceEnd <= 0.01
+    ? schedule[schedule.length - 1].month
+    : p.months;
+  const isEarlyPayoff = payoffMonth < p.months;
+  const monthsSaved = isEarlyPayoff ? p.months - payoffMonth : 0;
+
+  // Standard schedule (no extra payments)
+  const stdSchedule = buildAmortSchedule(planIdx, false, 0, 999);
+  const stdInterests = stdSchedule.reduce((s, r) => s + r.interest, 0);
+  const accelInterests = schedule.reduce((s, r) => s + r.interest, 0);
+  const interestSaved = stdInterests - accelInterests;
+
+  // Total paid with acceleration
+  const totalPaidAccel = p.downPayment + schedule.reduce((s,r) => s + r.totalPaid, 0);
+  const totalPaidStd = p.downPayment + p.monthlyPayment * p.months;
+
+  // Adjusted investment = down + all payments made (with extras)
+  const adjustedInvestment = totalPaidAccel;
+
+  // Flow relief: months where income covers ≥ monthly payment
+  const monthsCovered = schedule.filter(r => r.extra >= r.capital + r.interest * 0.5).length;
+  const totalRelief = schedule.reduce((s,r) => s + r.extra, 0);
+
+  // ROI metrics — plusvalía siempre sobre precio de lista (valor de mercado del inmueble)
+  const marketBase = p.listPrice || p.finalPrice;
+  const futureValue = marketBase * Math.pow(1 + apprRate, roiYears);
+  const appreciationGain = futureValue - marketBase;
+  const opMonths = Math.max(0, tenureMonths - opStart + 1);
+  const totalNetIncome = netMonthly * opMonths - (annualTaxes * Math.ceil(opMonths / 12));
+  const escrituraCostAmt = futureValue * escrituraPct;
+
+  const netGainAccel = appreciationGain + totalNetIncome - accelInterests - escrituraCostAmt;
+  const roiSimpleAccel = adjustedInvestment > 0 ? (netGainAccel / adjustedInvestment) * 100 : 0;
+  const roiAnnualAccel = roiYears > 0 ? roiSimpleAccel / roiYears : 0;
+  const roiTotalPct = adjustedInvestment > 0 ? ((appreciationGain + totalNetIncome) / adjustedInvestment) * 100 : 0;
+
+  return {
+    applicable: true,
+    payoffMonth,
+    isEarlyPayoff,
+    monthsSaved,
+    interestSaved,
+    totalPaidAccel,
+    totalPaidStd,
+    totalRelief,
+    monthsCovered,
+    accelInterests,
+    stdInterests,
+    adjustedInvestment,
+    netGainAccel,
+    roiSimpleAccel,
+    roiAnnualAccel,
+    roiTotalPct,
+    schedule
+  };
+}
+
+// ── Calculate ROI ───────────────────────────────────────────────────────────
+function calculateROI() {
+  if (plans.length === 0) { alert('Calcule primero los planes de financiamiento.'); return; }
+
+  const planIdx = parseInt(document.getElementById('roiPlanSelect').value);
+  const p = plans[planIdx];
+  const roiYears = parseInt(document.getElementById('roiYears').value);
+  const tenureMonths = roiYears * 12;
+  const apprRate = parseFloat(document.getElementById('appreciationRate').value) / 100;
+  const monthlyIncome = parseFloat(document.getElementById('monthlyIncome').value);
+  const monthlyExpenses = parseFloat(document.getElementById('monthlyExpenses').value);
+  const annualTaxes = parseFloat(document.getElementById('annualTaxes').value);
+  const escrituraPct = parseFloat(document.getElementById('escrituraCost').value) / 100;
+  const opStart = parseInt(document.getElementById('operationStartMonth').value);
+  const delivery = deliveryMonths();
+
+  // ── Scenario 1 ─────────────────────────────────────────────────────────
+  const totalInvestment = p.downPayment + p.monthlyPayment * p.months;
+  const totalInterests = p.monthlyPayment * p.months - p.financed;
+  // Plusvalía siempre sobre precio de lista (valor de mercado del inmueble, no el precio de compra negociado)
+  const marketBase = p.listPrice || p.finalPrice;
+  const futureValue = marketBase * Math.pow(1 + apprRate, roiYears);
+  const appreciationGain = futureValue - marketBase;
+  const opMonths = Math.max(0, tenureMonths - opStart + 1);
+  const netMonthly = monthlyIncome - monthlyExpenses;
+  const totalNetIncome = netMonthly * opMonths - annualTaxes * Math.ceil(opMonths / 12);
+  const escrituraCostAmt = futureValue * escrituraPct;
+  const netGain1 = appreciationGain + totalNetIncome - totalInterests - escrituraCostAmt;
+  const roiSimple1 = totalInvestment > 0 ? (netGain1 / totalInvestment) * 100 : 0;
+  const roiAnnual1 = roiYears > 0 ? roiSimple1 / roiYears : 0;
+  const roiIncomePct1 = totalInvestment > 0 ? (totalNetIncome / totalInvestment) * 100 : 0;
+  const roiTotalPct1 = totalInvestment > 0 ? ((appreciationGain + totalNetIncome) / totalInvestment) * 100 : 0;
+
+  // ── Scenario 2 ─────────────────────────────────────────────────────────
+  const sc2 = calcScenario2(planIdx);
+
+  // Store for other pages
+  roiData[planIdx] = {
+    p, planIdx, roiYears, tenureMonths, apprRate,
+    monthlyIncome, monthlyExpenses, annualTaxes, escrituraPct, opStart, delivery,
+    totalInvestment, totalInterests, futureValue, appreciationGain, opMonths,
+    totalNetIncome, escrituraCostAmt, netGain1, roiSimple1, roiAnnual1,
+    roiIncomePct1, roiTotalPct1, netMonthly, sc2
+  };
+
+  // Populate compare table
+  populateCompareTable();
+  populateSensitivity(planIdx);
+  document.getElementById('compareYears').textContent = roiYears;
+
+  // ── Render Scenario 1 ───────────────────────────────────────────────────
+  metricGrid('sc1-income-metrics', [
+    {label:'Ingresos netos totales', val:fmtK(totalNetIncome), cls: totalNetIncome>=0?'green':'red', sub:`${opMonths} meses de operación`},
+    {label:'Tasa retorno ingresos', val:fmtPct(roiIncomePct1), cls: roiIncomePct1>=0?'green':'red', sub:'Ingresos / Inversión total'},
+    {label:'Ingresos mensuales netos', val:fmtMXN(netMonthly), cls:'blue', sub:'Renta menos gastos'},
+    {label:'Costos operacionales', val:fmtK(totalNetIncome < 0 ? Math.abs(totalNetIncome) : totalNetIncome * 0.1), cls:'amber', sub:'Aprox. gastos del período'},
+  ]);
+  metricGrid('sc1-total-metrics', [
+    {label:'Plusvalía ganada', val:fmtK(appreciationGain), cls:'green', sub:`${roiYears} años × ${fmtPct(apprRate*100)} anual`},
+    {label:'ROI total (absoluto)', val:fmtK(appreciationGain + totalNetIncome), cls:'green', sub:'Plusvalía + ingresos'},
+    {label:'Tasa retorno total', val:fmtPct(roiTotalPct1), cls:'green', sub:'Total / inversión'},
+    {label:'ROI anualizado', val:fmtPct(roiAnnual1,2), cls: roiAnnual1>=0?'purple':'red', sub:'Tasa anual promedio', accent:true},
+  ]);
+  metricGrid('sc1-breakdown', [
+    {label:'Enganche', val:fmtMXN(p.downPayment), cls:'blue'},
+    {label:'Total mensualidades', val:fmtMXN(p.monthlyPayment * p.months), cls:'blue'},
+    {label:'Intereses pagados', val:fmtK(totalInterests), cls: totalInterests>0?'red':'green'},
+    {label:'Gastos escrituración', val:fmtK(escrituraCostAmt), cls:'amber'},
+  ]);
+  const g1 = document.getElementById('sc1-gain');
+  g1.innerHTML = `
+    <div class="metric ${netGain1>=0?'green':'red'} accent">
+      <div class="metric-label">Ganancia Neta Total</div>
+      <div class="metric-value">${fmtK(netGain1)}</div>
+      <div class="metric-sub">Ingresos + Plusvalía − Intereses − Escrituración</div>
+    </div>
+    <div class="metric ${roiAnnual1>=0?'green':'red'}">
+      <div class="metric-label">ROI Anualizado</div>
+      <div class="metric-value">${fmtPct(roiAnnual1,2)}</div>
+      <div class="metric-sub">Sobre inversión total de ${fmtK(totalInvestment)}</div>
+    </div>`;
+
+  // ── Render Scenario 2 ───────────────────────────────────────────────────
+  const sc2tab = document.getElementById('sc2tab');
+  if (!sc2 || !sc2.applicable) {
+    sc2tab.textContent = 'Escenario 2 — No aplica';
+    document.getElementById('sc2-notavail').style.display = 'block';
+    document.getElementById('sc2-content').style.display = 'none';
+  } else {
+    sc2tab.textContent = 'Escenario 2 — Con abono de ingresos';
+    document.getElementById('sc2-notavail').style.display = 'none';
+    document.getElementById('sc2-content').style.display = 'block';
+
+    // Badge
+    const badge = document.getElementById('sc2badge');
+    if (sc2.isEarlyPayoff) {
+      badge.className = 'badge badge-green';
+      badge.textContent = `Liquida mes ${sc2.payoffMonth} (−${sc2.monthsSaved} meses)`;
+    } else {
+      badge.className = 'badge badge-gold';
+      badge.textContent = 'Sin liquidación anticipada en el horizonte';
+    }
+
+    // Compare vs Sc1
+    const roiDiff = sc2.roiAnnualAccel - roiAnnual1;
+    metricGrid('sc2-compare-metrics', [
+      {label:'Inversión ajustada', val:fmtK(sc2.adjustedInvestment), cls:'blue', sub:`vs ${fmtK(totalInvestment)} Esc.1`},
+      {label:'Intereses pagados', val:fmtK(sc2.accelInterests), cls:'amber', sub:`Ahorro: ${fmtK(sc2.interestSaved)}`},
+      {label:'Ganancia neta', val:fmtK(sc2.netGainAccel), cls: sc2.netGainAccel>=0?'green':'red'},
+      {label:'ROI anualizado', val:fmtPct(sc2.roiAnnualAccel,2), cls: sc2.roiAnnualAccel>=0?'purple':'red',
+        sub: `${roiDiff>=0?'+':''}${fmtPct(roiDiff,2)} vs Esc.1`, accent:true},
+    ]);
+
+    // Flow relief
+    const flowSavings = sc2.totalRelief;
+    const monthsCoveredFull = sc2.schedule.filter(r => r.extra >= p.monthlyPayment * 0.95).length;
+    metricGrid('sc2-flowrelief-metrics', [
+      {label:'Total abonado extra', val:fmtK(flowSavings), cls:'green', sub:'Aplicado desde inicio operación'},
+      {label:'Meses cubiertos por renta', val:monthsCoveredFull, cls:'blue', sub:'Mensualidad cubierta ≥95%'},
+      {label:'Mensualidad de bolsillo', val:fmtMXN(Math.max(0,p.monthlyPayment - netMonthly)), cls: netMonthly>=p.monthlyPayment?'green':'amber', sub:'Cuota − ingreso neto'},
+      {label:'Alivio mensual promedio', val:fmtMXN(flowSavings / Math.max(1, sc2.schedule.filter(r=>r.extra>0).length)), cls:'green', sub:'Promedio de abonos'},
+    ]);
+
+    // Accelerated payoff
+    metricGrid('sc2-accel-metrics', [
+      {label:'Intereses ahorrados', val:fmtK(sc2.interestSaved), cls:'green', sub:'vs. amortización estándar'},
+      {label:'Meses ahorrados', val: sc2.isEarlyPayoff ? sc2.monthsSaved : 0, cls: sc2.isEarlyPayoff?'green':'amber', sub: sc2.isEarlyPayoff ? `Liquida mes ${sc2.payoffMonth}` : 'Sin liquidación anticipada'},
+      {label:'Tasa retorno total', val:fmtPct(sc2.roiTotalPct), cls:'green', sub:'Ajustada por inversión menor'},
+      {label:'ROI simple', val:fmtPct(sc2.roiSimpleAccel,1), cls: sc2.roiSimpleAccel>=0?'purple':'red'},
+    ]);
+
+    // Payoff alert
+    const pal = document.getElementById('sc2-payoff-alert');
+    if (sc2.isEarlyPayoff) {
+      pal.className = 'alert alert-success';
+      pal.innerHTML = `<strong>Liquidación anticipada en mes ${sc2.payoffMonth}:</strong> El plan se liquida ${sc2.monthsSaved} meses antes de lo programado, ahorrando ${fmtMXN(sc2.interestSaved)} en intereses. Después del mes ${sc2.payoffMonth}, el inversionista retiene el 100% de los ingresos sin cuota de deuda.`;
+    } else {
+      pal.className = 'alert alert-warning';
+      pal.innerHTML = `<strong>Sin liquidación anticipada:</strong> Con los supuestos actuales, los ingresos no son suficientes para liquidar el crédito antes del vencimiento. Sin embargo, se genera un ahorro de ${fmtMXN(sc2.interestSaved)} en intereses y un alivio de flujo de ${fmtMXN(sc2.totalRelief)} en el período.`;
+    }
+
+    // Amort preview table (first 60 rows)
+    const tbody = document.getElementById('sc2-amort-tbody');
+    tbody.innerHTML = '';
+    const preview = sc2.schedule.slice(0, 60);
+    preview.forEach(r => {
+      const tr = document.createElement('tr');
+      if (r.balanceEnd <= 0.01 && r.balanceStart > 0.01) tr.className = 'highlight';
+      else if (r.incomeMonth) tr.className = 'income-applied';
+      tr.innerHTML = `<td>${r.month}</td><td>${fmtMXN(r.balanceStart)}</td><td>${fmtMXN(r.interest)}</td><td>${fmtMXN(r.capital)}</td><td>${r.extra > 0 ? fmtMXN(r.extra) : '—'}</td><td>${fmtMXN(r.totalPaid)}</td><td>${fmtMXN(r.balanceEnd)}</td>`;
+      tbody.appendChild(tr);
+    });
+  }
+
+  // Timeline
+  renderTimeline(planIdx, roiYears, opStart, delivery, sc2);
+
+  document.getElementById('roiResults').style.display = 'block';
+  showScenario(1, document.querySelector('.scenario-tab'));
+}
+
+function metricGrid(id, items) {
+  const el = document.getElementById(id);
+  el.innerHTML = items.map(item => `
+    <div class="metric ${item.cls||''} ${item.accent?'accent':''}">
+      <div class="metric-label">${item.label}</div>
+      <div class="metric-value">${item.val}</div>
+      ${item.sub ? `<div class="metric-sub">${item.sub}</div>` : ''}
+    </div>`).join('');
+}
+
+function showScenario(n, btn) {
+  document.querySelectorAll('.scenario-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('sc1').style.display = n===1 ? 'block' : 'none';
+  document.getElementById('sc2').style.display = n===2 ? 'block' : 'none';
+}
+
+function renderTimeline(planIdx, roiYears, opStart, delivery, sc2) {
+  const p = plans[planIdx];
+  const total = roiYears * 12;
+  const payMonths = p.months;
+  const gapMonths = Math.max(0, opStart - payMonths - 1);
+  const incomeMonths = Math.max(0, total - opStart + 1);
+  const payoffMonth = sc2 && sc2.isEarlyPayoff ? sc2.payoffMonth : null;
+
+  const segs = [
+    {pct: (payMonths/total)*100, cls:'tl-pay', label:`Pagos (${payMonths}m)`},
+    {pct: (gapMonths/total)*100, cls:'tl-gap', label: gapMonths>0?`Espera (${gapMonths}m)`:''},
+    {pct: (incomeMonths/total)*100, cls:'tl-income', label:`Ingresos (${incomeMonths}m)`},
+  ];
+
+  const tl = document.getElementById('roiTimeline');
+  tl.innerHTML = segs.map(s => s.pct > 0 ? `<div class="timeline-seg ${s.cls}" style="width:${s.pct}%">${s.pct>8?s.label:''}</div>` : '').join('');
+
+  const leg = document.getElementById('roiTimelineLegend');
+  leg.innerHTML = [
+    {cls:'tl-pay',label:`Pagos (meses 1–${payMonths})`},
+    gapMonths>0?{cls:'tl-gap',label:`Sin flujo (meses ${payMonths+1}–${opStart-1})`}:null,
+    {cls:'tl-income',label:`Ingresos operacionales (mes ${opStart}–${total})`},
+    payoffMonth?{cls:'tl-income2',label:`Liquidación anticipada mes ${payoffMonth}`}:null,
+  ].filter(Boolean).map(l=>`<div class="tl-leg"><div class="tl-dot" style="background:${l.cls==='tl-pay'?'var(--navy)':l.cls==='tl-gap'?'var(--steel)':l.cls==='tl-income'?'var(--green)':'var(--blue)'}"></div>${l.label}</div>`).join('');
+}
+
+// ── Amortization Page ───────────────────────────────────────────────────────
+function toggleAmortScenario() {
+  amortShowScenario2 = !amortShowScenario2;
+  document.getElementById('amortToggle').className = 'toggle-track' + (amortShowScenario2?' on':'');
+  renderAmortTable();
+}
+
+function renderAmortTable() {
+  if (plans.length === 0) return;
+  const planIdx = parseInt(document.getElementById('amortPlanSelect').value);
+  const p = plans[planIdx];
+  const opStart = parseInt(document.getElementById('operationStartMonth').value) || 42;
+  const rows = buildAmortSchedule(planIdx, amortShowScenario2, 0, opStart);
+
+  const totalInterests = rows.reduce((s,r)=>s+r.interest,0);
+  const totalExtra = rows.reduce((s,r)=>s+r.extra,0);
+  const totalPaid = rows.reduce((s,r)=>s+r.totalPaid,0);
+  const payoffRow = rows.find(r=>r.balanceEnd<=0.01);
+
+  metricGrid('amortKPIs', [
+    {label:'Intereses totales', val:fmtK(totalInterests), cls: totalInterests>0?'red':'green'},
+    {label:'Total abonado extra', val:fmtK(totalExtra), cls: totalExtra>0?'green':'amber'},
+    {label:'Total pagado', val:fmtK(p.downPayment + totalPaid), cls:'blue'},
+    {label: payoffRow?'Liquida mes':'Plazo completo', val: payoffRow?payoffRow.month:p.months, cls: payoffRow?'green':'amber'},
+  ]);
+
+  const tbody = document.getElementById('fullAmortBody');
+  tbody.innerHTML = '';
+  rows.forEach(r => {
+    const tr = document.createElement('tr');
+    if (r.balanceEnd <= 0.01 && r.balanceStart > 0.01) tr.className = 'highlight';
+    else if (r.incomeMonth && amortShowScenario2) tr.className = 'income-applied';
+    const estado = r.balanceEnd<=0.01 ? '<span class="badge badge-green">Liquidado</span>' : r.incomeMonth && amortShowScenario2 ? '<span class="badge badge-blue">Con abono</span>' : '';
+    tr.innerHTML = `<td>${r.month}</td><td>${fmtMXN(r.balanceStart)}</td><td>${fmtMXN(r.interest)}</td><td>${fmtMXN(r.capital)}</td><td>${r.extra>0?fmtMXN(r.extra):'—'}</td><td>${fmtMXN(r.totalPaid)}</td><td>${fmtMXN(r.balanceEnd)}</td><td>${estado}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+// ── Compare Table ───────────────────────────────────────────────────────────
+function populateCompareTable() {
+  if (plans.length === 0) return;
+  const roiYears = parseInt(document.getElementById('roiYears').value);
+  const apprRate = parseFloat(document.getElementById('appreciationRate').value) / 100;
+  const monthlyIncome = parseFloat(document.getElementById('monthlyIncome').value);
+  const monthlyExpenses = parseFloat(document.getElementById('monthlyExpenses').value);
+  const annualTaxes = parseFloat(document.getElementById('annualTaxes').value);
+  const escrituraPct = parseFloat(document.getElementById('escrituraCost').value) / 100;
+  const opStart = parseInt(document.getElementById('operationStartMonth').value);
+  const tenureMonths = roiYears * 12;
+
+  const tbody = document.getElementById('compareBody');
+  tbody.innerHTML = '';
+
+  let bestROI = -Infinity, bestIdx = 0;
+  const rows = plans.map((p, i) => {
+    const totalInv = p.downPayment + p.monthlyPayment * p.months;
+    const totalInt = p.monthlyPayment * p.months - p.financed;
+    // Plusvalía sobre precio de lista (valor de mercado), no sobre precio final de compra
+    const mktBase = p.listPrice || p.finalPrice;
+    const fv = mktBase * Math.pow(1 + apprRate, roiYears);
+    const appGain = fv - mktBase;
+    const opMonths = Math.max(0, tenureMonths - opStart + 1);
+    const netInc = (monthlyIncome - monthlyExpenses) * opMonths - annualTaxes * Math.ceil(opMonths/12);
+    const escCost = fv * escrituraPct;
+    const netGain = appGain + netInc - totalInt - escCost;
+    const roiA = roiYears > 0 ? (netGain / totalInv * 100) / roiYears : 0;
+    const sc2 = calcScenario2(i);
+    const roiA2 = sc2 && sc2.applicable ? sc2.roiAnnualAccel : null;
+    if (roiA > bestROI) { bestROI = roiA; bestIdx = i; }
+    return {p, i, totalInv, totalInt, appGain, netInc, netGain, roiA, roiA2};
+  });
+
+  rows.forEach(({p, i, totalInv, totalInt, appGain, netInc, netGain, roiA, roiA2}) => {
+    const tr = document.createElement('tr');
+    if (i === bestIdx) tr.className = 'highlight-row';
+    tr.innerHTML = `
+      <td>${p.name}${i===bestIdx?' ⭐':''}</td>
+      <td>${fmtMXN(p.downPayment)}</td>
+      <td>${fmtMXN(p.monthlyPayment)}</td>
+      <td>${fmtMXN(p.downPayment + p.monthlyPayment * p.months)}</td>
+      <td class="${totalInt>0?'neg':''}">${fmtK(totalInt)}</td>
+      <td class="pos">${fmtK(appGain)}</td>
+      <td class="${netInc>=0?'pos':'neg'}">${fmtK(netInc)}</td>
+      <td class="${netGain>=0?'pos':'neg'}">${fmtK(netGain)}</td>
+      <td class="${roiA>=0?'pos':'neg'}">${fmtPct(roiA,2)}</td>
+      <td class="${roiA2!=null?(roiA2>=0?'pos':'neg'):''}">${roiA2!=null?fmtPct(roiA2,2):'—'}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+// ── Sensitivity ─────────────────────────────────────────────────────────────
+function calcROIForSens(planIdx, testAppr, testIncome) {
+  const p = plans[planIdx];
+  if (!p) return 0;
+  const roiYears = parseInt(document.getElementById('roiYears').value);
+  const tenureMonths = roiYears * 12;
+  const monthlyExpenses = parseFloat(document.getElementById('monthlyExpenses').value);
+  const annualTaxes = parseFloat(document.getElementById('annualTaxes').value);
+  const escrituraPct = parseFloat(document.getElementById('escrituraCost').value) / 100;
+  const opStart = parseInt(document.getElementById('operationStartMonth').value);
+  const totalInv = p.downPayment + p.monthlyPayment * p.months;
+  const totalInt = p.monthlyPayment * p.months - p.financed;
+  // Plusvalía sobre precio de lista (valor de mercado)
+  const mktBase = p.listPrice || p.finalPrice;
+  const fv = mktBase * Math.pow(1 + testAppr/100, roiYears);
+  const appGain = fv - mktBase;
+  const opMonths = Math.max(0, tenureMonths - opStart + 1);
+  const netInc = (testIncome - monthlyExpenses) * opMonths - annualTaxes * Math.ceil(opMonths/12);
+  const escCost = fv * escrituraPct;
+  const netGain = appGain + netInc - totalInt - escCost;
+  return roiYears > 0 ? (netGain / totalInv * 100) / roiYears : 0;
+}
+
+function populateSensitivity(planIdx) {
+  const apprVals = [2, 4, 5, 6, 8, 10, 12, 15];
+  const incomeVals = [0, 15000, 25000, 35000, 45000, 55000, 65000, 80000];
+  const currentAppr = parseFloat(document.getElementById('appreciationRate').value);
+  const currentIncome = parseFloat(document.getElementById('monthlyIncome').value);
+
+  const rois = apprVals.map(a => calcROIForSens(planIdx, a, currentIncome));
+  const maxAbs = Math.max(...rois.map(Math.abs), 1);
+  document.getElementById('sensApprec').innerHTML = apprVals.map((a, i) => {
+    const r = rois[i];
+    const pct = Math.min(Math.abs(r) / maxAbs * 100, 100);
+    return `<div class="sens-row">
+      <span class="sens-label">${a}% anual</span>
+      <div class="sens-bar-wrap"><div class="sens-bar ${r>=0?'pos':'neg'}" style="width:${pct}%"></div></div>
+      <span class="sens-val ${r>=0?'pos':'neg'}">${fmtPct(r,1)}</span>
+    </div>`;
+  }).join('');
+
+  const roiI = incomeVals.map(inc => calcROIForSens(planIdx, currentAppr, inc));
+  const maxAbsI = Math.max(...roiI.map(Math.abs), 1);
+  document.getElementById('sensIncome').innerHTML = incomeVals.map((inc, i) => {
+    const r = roiI[i];
+    const pct = Math.min(Math.abs(r) / maxAbsI * 100, 100);
+    return `<div class="sens-row">
+      <span class="sens-label">${inc===0?'$0':fmtK(inc)}/mes</span>
+      <div class="sens-bar-wrap"><div class="sens-bar ${r>=0?'pos':'neg'}" style="width:${pct}%"></div></div>
+      <span class="sens-val ${r>=0?'pos':'neg'}">${fmtPct(r,1)}</span>
+    </div>`;
+  }).join('');
+}
+
+function renderSensitivity() {
+  const planIdx = parseInt(document.getElementById('sensPlanSelect').value);
+  if (plans.length > 0) populateSensitivity(planIdx);
+}
+
+// ── PDF Export ─────────────────────────────────────────────────────────────
+function exportPlansPDF() {
+  if (plans.length === 0) { alert('Calcule primero los planes.'); return; }
+  const jsPDF = getJsPDF(); if (!jsPDF) return;
+  const doc = new jsPDF({ orientation: 'landscape' });
+  const unit = document.getElementById('unitName').value;
+  const price = parseFloat(document.getElementById('listPrice').value);
+  const W = doc.internal.pageSize.getWidth();
+  const M = 16;
+
+  doc.setFillColor(26, 37, 64);
+  doc.rect(0, 0, W, 28, 'F');
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(18);
+  doc.setTextColor(212, 168, 75);
+  doc.text('TORAM — Planes de Financiamiento', M, 13);
+  doc.setFontSize(9);
+  doc.setTextColor(180,195,220);
+  doc.setFont('helvetica','normal');
+  doc.text(`Unidad: ${unit}   |   Precio de lista: $${fmt(price)}   |   Torre ${document.getElementById('tower').value}`, M, 21);
+
+  let y = 36;
+  const cols = ['Plan','Enganche','Mensualidad','Plazo','Tasa','Precio Final','Total Pagado'];
+  const widths = [65, 30, 30, 20, 18, 35, 35];
+  let x = M;
+  doc.setFillColor(240, 242, 248);
+  doc.rect(M, y-4, W-M*2, 8, 'F');
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(7.5);
+  doc.setTextColor(80,90,120);
+  cols.forEach((c,i) => { doc.text(c, x+1, y); x += widths[i]; });
+  y += 6;
+
+  plans.forEach((p, idx) => {
+    if (idx % 2 === 0) { doc.setFillColor(252,252,255); doc.rect(M, y-3, W-M*2, 8, 'F'); }
+    const totalPaid = p.downPayment + p.monthlyPayment * p.months;
+    const interests = totalPaid - p.finalPrice;
+    const row = [
+      p.name,
+      fmtMXN(p.downPayment),
+      fmtMXN(p.monthlyPayment),
+      `${p.months}m`,
+      p.interestRate ? `${p.interestRate}%` : 'Sin int.',
+      fmtMXN(p.finalPrice),
+      fmtMXN(totalPaid)
+    ];
+    x = M;
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(8);
+    doc.setTextColor(30,40,60);
+    row.forEach((v,i) => { doc.text(v, x+1, y); x += widths[i]; });
+    if (interests > 0) {
+      x = M + widths.slice(0,6).reduce((a,b)=>a+b,0);
+      doc.setTextColor(180,40,40);
+      doc.setFontSize(6.5);
+      doc.text(`+${fmtMXN(interests)}`, x+1, y+2.5);
+    }
+    doc.setDrawColor(220,226,236);
+    doc.line(M, y+3, W-M, y+3);
+    y += 9;
+  });
+
+  y += 4;
+  doc.setFontSize(7);
+  doc.setTextColor(140,150,170);
+  doc.text('Nota: Los planes están sujetos a disponibilidad. Consulte con el equipo de ventas para condiciones específicas.', M, y);
+  doc.text(`Generado: ${new Date().toLocaleDateString('es-MX')}`, W-M-30, y);
+
+  doc.save(`Toram_${unit}_Planes.pdf`);
+}
+
+function exportAmortPDF() {
+  if (plans.length === 0) { alert('Calcule primero los planes.'); return; }
+  const jsPDF = getJsPDF(); if (!jsPDF) return;
+  const doc = new jsPDF({ orientation: 'landscape' });
+  const planIdx = parseInt(document.getElementById('amortPlanSelect').value);
+  const p = plans[planIdx];
+  const opStart = parseInt(document.getElementById('operationStartMonth').value) || 42;
+  const rows = buildAmortSchedule(planIdx, amortShowScenario2, 0, opStart);
+  const W = doc.internal.pageSize.getWidth();
+  const M = 14;
+
+  doc.setFillColor(26,37,64);
+  doc.rect(0,0,W,26,'F');
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(15);
+  doc.setTextColor(212,168,75);
+  doc.text(`TORAM — Amortización: ${p.name}`, M, 12);
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(8);
+  doc.setTextColor(180,195,220);
+  doc.text(`${amortShowScenario2?'Escenario 2 (con abono de ingresos)':'Escenario 1 (estándar)'}   |   Plazo: ${p.months} meses   |   Tasa: ${p.interestRate||0}% anual`, M, 20);
+
+  const headers = ['Mes','Saldo Inicial','Interés','Capital','Abono Extra','Cuota','Saldo Final'];
+  const cw = [14,32,28,28,28,28,32];
+  let y = 34;
+  let x = M;
+  doc.setFillColor(240,242,248);
+  doc.rect(M, y-4, W-M*2, 8,'F');
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(7);
+  doc.setTextColor(80,90,120);
+  headers.forEach((h,i) => { doc.text(h, x+1, y); x+=cw[i]; });
+
+  const rowH = 7;
+  rows.forEach((r, i) => {
+    y += rowH;
+    if (y > doc.internal.pageSize.getHeight() - 20) {
+      doc.addPage();
+      y = 20;
+    }
+    const isPayoff = r.balanceEnd<=0.01 && r.balanceStart>0.01;
+    if (isPayoff) { doc.setFillColor(237,247,242); doc.rect(M,y-4,W-M*2,rowH,'F'); }
+    else if (i%2===0) { doc.setFillColor(252,252,255); doc.rect(M,y-4,W-M*2,rowH,'F'); }
+
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(7.5);
+    doc.setTextColor(isPayoff?21:50, isPayoff?120:60, isPayoff?74:90);
+
+    const vals = [r.month, fmtMXN(r.balanceStart), fmtMXN(r.interest), fmtMXN(r.capital), r.extra>0?fmtMXN(r.extra):'—', fmtMXN(r.totalPaid), fmtMXN(r.balanceEnd)];
+    x = M;
+    vals.forEach((v,j) => { doc.text(String(v), x+1, y); x+=cw[j]; });
+    doc.setDrawColor(225,230,240);
+    doc.line(M, y+2.5, W-M, y+2.5);
+  });
+
+  doc.save(`Toram_Amortizacion_${p.name.replace(/[^a-z0-9]/gi,'_')}.pdf`);
+}
+
+function exportComparePDF() {
+  if (plans.length === 0) { alert('Calcule primero.'); return; }
+  const jsPDF = getJsPDF(); if (!jsPDF) return;
+  const doc = new jsPDF({ orientation: 'landscape' });
+  const W = doc.internal.pageSize.getWidth();
+  const M = 12;
+  const roiYears = parseInt(document.getElementById('roiYears').value);
+
+  doc.setFillColor(26,37,64);
+  doc.rect(0,0,W,26,'F');
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(15);
+  doc.setTextColor(212,168,75);
+  doc.text('TORAM — Tabla Comparativa de ROI', M, 12);
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(8);
+  doc.setTextColor(180,195,220);
+  doc.text(`Horizonte de inversión: ${roiYears} años   |   ${document.getElementById('unitName').value}`, M, 20);
+
+  const headers = ['Plan','Enganche','Mensualidad','Intereses','Plusvalía','Ingr.Netos','Gan.Neta','ROI Anual','Sc2 ROI'];
+  const cw = [60,28,28,24,24,24,26,22,22];
+  let y = 34, x = M;
+  doc.setFillColor(240,242,248);
+  doc.rect(M,y-4,W-M*2,8,'F');
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(6.5);
+  doc.setTextColor(80,90,120);
+  headers.forEach((h,i) => { doc.text(h, x+1, y); x+=cw[i]; });
+
+  const apprRate = parseFloat(document.getElementById('appreciationRate').value)/100;
+  const monthlyIncome = parseFloat(document.getElementById('monthlyIncome').value);
+  const monthlyExpenses = parseFloat(document.getElementById('monthlyExpenses').value);
+  const annualTaxes = parseFloat(document.getElementById('annualTaxes').value);
+  const escrituraPct = parseFloat(document.getElementById('escrituraCost').value)/100;
+  const opStart = parseInt(document.getElementById('operationStartMonth').value);
+  const tenureMonths = roiYears * 12;
+
+  plans.forEach((p, i) => {
+    y += 9;
+    const totalInv = p.downPayment + p.monthlyPayment * p.months;
+    const totalInt = p.monthlyPayment * p.months - p.financed;
+    // Plusvalía sobre precio de lista (valor de mercado)
+    const mktBase = p.listPrice || p.finalPrice;
+    const fv = mktBase * Math.pow(1+apprRate, roiYears);
+    const appGain = fv - mktBase;
+    const opMonths = Math.max(0, tenureMonths-opStart+1);
+    const netInc = (monthlyIncome-monthlyExpenses)*opMonths - annualTaxes*Math.ceil(opMonths/12);
+    const escCost = fv*escrituraPct;
+    const netGain = appGain+netInc-totalInt-escCost;
+    const roiA = roiYears>0?(netGain/totalInv*100)/roiYears:0;
+    const sc2 = calcScenario2(i);
+    const roiA2 = sc2&&sc2.applicable?sc2.roiAnnualAccel:null;
+
+    if (i%2===0){doc.setFillColor(252,252,255);doc.rect(M,y-4,W-M*2,8,'F');}
+    x = M;
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(7);
+    const vals=[p.name,fmtMXN(p.downPayment),fmtMXN(p.monthlyPayment),fmtK(totalInt),fmtK(appGain),fmtK(netInc),fmtK(netGain),fmtPct(roiA,2),roiA2!=null?fmtPct(roiA2,2):'N/A'];
+    vals.forEach((v,j)=>{
+      doc.setTextColor(j>=6?(parseFloat(v)>=0?21:160):50, j>=6?(parseFloat(v)>=0?120:40):60, j>=6?(parseFloat(v)>=0?74:40):90);
+      doc.text(String(v),x+1,y); x+=cw[j];
+    });
+    doc.setDrawColor(225,230,240);
+    doc.line(M,y+2.5,W-M,y+2.5);
+  });
+
+  doc.save(`Toram_Comparativa_ROI.pdf`);
+}
+
+// ── Inventory data ─────────────────────────────────────────────────────────
+const INVENTORY = [
+  {num:"401",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE/ACCESO",m2:139.41,precio:5454750},
+  {num:"402",torre:"T1",tipo:"DEPTO 3 REC.",vista:"PARQUE/ACCESO",m2:156.48,precio:6272324.21},
+  {num:"403-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:2846052.63},
+  {num:"403-B",torre:"T1",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2210526.32},
+  {num:"404-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:2938894.74},
+  {num:"404-B",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:2938894.74},
+  {num:"405-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:2846052.63},
+  {num:"405-B",torre:"T1",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2210526.32},
+  {num:"406-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:2938894.74},
+  {num:"406-B",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:2938894.74},
+  {num:"407-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:2846052.63},
+  {num:"407-B",torre:"T1",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2210526.32},
+  {num:"408-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:2938894.74},
+  {num:"408-B",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:2938894.74},
+  {num:"409",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE/TORRE 2",m2:148.42,precio:5703710.53},
+  {num:"410",torre:"T1",tipo:"DEPTO 3 REC.",vista:"PARQUE/TORRE2",m2:166.72,precio:6577907.37},
+  {num:"501",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE/ACCESO",m2:135.97,precio:5359697.37},
+  {num:"502",torre:"T1",tipo:"DEPTO 3 REC.",vista:"PARQUE/ACCESO",m2:152.96,precio:6167280},
+  {num:"503-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:2846052.63},
+  {num:"503-B",torre:"T1",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2210526.32},
+  {num:"504",torre:"T1",tipo:"DEPTO 3 REC.",vista:"PARQUE",m2:140.29,precio:5347075.26},
+  {num:"505-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:2846052.63},
+  {num:"505-B",torre:"T1",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2210526.32},
+  {num:"506-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:2938894.74},
+  {num:"506-B",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:2938894.74},
+  {num:"507-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:2846052.63},
+  {num:"507-B",torre:"T1",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2210526.32},
+  {num:"508-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:2938894.74},
+  {num:"508-B",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:2938894.74},
+  {num:"509",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE/TORRE 2",m2:148.42,precio:5703710.53},
+  {num:"510",torre:"T1",tipo:"DEPTO 3 REC.",vista:"PARQUE/TORRE2",m2:166.72,precio:6577907.37},
+  {num:"601",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE/ACCESO",m2:136.22,precio:5421868.42},
+  {num:"602",torre:"T1",tipo:"DEPTO 3 REC.",vista:"PARQUE/ACCESO",m2:153.28,precio:6232092.63},
+  {num:"603-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:2901315.79},
+  {num:"603-B",torre:"T1",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2265789.47},
+  {num:"604-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:2846052.63},
+  {num:"604-B",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:2846052.63},
+  {num:"605-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:2901315.79},
+  {num:"605-B",torre:"T1",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2376315.79},
+  {num:"606-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:2846052.63},
+  {num:"606-B",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:2846052.63},
+  {num:"607-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:2901315.79},
+  {num:"607-B",torre:"T1",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2265789.47},
+  {num:"608-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:2994157.89},
+  {num:"608-B",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:2994157.89},
+  {num:"609",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE/TORRE 2",m2:148.42,precio:5758973.68},
+  {num:"610",torre:"T1",tipo:"DEPTO 3 REC.",vista:"PARQUE/TORRE2",m2:166.72,precio:6633170.53},
+  {num:"701",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE/ACCESO",m2:137.25,precio:5505592.11},
+  {num:"702",torre:"T1",tipo:"DEPTO 3 REC.",vista:"PARQUE/ACCESO",m2:154,precio:6308842.11},
+  {num:"703-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:2956578.95},
+  {num:"703-B",torre:"T1",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2321052.63},
+  {num:"704-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3049421.05},
+  {num:"704-B",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3049421.05},
+  {num:"705-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:2956578.95},
+  {num:"705-B",torre:"T1",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2321052.63},
+  {num:"706-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3049421.05},
+  {num:"706-B",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3049421.05},
+  {num:"707-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:2956578.95},
+  {num:"707-B",torre:"T1",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2321052.63},
+  {num:"708-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3049421.05},
+  {num:"708-B",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3049421.05},
+  {num:"709",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE/TORRE 2",m2:148.42,precio:5869500},
+  {num:"710",torre:"T1",tipo:"DEPTO 3 REC.",vista:"PARQUE/TORRE2",m2:166.72,precio:6743696.84},
+  {num:"801",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE/ACCESO",m2:138,precio:5581578.95},
+  {num:"802",torre:"T1",tipo:"DEPTO 3 REC.",vista:"PARQUE/ACCESO",m2:154.93,precio:6391858.42},
+  {num:"803-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3011842.11},
+  {num:"803-B",torre:"T1",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2376315.79},
+  {num:"804",torre:"T1",tipo:"DEPTO 3 REC.",vista:"PARQUE",m2:138.37,precio:5455567.89},
+  {num:"805-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3011842.11},
+  {num:"805-B",torre:"T1",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2376315.79},
+  {num:"806-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3104684.21},
+  {num:"806-B",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3104684.21},
+  {num:"807-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3011842.11},
+  {num:"807-B",torre:"T1",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2376315.79},
+  {num:"808-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3325736.84},
+  {num:"808-B",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3325736.84},
+  {num:"809",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE/TORRE 2",m2:148.42,precio:5869500},
+  {num:"810",torre:"T1",tipo:"DEPTO 3 REC.",vista:"PARQUE/TORRE2",m2:166.72,precio:6743696.84},
+  {num:"901",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE/ACCESO",m2:139,precio:5664473.68},
+  {num:"902",torre:"T1",tipo:"DEPTO 3 REC.",vista:"PARQUE/ACCESO",m2:155.79,precio:6472785.79},
+  {num:"903-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3067105.26},
+  {num:"903-B",torre:"T1",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2431578.95},
+  {num:"904",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:138,precio:5499789.47},
+  {num:"905-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3067105.26},
+  {num:"905-B",torre:"T1",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2431578.95},
+  {num:"906",torre:"T1",tipo:"DEPTO 3 REC.",vista:"PARQUE",m2:140.45,precio:5572902.63},
+  {num:"907",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:125.42,precio:4847131.58},
+  {num:"908",torre:"T1",tipo:"DEPTO 3 REC.",vista:"PARQUE",m2:140.89,precio:5586033.16},
+  {num:"909",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE/TORRE 2",m2:148.42,precio:5924763.16},
+  {num:"910",torre:"T1",tipo:"DEPTO 3 REC.",vista:"PARQUE/TORRE2",m2:166.72,precio:6798960},
+  {num:"1001",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE/ACCESO",m2:139.33,precio:5728855.26},
+  {num:"1002",torre:"T1",tipo:"DEPTO 3 REC.",vista:"PARQUE/ACCESO",m2:156.60,precio:6552221.05},
+  {num:"1003",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:122.04,precio:4809000},
+  {num:"1004-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3215210.53},
+  {num:"1004-B",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3215210.53},
+  {num:"1005",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:124.44,precio:4875315.79},
+  {num:"1006-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3215210.53},
+  {num:"1006-B",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3215210.53},
+  {num:"1007-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3122368.42},
+  {num:"1007-B",torre:"T1",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2486842.11},
+  {num:"1008-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3215210.53},
+  {num:"1008-B",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3215210.53},
+  {num:"1009",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE/TORRE 2",m2:148.42,precio:5980026.32},
+  {num:"1010",torre:"T1",tipo:"DEPTO 3 REC.",vista:"PARQUE/TORRE2",m2:166.72,precio:6854223.16},
+  {num:"1101",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE/ACCESO",m2:139.40,precio:5786052.63},
+  {num:"1102",torre:"T1",tipo:"DEPTO 3 REC.",vista:"PARQUE/ACCESO",m2:156.48,precio:6603903.16},
+  {num:"1103-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3177631.58},
+  {num:"1103-B",torre:"T1",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2542105.26},
+  {num:"1104-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3270473.68},
+  {num:"1104-B",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3270473.68},
+  {num:"1105-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3177631.58},
+  {num:"1105-B",torre:"T1",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2542105.26},
+  {num:"1106-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3270473.68},
+  {num:"1106-B",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3270473.68},
+  {num:"1107-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3177631.58},
+  {num:"1107-B",torre:"T1",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2542105.26},
+  {num:"1108-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3270473.68},
+  {num:"1108-B",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3270473.68},
+  {num:"1109",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE/TORRE 2",m2:148.42,precio:6035289.47},
+  {num:"1110",torre:"T1",tipo:"DEPTO 3 REC.",vista:"PARQUE/TORRE2",m2:166.72,precio:6909486.32},
+  {num:"1201",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE/ACCESO",m2:141,precio:5885526.32},
+  {num:"1202",torre:"T1",tipo:"DEPTO 3 REC.",vista:"PARQUE/ACCESO",m2:156.48,precio:6659166.32},
+  {num:"1203-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3232894.74},
+  {num:"1203-B",torre:"T1",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2597368.42},
+  {num:"1204-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3325736.84},
+  {num:"1204-B",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3325736.84},
+  {num:"1205-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3232894.74},
+  {num:"1205-B",torre:"T1",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2597368.42},
+  {num:"1206-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3325736.84},
+  {num:"1206-B",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3325736.84},
+  {num:"1207-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3232894.74},
+  {num:"1207-B",torre:"T1",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2597368.42},
+  {num:"1208-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3325736.84},
+  {num:"1208-B",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3325736.84},
+  {num:"1209",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE/TORRE 2",m2:148.42,precio:6090552.63},
+  {num:"1210",torre:"T1",tipo:"DEPTO 3 REC.",vista:"PARQUE/TORRE2",m2:166.72,precio:6964749.47},
+  {num:"1401",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE/ACCESO",m2:139.41,precio:5896855.26},
+  {num:"1402",torre:"T1",tipo:"DEPTO 3 REC.",vista:"PARQUE/ACCESO",m2:156.48,precio:6714429.47},
+  {num:"1403-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3288157.89},
+  {num:"1403-B",torre:"T1",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2652631.58},
+  {num:"1404-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3381000},
+  {num:"1404-B",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3381000},
+  {num:"1405-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3288157.89},
+  {num:"1405-B",torre:"T1",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2652631.58},
+  {num:"1406-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3381000},
+  {num:"1406-B",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3381000},
+  {num:"1407-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3288157.89},
+  {num:"1407-B",torre:"T1",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2652631.58},
+  {num:"1408-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3381000},
+  {num:"1408-B",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3381000},
+  {num:"1409",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE/TORRE 2",m2:148.42,precio:6145815.79},
+  {num:"1410",torre:"T1",tipo:"DEPTO 3 REC.",vista:"PARQUE/TORRE2",m2:166.72,precio:7020012.63},
+  {num:"1501",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE/ACCESO",m2:139.42,precio:5952394.74},
+  {num:"1502",torre:"T1",tipo:"DEPTO 3 REC.",vista:"PARQUE/ACCESO",m2:156.48,precio:6769692.63},
+  {num:"1503-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3343421.05},
+  {num:"1503-B",torre:"T1",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2707894.74},
+  {num:"1504-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3436263.16},
+  {num:"1504-B",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3436263.16},
+  {num:"1505-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3343421.05},
+  {num:"1505-B",torre:"T1",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2707894.74},
+  {num:"1506-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3436263.16},
+  {num:"1506-B",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3436263.16},
+  {num:"1507-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3343421.05},
+  {num:"1507-B",torre:"T1",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2707894.74},
+  {num:"1508-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3436263.16},
+  {num:"1508-B",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3436263.16},
+  {num:"1509",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE/TORRE 2",m2:148.42,precio:6201078.95},
+  {num:"1510",torre:"T1",tipo:"DEPTO 3 REC.",vista:"PARQUE/TORRE2",m2:166.72,precio:7075275.79},
+  {num:"1601",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE/ACCESO",m2:139.42,precio:6007657.89},
+  {num:"1602",torre:"T1",tipo:"DEPTO 3 REC.",vista:"PARQUE/ACCESO",m2:156.48,precio:6824955.79},
+  {num:"1603-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3398684.21},
+  {num:"1603-B",torre:"T1",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2763157.89},
+  {num:"1604-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3491526.32},
+  {num:"1604-B",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3491526.32},
+  {num:"1605-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3398684.21},
+  {num:"1605-B",torre:"T1",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2763157.89},
+  {num:"1606-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3491526.32},
+  {num:"1606-B",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3491526.32},
+  {num:"1607-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3398684.21},
+  {num:"1607-B",torre:"T1",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2763157.89},
+  {num:"1608-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3491526.32},
+  {num:"1608-B",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3491526.32},
+  {num:"1609",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE/TORRE 2",m2:148.42,precio:6256342.11},
+  {num:"1610",torre:"T1",tipo:"DEPTO 3 REC.",vista:"PARQUE/TORRE2",m2:166.72,precio:7130538.95},
+  {num:"1701",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE/ACCESO",m2:139.42,precio:6062921.05},
+  {num:"1702",torre:"T1",tipo:"DEPTO 3 REC.",vista:"PARQUE/ACCESO",m2:156.48,precio:6880218.95},
+  {num:"1703-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3453947.37},
+  {num:"1703-B",torre:"T1",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2818421.05},
+  {num:"1704-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3546789.47},
+  {num:"1704-B",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3546789.47},
+  {num:"1705-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3453947.37},
+  {num:"1705-B",torre:"T1",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2818421.05},
+  {num:"1706",torre:"T1",tipo:"DEPTO 3 REC.",vista:"PARQUE",m2:140.1,precio:5949300},
+  {num:"1707-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3453947.37},
+  {num:"1707-B",torre:"T1",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2818421.05},
+  {num:"1708-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3546789.47},
+  {num:"1708-B",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3546789.47},
+  {num:"1709",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE/TORRE 2",m2:148.27,precio:6307460.53},
+  {num:"1710",torre:"T1",tipo:"DEPTO 3 REC.",vista:"PARQUE/TORRE2",m2:166.59,precio:7181922.63},
+  {num:"1801",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE/ACCESO",m2:139.42,precio:6118184.21},
+  {num:"1802",torre:"T1",tipo:"DEPTO 3 REC.",vista:"PARQUE/ACCESO",m2:156.48,precio:6935482.11},
+  {num:"1803-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3509210.53},
+  {num:"1803-B",torre:"T1",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2873684.21},
+  {num:"1804-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3602052.63},
+  {num:"1804-B",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3602052.63},
+  {num:"1805-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3509210.53},
+  {num:"1805-B",torre:"T1",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2873684.21},
+  {num:"1806-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3602052.63},
+  {num:"1806-B",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3602052.63},
+  {num:"1807-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3509210.53},
+  {num:"1807-B",torre:"T1",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2873684.21},
+  {num:"1808-A",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3602052.63},
+  {num:"1808-B",torre:"T1",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3602052.63},
+  {num:"1809",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE/TORRE 2",m2:147.54,precio:6342552.63},
+  {num:"1810",torre:"T1",tipo:"DEPTO 3 REC.",vista:"PARQUE/TORRE2",m2:165.85,precio:7215102.63},
+  {num:"1901",torre:"T1",tipo:"DEPTO 4 REC.",vista:"OESTE/ACCESO",m2:200.97,precio:8662864.74},
+  {num:"1902",torre:"T1",tipo:"DEPTO 4 REC.",vista:"PARQUE/ACCESO",m2:250,precio:10776315.79},
+  {num:"1903",torre:"T1",tipo:"DEPTO 4 REC.",vista:"OESTE",m2:186.9,precio:8056373.68},
+  {num:"1904",torre:"T1",tipo:"DEPTO 4 REC.",vista:"PARQUE",m2:209.95,precio:9049950},
+  {num:"1905",torre:"T1",tipo:"DEPTO 4 REC.",vista:"OESTE/TORRE 2",m2:267.35,precio:11524192.11},
+  {num:"1906",torre:"T1",tipo:"DEPTO 4 REC.",vista:"PARQUE/TORRE2",m2:300.84,precio:12967787.37},
+  {num:"2001",torre:"T1",tipo:"DEPTO 4 REC.",vista:"OESTE/ACCESO",m2:200.97,precio:8662864.74},
+  {num:"2002",torre:"T1",tipo:"DEPTO 4 REC.",vista:"PARQUE/ACCESO",m2:250,precio:10776315.79},
+  {num:"2003",torre:"T1",tipo:"DEPTO 4 REC.",vista:"OESTE",m2:186.9,precio:8056373.68},
+  {num:"2004",torre:"T1",tipo:"DEPTO 4 REC.",vista:"PARQUE",m2:209.95,precio:9049950},
+  {num:"2005",torre:"T1",tipo:"DEPTO 4 REC.",vista:"OESTE/TORRE 2",m2:267.35,precio:11524192.11},
+  {num:"2006",torre:"T1",tipo:"DEPTO 4 REC.",vista:"PARQUE/TORRE2",m2:300.84,precio:12967787.37},
+  // Torre 2
+  {num:"401-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:94,precio:4261764.71},
+  {num:"401-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:51,precio:2377941.18},
+  {num:"402-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:92,precio:4200000},
+  {num:"402-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:66,precio:2964705.88},
+  {num:"403-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3057352.94},
+  {num:"403-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2347058.82},
+  {num:"404-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3161117.65},
+  {num:"404-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3161117.65},
+  {num:"405-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3057352.94},
+  {num:"405-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2347058.82},
+  {num:"406-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3161117.65},
+  {num:"406-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3161117.65},
+  {num:"407-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3057352.94},
+  {num:"407-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2347058.82},
+  {num:"408-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3161117.65},
+  {num:"408-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3161117.65},
+  {num:"409",torre:"T2",tipo:"DEPTO 3 REC.",vista:"OESTE/TORRE 1",m2:148.42,precio:6374735.29},
+  {num:"410",torre:"T2",tipo:"DEPTO 3 REC.",vista:"PARQUE/TORRE 1",m2:166.72,precio:6939882.35},
+  {num:"501-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:94,precio:4385294.12},
+  {num:"501-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:51,precio:2501470.59},
+  {num:"502-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:92,precio:4323529.41},
+  {num:"502-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:66,precio:3088235.29},
+  {num:"503-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3180882.35},
+  {num:"503-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2470588.24},
+  {num:"504-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3119117.65},
+  {num:"504-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3119117.65},
+  {num:"505-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3180882.35},
+  {num:"505-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2470588.24},
+  {num:"506-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3119117.65},
+  {num:"506-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3119117.65},
+  {num:"507-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3180882.35},
+  {num:"507-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2470588.24},
+  {num:"508-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3119117.65},
+  {num:"508-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3119117.65},
+  {num:"509",torre:"T2",tipo:"DEPTO 3 REC.",vista:"OESTE/TORRE 1",m2:148.42,precio:6374735.29},
+  {num:"510",torre:"T2",tipo:"DEPTO 3 REC.",vista:"PARQUE/TORRE 1",m2:166.72,precio:6939882.35},
+  {num:"601-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:94,precio:4508823.53},
+  {num:"601-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:51,precio:2686764.71},
+  {num:"602-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:92,precio:4447058.82},
+  {num:"602-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:66,precio:3211764.71},
+  {num:"603-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3304411.76},
+  {num:"603-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2655882.35},
+  {num:"604-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3242647.06},
+  {num:"604-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3242647.06},
+  {num:"605-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3304411.76},
+  {num:"605-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2655882.35},
+  {num:"606-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3242647.06},
+  {num:"606-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3242647.06},
+  {num:"607-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3304411.76},
+  {num:"607-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2655882.35},
+  {num:"608-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3242647.06},
+  {num:"608-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3242647.06},
+  {num:"609",torre:"T2",tipo:"DEPTO 3 REC.",vista:"OESTE/TORRE 1",m2:148.42,precio:6560029.41},
+  {num:"610",torre:"T2",tipo:"DEPTO 3 REC.",vista:"PARQUE/TORRE 1",m2:166.72,precio:7125176.47},
+  {num:"701-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:94,precio:4570588.24},
+  {num:"701-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:51,precio:2748529.41},
+  {num:"702-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:92,precio:4508823.53},
+  {num:"702-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:66,precio:3273529.41},
+  {num:"703-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3366176.47},
+  {num:"703-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2717647.06},
+  {num:"704-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3304411.76},
+  {num:"704-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3304411.76},
+  {num:"705-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3366176.47},
+  {num:"705-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2717647.06},
+  {num:"706-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3304411.76},
+  {num:"706-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3304411.76},
+  {num:"707-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3366176.47},
+  {num:"707-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2717647.06},
+  {num:"708-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3304411.76},
+  {num:"708-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3304411.76},
+  {num:"709",torre:"T2",tipo:"DEPTO 3 REC.",vista:"OESTE/TORRE 1",m2:148.42,precio:6621794.12},
+  {num:"710",torre:"T2",tipo:"DEPTO 3 REC.",vista:"PARQUE/TORRE 1",m2:166.72,precio:7186941.18},
+  {num:"801-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:94,precio:4632352.94},
+  {num:"801-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:51,precio:2810294.12},
+  {num:"802-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:92,precio:4570588.24},
+  {num:"802-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:66,precio:3397058.82},
+  {num:"803-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3489705.88},
+  {num:"803-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2779411.76},
+  {num:"804-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3427941.18},
+  {num:"804-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3427941.18},
+  {num:"805-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3489705.88},
+  {num:"805-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2779411.76},
+  {num:"806-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3427941.18},
+  {num:"806-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3427941.18},
+  {num:"807-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3489705.88},
+  {num:"807-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2779411.76},
+  {num:"808-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3427941.18},
+  {num:"808-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3427941.18},
+  {num:"809",torre:"T2",tipo:"DEPTO 3 REC.",vista:"OESTE/TORRE 1",m2:148.42,precio:6683558.82},
+  {num:"810",torre:"T2",tipo:"DEPTO 3 REC.",vista:"PARQUE/TORRE 1",m2:166.72,precio:7248705.88},
+  {num:"901-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:94,precio:4694117.65},
+  {num:"901-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:51,precio:2933823.53},
+  {num:"902-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:92,precio:4632352.94},
+  {num:"902-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:66,precio:3458823.53},
+  {num:"903-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3551470.59},
+  {num:"903-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2902941.18},
+  {num:"904-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3489705.88},
+  {num:"904-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3489705.88},
+  {num:"905-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3551470.59},
+  {num:"905-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2902941.18},
+  {num:"906-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3489705.88},
+  {num:"906-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3489705.88},
+  {num:"907-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3551470.59},
+  {num:"907-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2902941.18},
+  {num:"908-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3489705.88},
+  {num:"908-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3489705.88},
+  {num:"909",torre:"T2",tipo:"DEPTO 3 REC.",vista:"OESTE/TORRE 1",m2:148.42,precio:6745323.53},
+  {num:"910",torre:"T2",tipo:"DEPTO 3 REC.",vista:"PARQUE/TORRE 1",m2:166.72,precio:7310470.59},
+  {num:"1001-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:94,precio:4755882.35},
+  {num:"1001-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:51,precio:2995588.24},
+  {num:"1002-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:92,precio:4694117.65},
+  {num:"1002-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:66,precio:3520588.24},
+  {num:"1003-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3613235.29},
+  {num:"1003-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2964705.88},
+  {num:"1004-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3551470.59},
+  {num:"1004-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3551470.59},
+  {num:"1005-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3613235.29},
+  {num:"1005-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2964705.88},
+  {num:"1006-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3551470.59},
+  {num:"1006-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3551470.59},
+  {num:"1007-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3613235.29},
+  {num:"1007-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2964705.88},
+  {num:"1008-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3551470.59},
+  {num:"1008-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3551470.59},
+  {num:"1009",torre:"T2",tipo:"DEPTO 3 REC.",vista:"OESTE/TORRE 1",m2:148.42,precio:6807088.24},
+  {num:"1010",torre:"T2",tipo:"DEPTO 3 REC.",vista:"PARQUE/TORRE 1",m2:166.72,precio:7372235.29},
+  {num:"1101-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:94,precio:4817647.06},
+  {num:"1101-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:51,precio:3057352.94},
+  {num:"1102-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:92,precio:4755882.35},
+  {num:"1102-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:66,precio:3582352.94},
+  {num:"1103-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3675000},
+  {num:"1103-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:3026470.59},
+  {num:"1104-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3613235.29},
+  {num:"1104-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3613235.29},
+  {num:"1105-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3675000},
+  {num:"1105-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:3026470.59},
+  {num:"1106-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3613235.29},
+  {num:"1106-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3613235.29},
+  {num:"1107-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3675000},
+  {num:"1107-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:3026470.59},
+  {num:"1108-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3613235.29},
+  {num:"1108-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3613235.29},
+  {num:"1109",torre:"T2",tipo:"DEPTO 3 REC.",vista:"OESTE/TORRE 1",m2:148.42,precio:6868852.94},
+  {num:"1110",torre:"T2",tipo:"DEPTO 3 REC.",vista:"PARQUE/TORRE 1",m2:166.72,precio:7434000},
+  {num:"1201-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:94,precio:4879411.76},
+  {num:"1201-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:51,precio:3026470.59},
+  {num:"1202-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:92,precio:4817647.06},
+  {num:"1202-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:66,precio:3613235.29},
+  {num:"1203-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3705882.35},
+  {num:"1203-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2995588.24},
+  {num:"1204-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3644117.65},
+  {num:"1204-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3644117.65},
+  {num:"1205-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3705882.35},
+  {num:"1205-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2995588.24},
+  {num:"1206-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3644117.65},
+  {num:"1206-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3644117.65},
+  {num:"1207-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3705882.35},
+  {num:"1207-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:2995588.24},
+  {num:"1208-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3644117.65},
+  {num:"1208-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3644117.65},
+  {num:"1209",torre:"T2",tipo:"DEPTO 3 REC.",vista:"OESTE/TORRE 1",m2:148.42,precio:6899735.29},
+  {num:"1210",torre:"T2",tipo:"DEPTO 3 REC.",vista:"PARQUE/TORRE 1",m2:166.72,precio:7464882.35},
+  {num:"1401-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:94,precio:4941176.47},
+  {num:"1401-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:51,precio:3057352.94},
+  {num:"1402-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:92,precio:4879411.76},
+  {num:"1402-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:66,precio:3644117.65},
+  {num:"1403-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3736764.71},
+  {num:"1403-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:3026470.59},
+  {num:"1404-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3675000},
+  {num:"1404-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3675000},
+  {num:"1405-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3736764.71},
+  {num:"1405-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:3026470.59},
+  {num:"1406-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3675000},
+  {num:"1406-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3675000},
+  {num:"1407-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3736764.71},
+  {num:"1407-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:3026470.59},
+  {num:"1408-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3675000},
+  {num:"1408-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3675000},
+  {num:"1409",torre:"T2",tipo:"DEPTO 3 REC.",vista:"OESTE/TORRE 1",m2:148.42,precio:6930617.65},
+  {num:"1410",torre:"T2",tipo:"DEPTO 3 REC.",vista:"PARQUE/TORRE 1",m2:166.72,precio:7495764.71},
+  {num:"1501-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:94,precio:4972058.82},
+  {num:"1501-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:51,precio:3088235.29},
+  {num:"1502-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:92,precio:4910294.12},
+  {num:"1502-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:66,precio:3675000},
+  {num:"1503-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3767647.06},
+  {num:"1503-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:3057352.94},
+  {num:"1504-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3705882.35},
+  {num:"1504-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3705882.35},
+  {num:"1505-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3767647.06},
+  {num:"1505-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:3057352.94},
+  {num:"1506-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:4045588.24},
+  {num:"1506-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3705882.35},
+  {num:"1507-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3767647.06},
+  {num:"1507-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:3057352.94},
+  {num:"1508-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3705882.35},
+  {num:"1508-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3705882.35},
+  {num:"1509",torre:"T2",tipo:"DEPTO 3 REC.",vista:"OESTE/TORRE 1",m2:148.42,precio:6961500},
+  {num:"1510",torre:"T2",tipo:"DEPTO 3 REC.",vista:"PARQUE/TORRE 1",m2:166.72,precio:7526647.06},
+  {num:"1601-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:94,precio:5002941.18},
+  {num:"1601-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:51,precio:3119117.65},
+  {num:"1602-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:92,precio:4941176.47},
+  {num:"1602-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:66,precio:3705882.35},
+  {num:"1603-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3798529.41},
+  {num:"1603-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:3088235.29},
+  {num:"1604-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3736764.71},
+  {num:"1604-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3736764.71},
+  {num:"1605-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3798529.41},
+  {num:"1605-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:3088235.29},
+  {num:"1606-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3736764.71},
+  {num:"1606-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3736764.71},
+  {num:"1607-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3798529.41},
+  {num:"1607-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:3088235.29},
+  {num:"1608-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3736764.71},
+  {num:"1608-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3736764.71},
+  {num:"1609",torre:"T2",tipo:"DEPTO 3 REC.",vista:"OESTE/TORRE 1",m2:148.42,precio:6992382.35},
+  {num:"1610",torre:"T2",tipo:"DEPTO 3 REC.",vista:"PARQUE/TORRE 1",m2:166.72,precio:7557529.41},
+  {num:"1701-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:94,precio:5033823.53},
+  {num:"1701-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:51,precio:3150000},
+  {num:"1702-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:92,precio:4972058.82},
+  {num:"1702-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:66,precio:3736764.71},
+  {num:"1703-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3829411.76},
+  {num:"1703-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:3119117.65},
+  {num:"1704-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3767647.06},
+  {num:"1704-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3767647.06},
+  {num:"1705-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3829411.76},
+  {num:"1705-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:3119117.65},
+  {num:"1706-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3767647.06},
+  {num:"1706-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3767647.06},
+  {num:"1707-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3829411.76},
+  {num:"1707-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:3119117.65},
+  {num:"1708-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3767647.06},
+  {num:"1708-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3767647.06},
+  {num:"1709",torre:"T2",tipo:"DEPTO 3 REC.",vista:"OESTE/TORRE 1",m2:148.42,precio:7023264.71},
+  {num:"1710",torre:"T2",tipo:"DEPTO 3 REC.",vista:"PARQUE/TORRE 1",m2:166.72,precio:7588411.76},
+  {num:"1801-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:94,precio:5064705.88},
+  {num:"1801-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:51,precio:3180882.35},
+  {num:"1802-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:92,precio:5002941.18},
+  {num:"1802-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:66,precio:3767647.06},
+  {num:"1803-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3860294.12},
+  {num:"1803-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:3150000},
+  {num:"1804-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3798529.41},
+  {num:"1804-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3798529.41},
+  {num:"1805-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3860294.12},
+  {num:"1805-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:3150000},
+  {num:"1806-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3798529.41},
+  {num:"1806-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3798529.41},
+  {num:"1807-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3860294.12},
+  {num:"1807-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:3150000},
+  {num:"1808-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3798529.41},
+  {num:"1808-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3798529.41},
+  {num:"1809",torre:"T2",tipo:"DEPTO 3 REC.",vista:"OESTE/TORRE 1",m2:148.42,precio:7054147.06},
+  {num:"1810",torre:"T2",tipo:"DEPTO 3 REC.",vista:"PARQUE/TORRE 1",m2:166.72,precio:7619294.12},
+  {num:"1901-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:94,precio:5095588.24},
+  {num:"1901-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:51,precio:3211764.71},
+  {num:"1902-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:92,precio:5033823.53},
+  {num:"1902-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:66,precio:3798529.41},
+  {num:"1903-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3891176.47},
+  {num:"1903-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:3180882.35},
+  {num:"1904-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3829411.76},
+  {num:"1904-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3829411.76},
+  {num:"1905-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3891176.47},
+  {num:"1905-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:3180882.35},
+  {num:"1906-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3829411.76},
+  {num:"1906-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3829411.76},
+  {num:"1907-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3891176.47},
+  {num:"1907-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:3180882.35},
+  {num:"1908-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3829411.76},
+  {num:"1908-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3829411.76},
+  {num:"1909",torre:"T2",tipo:"DEPTO 3 REC.",vista:"OESTE/TORRE 1",m2:148.42,precio:7085029.41},
+  {num:"1910",torre:"T2",tipo:"DEPTO 3 REC.",vista:"PARQUE/TORRE 1",m2:166.72,precio:7650176.47},
+  {num:"2001-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:94,precio:5126470.59},
+  {num:"2001-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:51,precio:3242647.06},
+  {num:"2002-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:92,precio:5064705.88},
+  {num:"2002-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:66,precio:3829411.76},
+  {num:"2003-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3922058.82},
+  {num:"2003-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:3211764.71},
+  {num:"2004-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3860294.12},
+  {num:"2004-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3860294.12},
+  {num:"2005-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3922058.82},
+  {num:"2005-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:3211764.71},
+  {num:"2006-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3860294.12},
+  {num:"2006-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3860294.12},
+  {num:"2007-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"OESTE",m2:69,precio:3922058.82},
+  {num:"2007-B",torre:"T2",tipo:"DEPTO 1 REC.",vista:"OESTE",m2:50,precio:3211764.71},
+  {num:"2008-A",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3860294.12},
+  {num:"2008-B",torre:"T2",tipo:"DEPTO 2 REC.",vista:"PARQUE",m2:67,precio:3860294.12},
+  {num:"2009",torre:"T2",tipo:"DEPTO 3 REC.",vista:"OESTE/TORRE 1",m2:148.42,precio:7115911.76},
+  {num:"2010",torre:"T2",tipo:"DEPTO 3 REC.",vista:"PARQUE/TORRE 1",m2:166.72,precio:7681058.82},
+];
+
+// ── Down payment mode ───────────────────────────────────────────────────────
+let dpMode = 'pct'; // 'pct' | 'mxn'
+
+function setDpMode(mode) {
+  dpMode = mode;
+  const price = parseFloat(document.getElementById('listPrice').value) || 0;
+  const pctBtn = document.getElementById('dpModePct');
+  const mxnBtn = document.getElementById('dpModeMxn');
+  if (mode === 'pct') {
+    pctBtn.style.background = 'var(--navy)'; pctBtn.style.color = 'white';
+    mxnBtn.style.background = 'var(--white)'; mxnBtn.style.color = 'var(--text-muted)';
+    document.getElementById('dpLabel').innerHTML = 'Enganche <span class="label-hint">(%)</span>';
+    document.getElementById('dpEquivLabel').textContent = 'Equivale en $';
+    const curVal = parseFloat(document.getElementById('dpValue').value) || 15;
+    document.getElementById('dpValue').value = curVal <= 100 ? curVal : 15;
+    document.getElementById('dpValue').step = '0.5';
+  } else {
+    mxnBtn.style.background = 'var(--navy)'; mxnBtn.style.color = 'white';
+    pctBtn.style.background = 'var(--white)'; pctBtn.style.color = 'var(--text-muted)';
+    document.getElementById('dpLabel').innerHTML = 'Enganche <span class="label-hint">($)</span>';
+    document.getElementById('dpEquivLabel').textContent = 'Equivale en %';
+    // Convert current % to $
+    const curPct = parseFloat(document.getElementById('dpValue').value) || 15;
+    document.getElementById('dpValue').value = price ? Math.round(price * curPct / 100) : '';
+    document.getElementById('dpValue').step = '1000';
+  }
+  syncDpDisplay();
+}
+
+function getDownPaymentPct() {
+  const price = parseFloat(document.getElementById('listPrice').value) || 0;
+  const val = parseFloat(document.getElementById('dpValue').value) || 0;
+  if (dpMode === 'pct') return val / 100;
+  return price > 0 ? val / price : 0;
+}
+
+function syncDpDisplay() {
+  const price = parseFloat(document.getElementById('listPrice').value) || 0;
+  const val = parseFloat(document.getElementById('dpValue').value) || 0;
+  let dpAmt, dpPct;
+  if (dpMode === 'pct') {
+    dpPct = val / 100;
+    dpAmt = price * dpPct;
+    document.getElementById('dpEquiv').value = price ? fmtMXN(dpAmt) : '—';
+  } else {
+    dpAmt = val;
+    dpPct = price > 0 ? val / price : 0;
+    document.getElementById('dpEquiv').value = price ? fmtPct(dpPct * 100, 1) : '—';
+  }
+  document.getElementById('dpFinanced').value = price ? fmtMXN(Math.max(0, price - dpAmt)) : '—';
+}
+
+function onPriceManualEdit() { syncDpDisplay(); }
+
+// ── Inventory search ────────────────────────────────────────────────────────
+function invSearch(q) {
+  if (!q) return [];
+  const u = q.toUpperCase().replace(/\s/g,'').replace(/^(T1|T2)-?/,'');
+  const torreFilter = q.toUpperCase().startsWith('T1') ? 'T1' : q.toUpperCase().startsWith('T2') ? 'T2' : null;
+  return INVENTORY.filter(d => {
+    const k = d.num.toUpperCase().replace(/\s/g,'');
+    const torMatch = !torreFilter || d.torre === torreFilter;
+    return torMatch && (k.startsWith(u) || k.includes(u));
+  }).slice(0, 9);
+}
+
+function invExact(q) {
+  const raw = q.trim().toUpperCase().replace(/\s/g,'');
+  const torreFilter = raw.startsWith('T1') ? 'T1' : raw.startsWith('T2') ? 'T2' : null;
+  const numPart = raw.replace(/^(T1|T2)-?/, '');
+  return INVENTORY.filter(d => {
+    const k = d.num.toUpperCase();
+    return (!torreFilter || d.torre === torreFilter) && k === numPart;
+  });
+}
+
+function onSearchInput() {
+  const q = document.getElementById('unitSearch').value.trim();
+  document.getElementById('noUnitMsg').style.display = 'none';
+  if (!q) { document.getElementById('searchDropdown').style.display = 'none'; return; }
+  const hits = invSearch(q);
+  const dd = document.getElementById('searchDropdown');
+  if (!hits.length) { dd.style.display = 'none'; return; }
+  dd.style.display = 'block';
+  dd.innerHTML = hits.map(d => `
+    <div onclick="selectUnit('${d.torre}','${d.num}')" style="padding:9px 14px;cursor:pointer;border-bottom:0.5px solid var(--border);font-size:13.5px;display:flex;align-items:center;gap:10px;transition:background 0.1s" onmouseover="this.style.background='#f4f6fb'" onmouseout="this.style.background=''">
+      <span style="font-size:11px;font-weight:700;padding:2px 7px;border-radius:999px;background:${d.torre==='T1'?'var(--blue-bg)':'var(--green-bg)'};color:${d.torre==='T1'?'var(--blue)':'var(--green)'}">${d.torre}</span>
+      <span style="font-weight:600;color:var(--navy)">Depto ${d.num}</span>
+      <span style="color:var(--text-muted)">${d.tipo}</span>
+      <span style="color:var(--text-muted);font-size:12px">${d.vista}</span>
+      <span style="margin-left:auto;font-weight:600;color:var(--navy)">${fmtMXN(d.precio)}</span>
+    </div>`).join('');
+  const exact = invExact(q);
+  if (exact.length === 1) showUnitChip(exact[0]);
+}
+
+function onSearchKey(e) {
+  if (e.key === 'Enter') {
+    document.getElementById('searchDropdown').style.display = 'none';
+    const hits = invExact(document.getElementById('unitSearch').value.trim());
+    if (hits.length === 1) { selectUnit(hits[0].torre, hits[0].num); }
+    else if (!hits.length) { document.getElementById('noUnitMsg').style.display = 'block'; }
+  }
+}
+
+function selectUnit(torre, num) {
+  const d = INVENTORY.find(x => x.torre === torre && x.num === num);
+  if (!d) return;
+  document.getElementById('searchDropdown').style.display = 'none';
+  document.getElementById('unitSearch').value = `${torre}-${num}`;
+  showUnitChip(d);
+  // Populate fields
+  document.getElementById('unitName').value = `${torre}-${num}`;
+  document.getElementById('listPrice').value = d.precio;
+  document.getElementById('tower').value = torre === 'T1' ? '1' : '2';
+  syncDpDisplay();
+}
+
+function showUnitChip(d) {
+  document.getElementById('unitChip').style.display = 'block';
+  document.getElementById('chipTorreTag').innerHTML = `<span style="font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;background:${d.torre==='T1'?'var(--blue-bg)':'var(--green-bg)'};color:${d.torre==='T1'?'var(--blue)':'var(--green)'}">${d.torre}</span>`;
+  document.getElementById('chipName').textContent = `Depto ${d.num}`;
+  document.getElementById('chipTipo').textContent = d.tipo;
+  document.getElementById('chipVista').textContent = `Vista: ${d.vista}`;
+  document.getElementById('chipM2').textContent = `${d.m2} m²`;
+  document.getElementById('chipPrecio').textContent = fmtMXN(d.precio);
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('#unitSearch') && !e.target.closest('#searchDropdown'))
+    document.getElementById('searchDropdown').style.display = 'none';
+});
+
+// ── Override buildPlans to use custom down payment ─────────────────────────
+const _origBuildPlans = buildPlans;
+buildPlans = function() {
+  const price = parseFloat(document.getElementById('listPrice').value);
+  const tower = document.getElementById('tower').value;
+  const dpFrac = getDownPaymentPct();
+  const result = [];
+
+  function frenchPayment(financed, annualRate, months) {
+    if (annualRate === 0 || months === 0) return financed / months;
+    const r = annualRate / 12 / 100;
+    return (financed * r * Math.pow(1+r, months)) / (Math.pow(1+r, months) - 1);
+  }
+
+  const addPlan = (name, discPct, rate, months) => {
+    const fp = price * (1 - discPct/100);
+    const dp = fp * dpFrac;
+    const fin = fp * (1 - dpFrac);
+    const mp = fin > 0 ? frenchPayment(fin, rate, months) : 0;
+    // listPrice = precio de mercado base para cálculo de plusvalía (siempre el precio de lista sin descuento)
+    result.push({name, downPayment:dp, finalPrice:fp, listPrice:price, monthlyPayment:mp, months, interestRate:rate, financed:fin});
+  };
+
+  addPlan('Pago de Contado', 20, 0, 6);
+  addPlan('12 Meses Sin Intereses', 15, 0, 12);
+  addPlan('24 Meses Sin Intereses', 10, 0, 24);
+  addPlan('36 Meses Sin Intereses', 5, 0, 36);
+  addPlan('Financiamiento Directo — 4 Años', 20, 12, 48);
+  addPlan('Financiamiento Directo — 5 Años', 20, 13, 60);
+  if (tower === '2') {
+    addPlan('Financiamiento Directo — 6 Años', 20, 14, 72);
+    addPlan('Financiamiento Directo — 7 Años', 20, 15, 84);
+  }
+  return result;
+};
+
+// ── Init ───────────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  showPage('unit');
+  syncDpDisplay();
+});
+</script>
+</body>
+</html>
