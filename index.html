@@ -970,7 +970,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
           </div>
           <div class="field" style="width:130px">
             <span class="label">Enganche %</span>
-            <input type="number" id="pDownPct" value="15" min="1" max="100" step="0.5">
+            <input type="number" id="pDownPct" value="15" min="1" max="100" step="0.5" onchange="if(pSelectedUnit) pOnUnitChange()">
           </div>
         </div>
         <div id="pModelInfo" style="display:none"></div>
