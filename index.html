@@ -3111,15 +3111,20 @@ function exportQuotePDF() {
   doc.setDrawColor(200,220,200); doc.setLineWidth(0.4); doc.line(0,43,W,43);
   hdr(6,[74,122,82],true);  doc.text('CLIENTE', M, 36);
   hdr(11,[26,51,32],true);  doc.text(clientName, M, 42);
-  if (note){ hdr(7.5,[74,106,82],false); doc.text(note, W-M, 40, {align:'right', maxWidth:95}); }
 
   var y = 52;
+  if (note){
+    hdr(7,[74,106,82],false);
+    var noteLines = doc.splitTextToSize('Nota: '+note, CW);
+    doc.text(noteLines, M, 48);
+    y = 48 + noteLines.length*4 + 5;
+  }
 
   // Table 1: units
   y = sectionBar('Descripción de Unidades', 'Precios y enganche de referencia', y);
   // Right-aligned column anchors (x distance from M to the right edge of each column's text).
   // Order left-to-right: UNIDAD(left) | DESCRIPCIÓN(left) | P. LISTA | P. C/DTO 20% | ENGANCHE | % ENG.
-  var t1x = [0, 24, 114, 136, 156, 170];
+  var t1x = [0, 24, 118, 141, 163, 184];
   y = tblHdr(['UNIDAD','DESCRIPCIÓN','P. LISTA','P. C/DTO 20%','ENGANCHE','% ENG.'],
              [t1x[0],t1x[1],t1x[2],t1x[3],t1x[4],t1x[5]], y, [1]);
 
@@ -3142,7 +3147,7 @@ function exportQuotePDF() {
   var planLabelW = 44, dpColW = 24;
   var unitColW   = Math.floor((CW-planLabelW-dpColW)/nU);
   var t2hdrs = ['PLAN','ENGANCHE'].concat(quoteUnits.map(function(u){ return u.inv.torre+'-'+u.inv.num; }));
-  var t2xs   = [0, planLabelW, planLabelW+dpColW].concat(quoteUnits.map(function(_,i){ return planLabelW+dpColW+unitColW*(i+1); }));
+  var t2xs   = [0, planLabelW+dpColW].concat(quoteUnits.map(function(_,i){ return planLabelW+dpColW+unitColW*(i+1); }));
   y = tblHdr(t2hdrs, t2xs, y);
 
   var grpAEndPDF = quoteUnits[0].plans.filter(function(p){ return p.disc===20; }).length;
@@ -4844,17 +4849,18 @@ function exportPropuestaDeptoPDF() {
   doc.roundedRect(W-M-stW, 24, stW, 6, 1, 1, 'F');
   setStyle(7,[255,255,255],true);
   doc.text(avail.status, W-M-stW/2, 28.2, {align:'center'});
-  // Cliente
+  // Cliente (debajo de la banda, texto oscuro legible sobre blanco)
   setStyle(13,[255,255,255],true);
   doc.text('Propuesta para '+cd.client, M, 36.5);
-  setStyle(8,[200,220,200],false);
-  doc.text('Asesor: '+cd.advisor+'  ·  '+cd.dateStr, M, 41.5);
-  if (cd.note) {
-    setStyle(8,[200,220,200],false);
-    doc.text(cd.note, M, 46);
-  }
-
+  setStyle(8,[74,106,82],false);
+  doc.text('Asesor: '+cd.advisor+'  ·  '+cd.dateStr, M, 46);
   var y = 56;
+  if (cd.note) {
+    setStyle(8,[74,106,82],false);
+    var pNoteLines = doc.splitTextToSize(cd.note, CW);
+    doc.text(pNoteLines, M, 51);
+    y = 51 + pNoteLines.length*4 + 4;
+  }
 
   // ── IMAGE (left) + SPECS (right) ─────────────────────────────────────────
   var imgW = 90, imgH = 70;
@@ -5074,14 +5080,15 @@ function exportPropuestaPartPDF() {
   doc.text('Parque Temático · Mazatlán', W-M, 21, {align:'right'});
   setStyle(13,[255,255,255],true);
   doc.text('Propuesta para '+cd.client, M, 36.5);
-  setStyle(8,[200,220,200],false);
-  doc.text('Asesor: '+cd.advisor+'  ·  '+cd.dateStr, M, 41.5);
-  if (cd.note) {
-    setStyle(8,[200,220,200],false);
-    doc.text(cd.note, M, 46);
-  }
-
+  setStyle(8,[74,106,82],false);
+  doc.text('Asesor: '+cd.advisor+'  ·  '+cd.dateStr, M, 46);
   var y = 56;
+  if (cd.note) {
+    setStyle(8,[74,106,82],false);
+    var pNoteLines = doc.splitTextToSize(cd.note, CW);
+    doc.text(pNoteLines, M, 51);
+    y = 51 + pNoteLines.length*4 + 4;
+  }
 
   // ── TU INVERSIÓN ─────────────────────────────────────────────────────────
   setStyle(7,[45,96,64],true);
@@ -5515,17 +5522,18 @@ function exportLocalesPDF() {
   doc.roundedRect(W-M-stW, 24, stW, 6, 1, 1, 'F');
   setStyle(7,[255,255,255],true);
   doc.text('Disponible', W-M-stW/2, 28.2, {align:'center'});
-  // Cliente
+  // Cliente (debajo de la banda, texto oscuro legible sobre blanco)
   setStyle(13,[255,255,255],true);
   doc.text('Cotización para '+cd.client, M, 36.5);
-  setStyle(8,[200,220,200],false);
-  doc.text('Asesor: '+cd.advisor+'  ·  '+cd.dateStr, M, 41.5);
-  if (cd.note) {
-    setStyle(8,[200,220,200],false);
-    doc.text(cd.note, M, 46);
-  }
-
+  setStyle(8,[74,106,82],false);
+  doc.text('Asesor: '+cd.advisor+'  ·  '+cd.dateStr, M, 46);
   var y = 56;
+  if (cd.note) {
+    setStyle(8,[74,106,82],false);
+    var lNoteLines = doc.splitTextToSize(cd.note, CW);
+    doc.text(lNoteLines, M, 51);
+    y = 51 + lNoteLines.length*4 + 4;
+  }
 
   // ── DATOS DEL LOCAL ──────────────────────────────────────────────────────
   doc.setDrawColor(184,212,184); doc.setLineWidth(0.5);
