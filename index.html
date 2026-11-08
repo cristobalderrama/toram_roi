@@ -4358,6 +4358,19 @@ function pModelLibreUnits(key) {
   return out;
 }
 
+// Todas las unidades de un modelo (cualquier estatus), de menor a mayor precio.
+// El asesor puede ofrecer la unidad que quiera, no solo la más económica ni solo
+// las disponibles; el estatus real se muestra siempre (Disponible / Apartado /
+// Vendido / Bloqueado) en el selector, la vista previa y el PDF.
+function pModelAllUnits(key) {
+  var out = [];
+  INVENTORY.forEach(function(u){
+    if (getUnitImageKey(u.torre, u.num) === key) out.push(u);
+  });
+  out.sort(function(a,b){ return a.precio - b.precio; });
+  return out;
+}
+
 function pPopulateModels() {
   var sel = document.getElementById('pModelSelect');
   if (!sel) return;
@@ -4370,11 +4383,10 @@ function pPopulateModels() {
       var label = m.nombre + ' · ' + m.m2 + ' m² · ' + m.recamaras + (m.recamaras===1?' recámara':' recámaras');
       if (n > 0) {
         label += ' — ' + n + (n===1?' disponible':' disponibles');
-        html += '<option value="'+m.key+'">'+label+'</option>';
       } else {
         label += ' — Sin disponibilidad';
-        html += '<option value="'+m.key+'" disabled>'+label+'</option>';
       }
+      html += '<option value="'+m.key+'">'+label+'</option>';
     });
     html += '</optgroup>';
   });
@@ -4396,8 +4408,9 @@ function pOnModelChange() {
   }
   var m = MODELS.find(function(x){ return x.key === key; });
   pSelectedModel = m;
-  var units = pModelLibreUnits(key);
+  var units = pModelAllUnits(key);
   pCurrentUnits = units;
+  var nLibre = units.filter(function(u){ return getAvailability(u.torre, u.num).status === 'Disponible'; }).length;
   var imgSrc = UNIT_IMAGES[m.imgKey] || '';
   var imgHtml = imgSrc
     ? '<img src="'+imgSrc+'" class="p-modelimg" alt="Plano '+m.nombre+'">'
@@ -4415,18 +4428,26 @@ function pOnModelChange() {
     '<tr><td style="padding:5px 0;color:var(--text-muted)">Vista</td><td style="padding:5px 0;text-align:right;font-weight:600">'+m.vista+'</td></tr>' +
     '<tr><td style="padding:5px 0;color:var(--text-muted)">Baños</td><td style="padding:5px 0;text-align:right;font-weight:600">'+m.banos+'</td></tr>' +
     '<tr><td style="padding:5px 0;color:var(--text-muted)">Incluye</td><td style="padding:5px 0;text-align:right;font-weight:600">'+m.extras+'</td></tr>' +
-    '<tr><td style="padding:5px 0;color:var(--text-muted)">Disponibles</td><td style="padding:5px 0;text-align:right;font-weight:700;color:var(--green)">'+units.length+(units.length===1?' unidad':' unidades')+'</td></tr>' +
+    '<tr><td style="padding:5px 0;color:var(--text-muted)">Disponibles</td><td style="padding:5px 0;text-align:right;font-weight:700;color:var(--green)">'+nLibre+(nLibre===1?' unidad':' unidades')+'</td></tr>' +
     '</table></div></div>';
   info.style.display = 'block';
   if (!units.length) {
-    unitSel.innerHTML = '<option value="">Sin disponibilidad</option>';
+    unitSel.innerHTML = '<option value="">Sin unidades en este modelo</option>';
     unitSel.disabled = true;
     return;
   }
   unitSel.innerHTML = units.map(function(u, i){
-    return '<option value="'+i+'">Depto '+u.num+' · '+fmtMXN(u.precio)+' lista · '+fmtMXN(u.precio*0.8)+' contado</option>';
+    var st = getAvailability(u.torre, u.num).status;
+    var stTxt = st === 'Disponible' ? '' : ' · ' + st.toUpperCase();
+    return '<option value="'+i+'">Depto '+u.num+' · '+fmtMXN(u.precio)+' lista · '+fmtMXN(u.precio*0.8)+' contado'+stTxt+'</option>';
   }).join('');
   unitSel.disabled = false;
+  // Por defecto, la unidad LIBRE más económica (como antes); si no hay LIBRE, la más económica
+  var defIdx = 0;
+  for (var di=0; di<units.length; di++){
+    if (getAvailability(units[di].torre, units[di].num).status === 'Disponible') { defIdx = di; break; }
+  }
+  unitSel.value = String(defIdx);
   pOnUnitChange();
 }
 
@@ -4437,12 +4458,13 @@ function pOnUnitChange() {
   if (isNaN(idx) || !pCurrentUnits[idx]) { pSelectedUnit = null; unitInfo.style.display='none'; return; }
   var u = pCurrentUnits[idx];
   pSelectedUnit = u;
+  var av = getAvailability(u.torre, u.num);
   var dpPct = parseFloat(document.getElementById('pDownPct').value) || 15;
   var plans = oRoundPlans(buildQuotePlans(u, dpPct));
   var cash = plans[0];
   unitInfo.innerHTML =
     '<strong>'+u.torre+'-'+u.num+'</strong> · '+u.tipo+' · '+u.m2+' m² · Vista '+u.vista+' · ' +
-    '<span style="font-weight:700;color:var(--green)">Disponible</span><br>' +
+    '<span style="font-weight:700;color:'+av.color+'">'+av.status+'</span><br>' +
     'Precio de lista <strong>'+fmtMXN(u.precio)+'</strong> · ' +
     'Contado (20% dto) <strong style="color:var(--navy)">'+fmtMXN(cash.finalPrice)+'</strong> · ' +
     'Enganche '+dpPct+'% <strong>'+fmtMXN(cash.downPayment)+'</strong>';
@@ -4771,7 +4793,7 @@ function buildPropuestaPartHTML() {
 function previewPropuesta() {
   var html = '';
   if (pMode === 'depto') {
-    if (!pSelectedUnit || !pSelectedModel) { alert('Elige un modelo y una unidad disponible primero.'); return; }
+    if (!pSelectedUnit || !pSelectedModel) { alert('Elige un modelo y una unidad primero.'); return; }
     html = buildPropuestaDeptoHTML();
   } else {
     html = buildPropuestaPartHTML();
@@ -4788,7 +4810,7 @@ function exportPropuestaPDF() {
 
 // ── PDF: Departamento ──────────────────────────────────────────────────────
 function exportPropuestaDeptoPDF() {
-  if (!pSelectedUnit || !pSelectedModel) { alert('Elige un modelo y una unidad disponible primero.'); return; }
+  if (!pSelectedUnit || !pSelectedModel) { alert('Elige un modelo y una unidad primero.'); return; }
   var jsPDF = getJsPDF(); if (!jsPDF) return;
   var dpPct = parseFloat(document.getElementById('pDownPct').value) || 15;
   var inv = pSelectedUnit;
