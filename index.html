@@ -968,9 +968,14 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
               <option value="">— Primero elige un modelo —</option>
             </select>
           </div>
-          <div class="field" style="width:130px">
-            <span class="label">Enganche %</span>
-            <input type="number" id="pDownPct" value="15" min="1" max="100" step="0.5" onchange="if(pSelectedUnit) pOnUnitChange()">
+          <div class="field" style="width:200px">
+            <div style="display:flex;border:1px solid var(--border-strong);border-radius:8px;overflow:hidden;margin-bottom:6px">
+              <button id="pDpModePct" onclick="pSetDpMode('pct')" style="flex:1;padding:7px 4px;font-size:11px;font-weight:600;border:none;cursor:pointer;background:var(--navy);color:white;font-family:inherit">Porcentaje %</button>
+              <button id="pDpModeMxn" onclick="pSetDpMode('mxn')" style="flex:1;padding:7px 4px;font-size:11px;font-weight:600;border:none;cursor:pointer;background:var(--white);color:var(--text-muted);font-family:inherit">Pesos $</button>
+            </div>
+            <span class="label" id="pDpLabel">Enganche <span class="label-hint">(%)</span></span>
+            <input type="number" id="pDpValue" value="15" min="1" max="100" step="0.5" onchange="pSyncDpDisplay(); if(pSelectedUnit) pOnUnitChange()">
+            <div style="font-size:10px;color:var(--text-muted);margin-top:3px"><span id="pDpEquivLabel">Equivale en $</span>: <span id="pDpEquiv">—</span></div>
           </div>
         </div>
         <div id="pModelInfo" style="display:none"></div>
@@ -4328,6 +4333,7 @@ var pMode = 'depto';
 var pSelectedModel = null;
 var pSelectedUnit = null;
 var pCurrentUnits = [];
+var pDpMode = 'pct'; // 'pct' = enganche en %, 'mxn' = enganche en pesos (como la calculadora principal)
 
 function pSetMode(mode) {
   pMode = mode;
@@ -4451,6 +4457,83 @@ function pOnModelChange() {
   pOnUnitChange();
 }
 
+// ── Enganche: % o Pesos $ (como la calculadora principal) ───────────────────
+function pSetDpMode(mode) {
+  pDpMode = mode;
+  var pctBtn = document.getElementById('pDpModePct');
+  var mxnBtn = document.getElementById('pDpModeMxn');
+  var valEl = document.getElementById('pDpValue');
+  var cur = parseFloat(valEl.value);
+  if (isNaN(cur)) cur = 15; // vacío -> default 15%
+  var price = pSelectedUnit ? pSelectedUnit.precio : 0;
+  if (mode === 'pct') {
+    pctBtn.style.background = 'var(--navy)'; pctBtn.style.color = 'white';
+    mxnBtn.style.background = 'var(--white)'; mxnBtn.style.color = 'var(--text-muted)';
+    document.getElementById('pDpLabel').innerHTML = 'Enganche <span class="label-hint">(%)</span>';
+    document.getElementById('pDpEquivLabel').textContent = 'Equivale en $';
+    valEl.value = price ? Math.round(cur / price * 1000) / 10 : (cur <= 100 ? cur : 15);
+    valEl.step = '0.5'; valEl.min = '1'; valEl.max = '100';
+  } else {
+    mxnBtn.style.background = 'var(--navy)'; mxnBtn.style.color = 'white';
+    pctBtn.style.background = 'var(--white)'; pctBtn.style.color = 'var(--text-muted)';
+    document.getElementById('pDpLabel').innerHTML = 'Enganche <span class="label-hint">($)</span>';
+    document.getElementById('pDpEquivLabel').textContent = 'Equivale en %';
+    valEl.value = price ? Math.round(price * cur / 100) : '';
+    valEl.step = '1000'; valEl.min = '0'; valEl.max = '';
+  }
+  pSyncDpDisplay();
+  if (pSelectedUnit) pOnUnitChange();
+}
+
+function pSyncDpDisplay() {
+  var eqEl = document.getElementById('pDpEquiv');
+  if (!eqEl) return;
+  var price = pSelectedUnit ? pSelectedUnit.precio : 0;
+  var val = parseFloat(document.getElementById('pDpValue').value) || 0;
+  if (pDpMode === 'pct') {
+    eqEl.textContent = price ? fmtMXN(price * val / 100) : '—';
+  } else {
+    eqEl.textContent = price ? fmtPct(val / price * 100, 1) + '  (s/lista)' : '—';
+  }
+}
+
+function pFrench(fin, rate, months) {
+  if (!rate || !months) return fin / months;
+  var r = rate / 12 / 100;
+  return (fin * r * Math.pow(1+r, months)) / (Math.pow(1+r, months) - 1);
+}
+
+// Planes de la propuesta con el enganche en % o en pesos.
+// En modo % usa buildQuotePlans tal cual; en modo $ el MISMO monto fijo es el
+// enganche de todos los planes (como buildPlans de la calculadora principal).
+function pBuildPlans(u) {
+  if (pDpMode === 'pct') {
+    var dpPct = parseFloat(document.getElementById('pDpValue').value) || 15;
+    return buildQuotePlans(u, dpPct);
+  }
+  var amt = parseFloat(document.getElementById('pDpValue').value) || 0;
+  var base = buildQuotePlans(u, 0);
+  return base.map(function(pl){
+    var dp = Math.min(amt, pl.finalPrice);
+    var fin = Math.max(0, pl.finalPrice - dp);
+    var mp = pl.available && fin > 0 ? pFrench(fin, pl.rate, pl.months) : 0;
+    return {
+      name: pl.name, disc: pl.disc, rate: pl.rate, months: pl.months,
+      finalPrice: pl.finalPrice, listPrice: pl.listPrice,
+      downPayment: dp, financed: fin, monthlyPayment: mp,
+      dpPctEff: pl.finalPrice > 0 ? dp / pl.finalPrice * 100 : 0,
+      totalPaid: dp + mp * pl.months,
+      t2only: pl.t2only, available: pl.available
+    };
+  });
+}
+
+// Texto corto del enganche para etiquetas ('15%' o '$500,000')
+function pDpDesc() {
+  var v = parseFloat(document.getElementById('pDpValue').value) || 0;
+  return pDpMode === 'pct' ? (v || 15) + '%' : fmtMXN(v);
+}
+
 function pOnUnitChange() {
   var unitSel = document.getElementById('pUnitSelect');
   var unitInfo = document.getElementById('pUnitInfo');
@@ -4459,15 +4542,23 @@ function pOnUnitChange() {
   var u = pCurrentUnits[idx];
   pSelectedUnit = u;
   var av = getAvailability(u.torre, u.num);
-  var dpPct = parseFloat(document.getElementById('pDownPct').value) || 15;
-  var plans = oRoundPlans(buildQuotePlans(u, dpPct));
+  pSyncDpDisplay();
+  var plans = oRoundPlans(pBuildPlans(u));
   var cash = plans[0];
+  var dpTxt;
+  if (pDpMode === 'pct') {
+    var dpPct = parseFloat(document.getElementById('pDpValue').value) || 15;
+    dpTxt = 'Enganche ' + dpPct + '% <strong>' + fmtMXN(cash.downPayment) + '</strong>';
+  } else {
+    var amt = parseFloat(document.getElementById('pDpValue').value) || 0;
+    dpTxt = 'Enganche <strong>' + fmtMXN(cash.downPayment) + '</strong> (' + fmtPct(u.precio ? amt / u.precio * 100 : 0, 1) + '% s/lista)';
+  }
   unitInfo.innerHTML =
     '<strong>'+u.torre+'-'+u.num+'</strong> · '+u.tipo+' · '+u.m2+' m² · Vista '+u.vista+' · ' +
     '<span style="font-weight:700;color:'+av.color+'">'+av.status+'</span><br>' +
     'Precio de lista <strong>'+fmtMXN(u.precio)+'</strong> · ' +
     'Contado (20% dto) <strong style="color:var(--navy)">'+fmtMXN(cash.finalPrice)+'</strong> · ' +
-    'Enganche '+dpPct+'% <strong>'+fmtMXN(cash.downPayment)+'</strong>';
+    dpTxt;
   unitInfo.style.display = 'block';
 }
 
@@ -4609,8 +4700,7 @@ function buildPropuestaDeptoHTML() {
   var inv = pSelectedUnit;
   var m = pSelectedModel;
   if (!inv || !m) return '';
-  var dpPct = parseFloat(document.getElementById('pDownPct').value) || 15;
-  var plans = oRoundPlans(buildQuotePlans(inv, dpPct));
+  var plans = oRoundPlans(pBuildPlans(inv));
   var avail = getAvailability(inv.torre, inv.num);
   var imgKey = getUnitImageKey(inv.torre, inv.num);
   var imgSrc = UNIT_IMAGES[imgKey] || '';
@@ -4697,7 +4787,7 @@ function buildPropuestaDeptoHTML() {
   '<tr><td style="padding:6px 0;color:#5a7a62">Precio c/Dto 20%</td><td style="padding:6px 0;text-align:right;font-weight:700;color:#1a6640">'+fmtMXN(plans[0].finalPrice)+'</td></tr>' +
   '</table></div></div>' +
   '<div style="padding:20px 24px">' +
-  '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#2d6040;margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Planes de Financiamiento · Eng. '+dpPct+'%</div>' +
+  '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#2d6040;margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Planes de Financiamiento · Eng. '+pDpDesc()+'</div>' +
   '<table style="width:100%;border-collapse:collapse;font-size:12px">' +
   '<thead><tr style="background:#2d5a38">' +
   '<th style="padding:7px 12px;text-align:left;color:rgba(255,255,255,0.85);font-size:10px;font-weight:600">Plan</th>' +
@@ -4812,10 +4902,11 @@ function exportPropuestaPDF() {
 function exportPropuestaDeptoPDF() {
   if (!pSelectedUnit || !pSelectedModel) { alert('Elige un modelo y una unidad primero.'); return; }
   var jsPDF = getJsPDF(); if (!jsPDF) return;
-  var dpPct = parseFloat(document.getElementById('pDownPct').value) || 15;
+  var dpVal = parseFloat(document.getElementById('pDpValue').value) || 0;
+  var dpLabel = pDpMode === 'pct' ? (dpVal || 15) + '%' : fmtMXN(dpVal);
   var inv = pSelectedUnit;
   var m = pSelectedModel;
-  var ps = oRoundPlans(buildQuotePlans(inv, dpPct));
+  var ps = oRoundPlans(pBuildPlans(inv));
   var avail = getAvailability(inv.torre, inv.num);
   var imgKey = getUnitImageKey(inv.torre, inv.num);
   var imgSrc = UNIT_IMAGES[imgKey] || null;
@@ -4910,7 +5001,7 @@ function exportPropuestaDeptoPDF() {
     ['Baños',                m.banos],
     ['Torre',                inv.torre + ' - ' + (inv.torre==='T1'?'Entrega 24m':'Entrega 42m')],
     ['Precio c/Dto 20%',     fmtMXN(ps[0].finalPrice)],
-    ['Enganche ref. ('+dpPct+'%)', fmtMXN(ps[0].downPayment)]
+    ['Enganche ref. ('+dpLabel+')', fmtMXN(ps[0].downPayment)]
   ];
   var rowH = 8.5;
   specs.forEach(function(sp, si) {
@@ -4932,7 +5023,7 @@ function exportPropuestaDeptoPDF() {
   doc.setDrawColor(184,212,184); doc.setLineWidth(0.5);
   doc.line(M, y, W - M, y);
   setStyle(7,[45,96,64],true);
-  doc.text('PLANES DE FINANCIAMIENTO  -  ENGANCHE ' + dpPct + '%', M, y - 1.5);
+  doc.text('PLANES DE FINANCIAMIENTO  -  ENGANCHE ' + dpLabel, M, y - 1.5);
   y += 5;
   var cPlan = 66, cEng = 30, cMens = 36, cPlaz = 22, cTasa = CW - cPlan - cEng - cMens - cPlaz;
   var rPad = 2;
@@ -5049,7 +5140,10 @@ function exportPropuestaDeptoPDF() {
   // ── Nota final ───────────────────────────────────────────────────────────
   y += 3;
   setStyle(6.5,[140,165,140],false);
-  doc.text('* Precios sujetos a disponibilidad. Enganche del ' + dpPct + '% sobre precio final de cada plan.', M, y);
+  var dpNote = pDpMode === 'pct'
+    ? '* Precios sujetos a disponibilidad. Enganche del ' + (dpVal || 15) + '% sobre precio final de cada plan.'
+    : '* Precios sujetos a disponibilidad. Enganche fijo de ' + fmtMXN(dpVal) + ' en cada plan.';
+  doc.text(dpNote, M, y);
   y += 4;
   doc.text('Proyecciones basadas en el desempeño esperado; no constituyen garantía.', M, y);
 
