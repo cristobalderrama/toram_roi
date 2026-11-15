@@ -1110,7 +1110,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
       <div class="l-hero-text">
         <div class="l-hero-kicker">Entregables · TORAM Plaza Comercial</div>
         <h2>Locales comerciales</h2>
-        <p>Plaza comercial dentro del parque, con acceso y operación independiente. Elige un local disponible y cotízalo con los 5 planes sin intereses.</p>
+        <p>Plaza comercial dentro del parque, con acceso y operación independiente. Elige un local y cotízalo con los 5 planes sin intereses. También puedes cotizar un local apartado: la propuesta lo marca como apartado y queda sujeta a su liberación.</p>
       </div>
     </div>
 
@@ -1164,7 +1164,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
       <div class="card-title">Seleccionar local comercial</div>
       <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:16px">
         <div class="field" style="flex:1;min-width:240px">
-          <span class="label">Local disponible (el más económico primero)</span>
+          <span class="label">Local (disponibles primero, del más económico al más caro)</span>
           <select id="lLocalSelect" onchange="lOnLocalChange()" style="width:100%;height:42px;border:1px solid var(--border-strong);border-radius:var(--radius);padding:0 10px;font-size:14px;background:white">
             <option value="">— Elige un local —</option>
           </select>
@@ -1198,7 +1198,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
     <div class="card" style="margin-top:16px">
       <div class="card-title">Disponibilidad — ETAPA 1 (21 locales)</div>
       <div id="lAvailTable"></div>
-      <p class="l-note" style="margin-top:10px">Precio por m²: $62,349.00 para todos los locales. Solo se cotizan los locales disponibles.</p>
+      <p class="l-note" style="margin-top:10px">Precio por m²: $62,349.00 para todos los locales. También se pueden cotizar locales apartados: la propuesta indica su estatus y queda sujeta a su liberación.</p>
     </div>
 
     <!-- Acciones -->
@@ -3335,7 +3335,9 @@ const PARTI = {
 // DISPONIBLE; APARTADO = no disponible. La tabla es la fuente de disponibilidad
 // (el plano marca en amarillo los mismos 10 APARTADO, pero su leyenda dice
 // "VENDIDOS"). Sin asesoría de ROI para locales: solo información, precios y
-// planes. No hay apartado para locales (no inventarlo).
+// planes. No hay pago de apartado en los planes de locales (no inventarlo);
+// el estatus APARTADO sí existe y esos locales también se pueden cotizar,
+// con el estatus visible en la propuesta (sujeta a su liberación).
 const LOCALES_PRECIO_M2 = 62349;
 const LOCALES = [
   {local:'L1', m2:46.81, precio_lista:2918556.69, estatus:'DISPONIBLE'},
@@ -5318,7 +5320,9 @@ function exportPropuestaPartPDF() {
 // precio de lista, sin intereses). La última mensualidad se ajusta por centavos
 // para que la suma de mensualidades sea exactamente el resto (igual que la
 // amortización de departamentos en FASE 2: el último pago deja el saldo en
-// $0.00 exacto). No hay apartado para locales.
+// $0.00 exacto). No hay pago de apartado en los planes de locales.
+// Se puede cotizar CUALQUIER local, incluido uno APARTADO: el selector los
+// lista todos (disponibles primero) y la vista previa/PDF muestran el estatus.
 var lSelectedLocal = null;
 var lSelectedPlanIdx = 0;
 
@@ -5326,6 +5330,16 @@ var lSelectedPlanIdx = 0;
 function lAvailableLocales() {
   return LOCALES.filter(function(x){ return x.estatus === 'DISPONIBLE'; })
     .sort(function(a,b){ return a.precio_lista - b.precio_lista; });
+}
+
+// Todos los locales cotizables, del más económico al más caro: primero los
+// DISPONIBLE y después los APARTADO (también de menor a mayor precio).
+// Un local APARTADO se puede cotizar: la propuesta muestra su estatus.
+function lSelectableLocales() {
+  var disp = lAvailableLocales();
+  var apart = LOCALES.filter(function(x){ return x.estatus === 'APARTADO'; })
+    .sort(function(a,b){ return a.precio_lista - b.precio_lista; });
+  return disp.concat(apart);
 }
 
 // Los 5 planes de un local: descuento sobre precio de lista, sin intereses.
@@ -5365,8 +5379,9 @@ function lPopulateLocales() {
   var sel = document.getElementById('lLocalSelect');
   if (sel) {
     var html = '<option value="">— Elige un local —</option>';
-    lAvailableLocales().forEach(function(x){
-      html += '<option value="'+x.local+'">Local '+x.local+' · '+x.m2+' m² · '+fmtMXN(x.precio_lista)+' lista</option>';
+    lSelectableLocales().forEach(function(x){
+      var tag = x.estatus === 'APARTADO' ? ' · Apartado' : '';
+      html += '<option value="'+x.local+'">Local '+x.local+' · '+x.m2+' m² · '+fmtMXN(x.precio_lista)+' lista'+tag+'</option>';
     });
     sel.innerHTML = html;
   }
@@ -5405,12 +5420,19 @@ function lOnLocalChange() {
     return;
   }
   var loc = LOCALES.find(function(x){ return x.local === key; });
-  if (!loc || loc.estatus !== 'DISPONIBLE') {
+  if (!loc) {
     info.style.display = 'none';
     tbl.style.display = 'none';
     return;
   }
   lSelectedLocal = loc;
+  var isApart = loc.estatus === 'APARTADO';
+  var badge = isApart
+    ? '<span class="l-badge l-badge-no">Apartado</span>'
+    : '<span class="l-badge l-badge-ok">Disponible</span>';
+  var apartNote = isApart
+    ? '<div class="l-note" style="margin-top:10px;color:#9a5b00">Este local está apartado. La cotización es informativa y queda sujeta a su liberación.</div>'
+    : '';
   info.innerHTML =
     '<div class="l-kicker">Plaza TORAM · ETAPA 1 · Local</div>' +
     '<div style="font-family:\'Playfair Display\',Georgia,serif;font-size:22px;font-weight:700;color:var(--navy);line-height:1.2;margin:4px 0 8px">Local '+loc.local+'</div>' +
@@ -5418,8 +5440,8 @@ function lOnLocalChange() {
     '<tr><td style="padding:5px 0;color:var(--text-muted)">Superficie</td><td style="padding:5px 0;text-align:right;font-weight:600">'+loc.m2+' m²</td></tr>' +
     '<tr><td style="padding:5px 0;color:var(--text-muted)">Precio por m²</td><td style="padding:5px 0;text-align:right;font-weight:600">'+fmtMXN(LOCALES_PRECIO_M2)+'</td></tr>' +
     '<tr><td style="padding:5px 0;color:var(--text-muted)">Precio de lista</td><td style="padding:5px 0;text-align:right;font-weight:700;color:var(--navy)">'+fmtMXN(loc.precio_lista)+'</td></tr>' +
-    '<tr><td style="padding:5px 0;color:var(--text-muted)">Estatus</td><td style="padding:5px 0;text-align:right"><span class="l-badge l-badge-ok">Disponible</span></td></tr>' +
-    '</table>';
+    '<tr><td style="padding:5px 0;color:var(--text-muted)">Estatus</td><td style="padding:5px 0;text-align:right">'+badge+'</td></tr>' +
+    '</table>' + apartNote;
   info.style.display = 'block';
   lRenderPlansTable(lBuildPlans(loc));
   tbl.style.display = 'block';
@@ -5487,6 +5509,13 @@ function lClientFileName() {
 function buildLocalesHTML() {
   var loc = lSelectedLocal;
   if (!loc) return '';
+  var isApart = loc.estatus === 'APARTADO';
+  var statusBadge = isApart
+    ? '<span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;background:#9a5b00;color:#fff">Apartado</span>'
+    : '<span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;background:#1a6640;color:#fff">Disponible</span>';
+  var apartNoteHtml = isApart
+    ? '<div style="font-size:12px;color:#f5c98a;margin-top:8px">Este local se encuentra apartado. Esta cotización es informativa y queda sujeta a su liberación.</div>'
+    : '';
   var plans = lBuildPlans(loc);
   var plan = plans[lSelectedPlanIdx] || plans[0];
   var sched = lMonthlySchedule(plan);
@@ -5526,7 +5555,8 @@ function buildLocalesHTML() {
   '<div style="text-align:right">' +
   '<div style="font-family:\'Playfair Display\',Georgia,serif;font-size:22px;font-weight:700;color:white">Local '+loc.local+'</div>' +
   '<div style="font-size:11px;color:#b8d890;margin-top:2px">Plaza TORAM · ETAPA 1</div>' +
-  '<div style="margin-top:6px"><span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;background:#1a6640;color:#fff">Disponible</span></div>' +
+  '<div style="margin-top:6px">'+statusBadge+'</div>' +
+  apartNoteHtml +
   '</div></div>' +
   '<div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.25)">' +
   '<div style="font-family:\'Playfair Display\',Georgia,serif;font-size:20px;font-weight:700;color:white">Cotización para '+cd.client+'</div>' +
@@ -5580,7 +5610,7 @@ function buildLocalesHTML() {
 }
 
 function previewLocales() {
-  if (!lSelectedLocal) { alert('Elige un local disponible primero.'); return; }
+  if (!lSelectedLocal) { alert('Elige un local primero.'); return; }
   var html = buildLocalesHTML();
   var wrap = document.getElementById('lPreviewContent');
   wrap.innerHTML = html;
@@ -5590,7 +5620,7 @@ function previewLocales() {
 
 // ── PDF: Local comercial ───────────────────────────────────────────────────
 function exportLocalesPDF() {
-  if (!lSelectedLocal) { alert('Elige un local disponible primero.'); return; }
+  if (!lSelectedLocal) { alert('Elige un local primero.'); return; }
   var jsPDF = getJsPDF(); if (!jsPDF) return;
   var loc = lSelectedLocal;
   var plans = lBuildPlans(loc);
@@ -5633,11 +5663,12 @@ function exportLocalesPDF() {
   doc.text('Local '+loc.local, W-M, 14, {align:'right'});
   setStyle(8,[184,216,144],false);
   doc.text('Plaza TORAM · ETAPA 1', W-M, 21, {align:'right'});
-  doc.setFillColor(26,100,64);
-  var stW = doc.getTextWidth('Disponible') + 6;
+  var stTxt = loc.estatus === 'APARTADO' ? 'Apartado' : 'Disponible';
+  if (loc.estatus === 'APARTADO') { doc.setFillColor(154,91,0); } else { doc.setFillColor(26,100,64); }
+  var stW = doc.getTextWidth(stTxt) + 6;
   doc.roundedRect(W-M-stW, 24, stW, 6, 1, 1, 'F');
   setStyle(7,[255,255,255],true);
-  doc.text('Disponible', W-M-stW/2, 28.2, {align:'center'});
+  doc.text(stTxt, W-M-stW/2, 28.2, {align:'center'});
   // Cliente (debajo de la banda, texto oscuro legible sobre blanco)
   setStyle(13,[255,255,255],true);
   doc.text('Cotización para '+cd.client, M, 36.5);
@@ -5649,6 +5680,11 @@ function exportLocalesPDF() {
     var lNoteLines = doc.splitTextToSize(cd.note, CW);
     doc.text(lNoteLines, M, 51);
     y = 51 + lNoteLines.length*4 + 4;
+  }
+  if (loc.estatus === 'APARTADO') {
+    setStyle(8,[154,91,0],true);
+    doc.text('Este local se encuentra apartado. Cotización informativa, sujeta a su liberación.', M, y);
+    y += 5;
   }
 
   // ── DATOS DEL LOCAL ──────────────────────────────────────────────────────
