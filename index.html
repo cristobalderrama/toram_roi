@@ -5114,41 +5114,6 @@ function exportPropuestaDeptoPDF() {
   var imageBottom = y + imgH + 6;
   y = Math.max(specsBottom, imageBottom);
 
-  // ── PLANO Y ACABADOS ──────────────────────────────────────────
-  var mi = getModelImages(imgKey);
-  if (mi.plano || mi.acabados) {
-    var paH = 105; // altura máxima de la fila de imágenes (mm)
-    var colW = (CW - 8) / 2;
-    var planoW = 0, planoH = 0, acabW = 0, acabH = 0;
-    if (mi.plano && mi.dims && mi.dims.plano) {
-      planoH = Math.min(paH, colW * mi.dims.plano[1] / mi.dims.plano[0]);
-      planoW = planoH * mi.dims.plano[0] / mi.dims.plano[1];
-    }
-    if (mi.acabados && mi.dims && mi.dims.acabados) {
-      acabH = Math.min(paH, colW * mi.dims.acabados[1] / mi.dims.acabados[0]);
-      acabW = acabH * mi.dims.acabados[0] / mi.dims.acabados[1];
-    }
-    var rowH = Math.max(planoH, acabH);
-    if (y + 12 + rowH + 10 > 268) { doc.addPage(); y = 20; }
-    y += 6;
-    doc.setDrawColor(184,212,184); doc.setLineWidth(0.5);
-    doc.line(M, y, W - M, y);
-    setStyle(7,[45,96,64],true);
-    doc.text('PLANO Y ACABADOS  -  ' + m.nombre.toUpperCase(), M, y - 1.5);
-    y += 4;
-    var imgY = y;
-    if (mi.plano) {
-      try { doc.addImage(mi.plano, 'JPEG', M + (colW - planoW)/2, imgY + (rowH - planoH)/2, planoW, planoH); } catch(e) {}
-      setStyle(6.5,[90,122,90],false);
-      doc.text('Plano - ' + m.nombre + ' (' + m.m2 + ' m2)', M + colW/2, imgY + rowH + 4, {align:'center'});
-    }
-    if (mi.acabados) {
-      try { doc.addImage(mi.acabados, 'JPEG', M + colW + 8 + (colW - acabW)/2, imgY + (rowH - acabH)/2, acabW, acabH); } catch(e) {}
-      setStyle(6.5,[90,122,90],false);
-      doc.text('Acabados - renders ilustrativos del modelo', M + colW + 8 + colW/2, imgY + rowH + 4, {align:'center'});
-    }
-    y = imgY + rowH + 8;
-  }
   // ── PLANS TABLE ───────────────────────────────────────────────────────────
   doc.setDrawColor(184,212,184); doc.setLineWidth(0.5);
   doc.line(M, y, W - M, y);
@@ -5251,6 +5216,45 @@ function exportPropuestaDeptoPDF() {
     y += 4;
   }
 
+  // ── PLANO Y ACABADOS (hoja dedicada) ────────────────────────
+  var mi = getModelImages(imgKey);
+  if (mi.plano || mi.acabados) {
+    var paH = 105; // altura máxima de la fila de imágenes (mm)
+    var colW = (CW - 8) / 2;
+    var planoW = 0, planoH = 0, acabW = 0, acabH = 0;
+    if (mi.plano && mi.dims && mi.dims.plano) {
+      planoH = Math.min(paH, colW * mi.dims.plano[1] / mi.dims.plano[0]);
+      planoW = planoH * mi.dims.plano[0] / mi.dims.plano[1];
+    }
+    if (mi.acabados && mi.dims && mi.dims.acabados) {
+      acabH = Math.min(paH, colW * mi.dims.acabados[1] / mi.dims.acabados[0]);
+      acabW = acabH * mi.dims.acabados[0] / mi.dims.acabados[1];
+    }
+    var rowH = Math.max(planoH, acabH);
+    // Hoja dedicada al plano y los renders, contenido centrado verticalmente
+    doc.addPage();
+    y = 80;
+    doc.setDrawColor(184,212,184); doc.setLineWidth(0.5);
+    doc.line(M, y, W - M, y);
+    setStyle(7,[45,96,64],true);
+    doc.text('PLANO Y ACABADOS  -  ' + m.nombre.toUpperCase(), M, y - 1.5);
+    y += 4;
+    var imgY = y;
+    if (mi.plano) {
+      try { doc.addImage(mi.plano, 'JPEG', M + (colW - planoW)/2, imgY + (rowH - planoH)/2, planoW, planoH); } catch(e) {}
+      setStyle(6.5,[90,122,90],false);
+      doc.text('Plano - ' + m.nombre + ' (' + m.m2 + ' m2)', M + colW/2, imgY + rowH + 4, {align:'center'});
+    }
+    if (mi.acabados) {
+      try { doc.addImage(mi.acabados, 'JPEG', M + colW + 8 + (colW - acabW)/2, imgY + (rowH - acabH)/2, acabW, acabH); } catch(e) {}
+      setStyle(6.5,[90,122,90],false);
+      doc.text('Acabados - renders ilustrativos del modelo', M + colW + 8 + colW/2, imgY + rowH + 4, {align:'center'});
+    }
+    y = imgY + rowH + 8;
+    // La siguiente sección (amenidades) empieza en hoja nueva
+    doc.addPage();
+    y = 20;
+  }
   // ── Amenidades ───────────────────────────────────────────────────────────
   var amW = 150, amH = Math.round(amW * 522 / 934);
   if (y + amH + 12 > 268) { doc.addPage(); y = 20; }
