@@ -5164,6 +5164,11 @@ function exportPropuestaDeptoPDF() {
   setStyle(6.5,[90,122,90],false);
   doc.text('Atracciones, cenote, playa y experiencias: el parque es el corazón del desarrollo.', M, y);
   y += 4;
+  // Mapa interactivo del parque (enlace clicable)
+  var mapaTxt = 'Recorre el parque en el mapa interactivo: cristobalderrama.github.io/Toram/mapa/';
+  setStyle(7,[45,96,64],true);
+  doc.text(mapaTxt, M, y, {link: 'https://cristobalderrama.github.io/Toram/mapa/'});
+  y += 5;
 
   pFooter();
   doc.save('Toram_Propuesta_' + pClientFileName() + '.pdf');
@@ -5297,6 +5302,11 @@ function exportPropuestaPartPDF() {
   setStyle(6.5,[90,122,90],false);
   doc.text('Atracciones, cenote, playa y experiencias: el parque es el corazón del desarrollo.', M, y);
   y += 4;
+  // Mapa interactivo del parque (enlace clicable)
+  var mapaTxt = 'Recorre el parque en el mapa interactivo: cristobalderrama.github.io/Toram/mapa/';
+  setStyle(7,[45,96,64],true);
+  doc.text(mapaTxt, M, y, {link: 'https://cristobalderrama.github.io/Toram/mapa/'});
+  y += 5;
 
   // ── PAGE FOOTER ───────────────────────────────────────────────────────────
   var pages = doc.getNumberOfPages();
