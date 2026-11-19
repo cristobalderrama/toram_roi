@@ -3055,8 +3055,14 @@ function buildQuoteHTML() {
     roiSection + '</div>' +
     '<div style="background:#1a3a22;padding:14px 40px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">' +
     '<div style="font-size:10px;color:rgba(255,255,255,0.4)">TORAM</div>' +
-    '<div style="font-size:10px;color:rgba(255,255,255,0.35)">Vigencia 30 días · Sujeto a disponibilidad</div>' +
+    '<div style="font-size:10px;color:rgba(255,255,255,0.35)">Vigencia 3 días · Sujeto a disponibilidad</div>' +
     '<div style="font-size:12px;font-weight:700;color:#b8d890">669 139 3136</div></div></div>';
+}
+
+// Vigencia de propuestas/cotizaciones: 3 días a partir de la emisión (día en que se genera el PDF).
+function vigenciaHastaTxt() {
+  var d = new Date(); d.setDate(d.getDate() + 3);
+  return d.toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'});
 }
 
 function exportQuotePDF() {
@@ -3244,7 +3250,7 @@ function exportQuotePDF() {
     doc.setFillColor(26,58,34); doc.rect(0,285,W,12,'F');
     hdr(7,[140,175,140],false);
     doc.text('TORAM', M, 292);
-    doc.text('Vigencia 30 días · Sujeto a disponibilidad', W/2, 292, {align:'center'});
+    doc.text('Vigencia 3 días · Sujeto a disponibilidad', W/2, 292, {align:'center'});
     hdr(8,[184,216,144],true); doc.text('669 139 3136', W-M, 292, {align:'right'});
     if (pages>1){ hdr(6.5,[120,155,120],false); doc.text(pg+' / '+pages, W/2, 284, {align:'center'}); }
   }
@@ -4087,7 +4093,7 @@ function buildFichaHTML(inv, dpPct) {
   // Footer
   '<div style="background:#1a3a22;padding:12px 32px;display:flex;justify-content:space-between;align-items:center">' +
   '<div style="font-size:10px;color:rgba(255,255,255,0.4)">TORAM Residencial</div>' +
-  '<div style="font-size:10px;color:rgba(255,255,255,0.35)">Precios sujetos a disponibilidad · '+new Date().toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'})+'</div>' +
+  '<div style="font-size:10px;color:rgba(255,255,255,0.35)">Precios sujetos a disponibilidad · Vigencia 3 días · '+new Date().toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'})+'</div>' +
   '<div style="font-size:11px;font-weight:700;color:#b8d890">669 139 3136</div>' +
   '</div></div>';
 }
@@ -4318,7 +4324,7 @@ function exportFichaPDF() {
     setStyle(7,[140,175,140],false);
     doc.text('TORAM Residencial', M, 292);
     setStyle(7,[100,140,100],false);
-    doc.text(new Date().toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'}), W/2, 292, {align:'center'});
+    doc.text('Vigencia 3 días · ' + new Date().toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'}), W/2, 292, {align:'center'});
     setStyle(8,[184,216,144],true);
     doc.text('669 139 3136', W - M, 292, {align:'right'});
   }
@@ -4811,7 +4817,7 @@ function buildPropuestaDeptoHTML() {
   '</div>' +
   '<div style="background:#1a3a22;padding:12px 32px;display:flex;justify-content:space-between;align-items:center">' +
   '<div style="font-size:10px;color:rgba(255,255,255,0.4)">TORAM Residencial · Proyecciones basadas en el desempeño esperado; no constituyen garantía.</div>' +
-  '<div style="font-size:10px;color:rgba(255,255,255,0.35)">Precios sujetos a disponibilidad · '+cd.dateStr+'</div>' +
+  '<div style="font-size:10px;color:rgba(255,255,255,0.35)">Vigencia 3 días · Precios sujetos a disponibilidad · '+cd.dateStr+'</div>' +
   '<div style="font-size:11px;font-weight:700;color:#d4a84b">669 139 3136</div>' +
   '</div></div>';
 }
@@ -4877,7 +4883,7 @@ function buildPropuestaPartHTML() {
   '</div>' +
   '<div style="background:#1a3a22;padding:12px 32px;display:flex;justify-content:space-between;align-items:center">' +
   '<div style="font-size:10px;color:rgba(255,255,255,0.4)">TORAM Parque Temático · Proyecciones basadas en el desempeño esperado; no constituyen garantía.</div>' +
-  '<div style="font-size:10px;color:rgba(255,255,255,0.35)">Sujeto a disponibilidad · '+cd.dateStr+'</div>' +
+  '<div style="font-size:10px;color:rgba(255,255,255,0.35)">Vigencia 3 días · Sujeto a disponibilidad · '+cd.dateStr+'</div>' +
   '<div style="font-size:11px;font-weight:700;color:#d4a84b">669 139 3136</div>' +
   '</div></div>';
 }
@@ -4940,7 +4946,7 @@ function exportPropuestaDeptoPDF() {
       setStyle(7,[140,175,140],false);
       doc.text('TORAM Residencial', M, 292);
       setStyle(7,[100,140,100],false);
-      doc.text(cd.dateStr, W/2, 292, {align:'center'});
+      doc.text('Vigencia 3 días · ' + cd.dateStr, W/2, 292, {align:'center'});
       setStyle(8,[212,168,75],true);
       doc.text('669 139 3136', W - M, 292, {align:'right'});
     }
@@ -5148,6 +5154,12 @@ function exportPropuestaDeptoPDF() {
   doc.text(dpNote, M, y);
   y += 4;
   doc.text('Proyecciones basadas en el desempeño esperado; no constituyen garantía.', M, y);
+  y += 4;
+  if (y > 270) { doc.addPage(); y = 20; }
+  setStyle(7,[45,96,64],true);
+  var vigLines = doc.splitTextToSize('Vigencia: 3 días a partir de la emisión (válida hasta el ' + vigenciaHastaTxt() + '). Después de esa fecha, precios y disponibilidad pueden cambiar.', CW);
+  doc.text(vigLines, M, y);
+  y += vigLines.length * 4;
 
   // ── Mapa del parque ──────────────────────────────────────────
   var mapW = 150, mapH = Math.round(mapW * 675 / 1200);
@@ -5286,6 +5298,12 @@ function exportPropuestaPartPDF() {
   doc.text('Cada participación equivale al 0.05% del ingreso neto del parque, con pagos trimestrales.', M, y);
   y += 4;
   doc.text('Sujeto a disponibilidad.', M, y);
+  y += 4;
+  if (y > 270) { doc.addPage(); y = 20; }
+  setStyle(7,[45,96,64],true);
+  var vigLines = doc.splitTextToSize('Vigencia: 3 días a partir de la emisión (válida hasta el ' + vigenciaHastaTxt() + '). Después de esa fecha, precios y disponibilidad pueden cambiar.', CW);
+  doc.text(vigLines, M, y);
+  y += vigLines.length * 4;
 
   // ── Mapa del parque ──────────────────────────────────────────
   var mapW = 150, mapH = Math.round(mapW * 675 / 1200);
@@ -5317,7 +5335,7 @@ function exportPropuestaPartPDF() {
     setStyle(7,[140,175,140],false);
     doc.text('TORAM Parque Temático', M, 292);
     setStyle(7,[100,140,100],false);
-    doc.text(cd.dateStr, W/2, 292, {align:'center'});
+    doc.text('Vigencia 3 días · ' + cd.dateStr, W/2, 292, {align:'center'});
     setStyle(8,[212,168,75],true);
     doc.text('669 139 3136', W - M, 292, {align:'right'});
   }
@@ -5614,7 +5632,7 @@ function buildLocalesHTML() {
   '<div style="padding:20px 32px;border-top:1px solid #deeadc">' +
   '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#2d6040;margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">La plaza</div>' +
   '<div style="font-size:12px;line-height:1.6;color:#5a7a62">Plaza comercial dentro del parque, con acceso y operación independiente. 21 locales en ETAPA 1, el corazón comercial de la experiencia TORAM, con flujo mixto de turismo, residentes y experiencias del parque. Visitantes diarios estimados: 2026: 1,600 · 2027: 1,920 · 2028: 2,304 · 2029: 2,765. Más de 1,000 departamentos en el desarrollo y más de 4 millones de turistas al año en Mazatlán.</div>' +
-  '<div style="font-size:10px;color:#7a9a82;margin-top:10px">Sujeto a disponibilidad · Precios sin intereses · Descuentos sobre precio de lista · 669 139 3136</div>' +
+  '<div style="font-size:10px;color:#7a9a82;margin-top:10px">Vigencia 3 días · Sujeto a disponibilidad · Precios sin intereses · Descuentos sobre precio de lista · 669 139 3136</div>' +
   '</div>' +
   '</div>';
 }
@@ -5655,7 +5673,7 @@ function exportLocalesPDF() {
       setStyle(7,[140,175,140],false);
       doc.text('TORAM Plaza Comercial', M, 292);
       setStyle(7,[100,140,100],false);
-      doc.text(cd.dateStr, W/2, 292, {align:'center'});
+      doc.text('Vigencia 3 días · ' + cd.dateStr, W/2, 292, {align:'center'});
       setStyle(8,[212,168,75],true);
       doc.text('669 139 3136', W - M, 292, {align:'right'});
     }
@@ -5845,6 +5863,12 @@ function exportLocalesPDF() {
   doc.text('* Precios sujetos a disponibilidad. Descuentos sobre precio de lista, sin intereses.', M, y);
   y += 4;
   doc.text('Sujeto a disponibilidad · TORAM Plaza Comercial · 669 139 3136', M, y);
+  y += 4;
+  if (y > 270) { doc.addPage(); y = 20; }
+  setStyle(7,[45,96,64],true);
+  var vigLines = doc.splitTextToSize('Vigencia: 3 días a partir de la emisión (válida hasta el ' + vigenciaHastaTxt() + '). Después de esa fecha, precios y disponibilidad pueden cambiar.', CW);
+  doc.text(vigLines, M, y);
+  y += vigLines.length * 4;
 
   lFooter();
   doc.save('Toram_Cotizacion_Local_' + lClientFileName() + '.pdf');
