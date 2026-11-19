@@ -4821,7 +4821,25 @@ function drawROIChart(doc, x, y, w, title, labels, segA, segB, legendA, legendB,
   var takeLines = takeaway ? doc.splitTextToSize(takeaway, w) : [];
   var legH = segB ? 7 : 0;
   var takeH = takeLines.length ? takeLines.length * 4.5 + 4 : 0;
-  var totalH = 6 + 4 + barH + 12 + legH + takeH + 4;
+  // Horizontes largos: mide las etiquetas con el ancho real y evita que se encimen.
+  // Valores: si no caben en su casilla, se alternan en dos alturas (y se achica la fuente si ni así caben).
+  // Años: si no caben, se muestra uno de cada dos.
+  var n0 = labels.length, slot0 = w / n0;
+  st(6.5,[26,51,32],true);
+  var maxValW = 0;
+  labels.forEach(function(lb, i){
+    var a = segA[i]||0, b = segB ? (segB[i]||0) : 0;
+    maxValW = Math.max(maxValW, doc.getTextWidth(fmtMXN(a + b, 0)));
+  });
+  var valFont = 6.5, valRows = 1;
+  if (maxValW > slot0 * 0.75) { valRows = 2; }
+  if (maxValW > 2 * slot0 * 0.75) { valFont = 5.5; }
+  var headExtra = valRows === 2 ? 7 : 0; // espacio extra arriba para las etiquetas elevadas
+  st(7,[90,122,90],false);
+  var maxYearW = 0;
+  labels.forEach(function(lb){ maxYearW = Math.max(maxYearW, doc.getTextWidth(lb)); });
+  var yearStep = maxYearW > slot0 ? 2 : 1;
+  var totalH = 6 + 4 + barH + headExtra + 12 + legH + takeH + 4;
   if (y + totalH > 268) { doc.addPage(); y = 20; }
   y += 6;
   doc.setDrawColor(184,212,184); doc.setLineWidth(0.5);
@@ -4829,7 +4847,7 @@ function drawROIChart(doc, x, y, w, title, labels, segA, segB, legendA, legendB,
   st(7,[45,96,64],true);
   doc.text(title, x, y - 1.5);
   y += 4;
-  var baseY = y + barH;
+  var baseY = y + barH + headExtra;
   [1/3, 2/3, 1].forEach(function(f){
     doc.setDrawColor(232,240,232); doc.setLineWidth(0.2);
     doc.line(x, baseY - f * barH, x + w, baseY - f * barH);
@@ -4844,10 +4862,11 @@ function drawROIChart(doc, x, y, w, title, labels, segA, segB, legendA, legendB,
     var hB = maxV > 0 ? b / maxV * barH : 0;
     if (hA > 0.5) { doc.setFillColor(45,90,56); doc.rect(cx - bw/2, baseY - hA, bw, hA, 'F'); }
     if (hB > 0.5) { doc.setFillColor(184,146,42); doc.rect(cx - bw/2, baseY - hA - hB, bw, hB, 'F'); }
-    st(6.5,[26,51,32],true);
-    doc.text(fmtMXN(t, 0), cx, baseY - hA - hB - 2, {align:'center'});
+    st(valFont,[26,51,32],true);
+    var raise = (valRows === 2 && i % 2 === 1) ? 7 : 0;
+    doc.text(fmtMXN(t, 0), cx, baseY - hA - hB - 2 - raise, {align:'center'});
     st(7,[90,122,90],false);
-    doc.text(lb, cx, baseY + 4.5, {align:'center'});
+    if (i % yearStep === 0) { doc.text(lb, cx, baseY + 4.5, {align:'center'}); }
   });
   y = baseY + 12; // leyenda debajo de las etiquetas de año (sin chocar con ellas)
   if (segB) {
@@ -4871,16 +4890,23 @@ function roiChartHtml(title, labels, segA, segB, legendA, legendB, takeaway) {
   var totals = labels.map(function(_, i){ return (segA[i]||0) + (segB ? (segB[i]||0) : 0); });
   var maxV = Math.max.apply(null, totals.concat([1]));
   var H = 120;
+  var nH = labels.length;
+  // Horizontes largos: valores escalonados en dos alturas y años uno de cada dos.
+  var stagH = nH > 10;
+  var valFs = nH > 14 ? 8 : 10;
+  var yearStepH = nH > 12 ? 2 : 1;
   var bars = labels.map(function(lb, i){
     var a = segA[i]||0, b = segB ? (segB[i]||0) : 0, t = a + b;
     var hA = maxV > 0 ? Math.round(a/maxV*H) : 0;
     var hB = maxV > 0 ? Math.round(b/maxV*H) : 0;
     var segs = '<div style="background:#2d5a38;height:'+hA+'px"></div>';
     if (segB) segs += '<div style="background:#b8922a;height:'+hB+'px"></div>';
+    var valPad = (stagH && i % 2 === 1) ? 'padding-top:13px;' : '';
+    var yearLb = (i % yearStepH === 0) ? lb : '&nbsp;';
     return '<div style="flex:1;min-width:0;text-align:center">' +
-      '<div style="font-size:10px;font-weight:700;color:#1a3320;margin-bottom:4px;white-space:nowrap">'+fmtMXN(t, 0)+'</div>' +
+      '<div style="font-size:'+valFs+'px;font-weight:700;color:#1a3320;margin-bottom:4px;white-space:nowrap;height:26px;'+valPad+'">'+fmtMXN(t, 0)+'</div>' +
       '<div style="display:flex;flex-direction:column;justify-content:flex-end;height:'+H+'px">'+segs+'</div>' +
-      '<div style="font-size:11px;color:#5a7a62;margin-top:6px;border-top:1px solid #deeadc;padding-top:4px">'+lb+'</div>' +
+      '<div style="font-size:11px;color:#5a7a62;margin-top:6px;border-top:1px solid #deeadc;padding-top:4px">'+yearLb+'</div>' +
     '</div>';
   }).join('');
   var legend = '';
