@@ -357,6 +357,11 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
       <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 8V21H3V8M1 3H23V8H1V3Z"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
       Actualizar Inventario
     </button>
+    <button class="nav-item" id="btnUpdateApp" onclick="updateApp()">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12a9 9 0 11-2.64-6.36"/><polyline points="21 3 21 9 15 9"/></svg>
+      Actualizar app
+    </button>
+    <div id="updateAppStatus" style="font-size:11px;color:#8fb996;padding:2px 12px 0 12px;min-height:14px"></div>
   </nav>
   <div class="sidebar-footer">
     Disponibilidad actualizada:<br><strong>T1:</strong> 12-Nov-2026 · <strong>T2:</strong> 07-Oct-2026<br><span style="opacity:0.6">Exportar PDF desde cada sección.</span>
@@ -6579,6 +6584,45 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('load', function(){
     navigator.serviceWorker.register('sw.js').catch(function(){});
   });
+}
+// Actualización manual de la app (botón "Actualizar app").
+// La app NO descarga sola: solo se actualiza cuando Cristo toca el botón.
+// Funciona en primer plano (con WiFi), aunque los datos en segundo plano estén apagados.
+function updateApp(){
+  var btn = document.getElementById('btnUpdateApp');
+  var st = document.getElementById('updateAppStatus');
+  function msg(t){ if (st) st.textContent = t; }
+  if (btn) { btn.disabled = true; }
+  msg('Buscando actualización…');
+  if (!('serviceWorker' in navigator) || !navigator.serviceWorker.controller) {
+    // Sin service worker activo: recarga normal (el navegador pide lo último).
+    msg('Recargando…');
+    setTimeout(function(){ location.reload(); }, 300);
+    return;
+  }
+  var done = false;
+  function onMsg(e){
+    if (!e.data || e.data.type !== 'UPDATE_RESULT') return;
+    navigator.serviceWorker.removeEventListener('message', onMsg);
+    done = true;
+    if (e.data.ok) {
+      msg('Actualizada. Recargando…');
+      setTimeout(function(){ location.reload(); }, 400);
+    } else {
+      msg('Sin conexión: no se pudo actualizar.');
+      if (btn) btn.disabled = false;
+    }
+  }
+  navigator.serviceWorker.addEventListener('message', onMsg);
+  navigator.serviceWorker.controller.postMessage({type: 'UPDATE_APP'});
+  // Si en 15 s no responde, restaura el botón.
+  setTimeout(function(){
+    if (!done) {
+      navigator.serviceWorker.removeEventListener('message', onMsg);
+      msg('No respondió: revisa tu conexión.');
+      if (btn) btn.disabled = false;
+    }
+  }, 15000);
 }
 </script>
 </body>
