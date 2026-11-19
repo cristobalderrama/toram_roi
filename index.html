@@ -357,6 +357,10 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
       <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 8V21H3V8M1 3H23V8H1V3Z"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
       Actualizar Inventario
     </button>
+    <button class="nav-item" onclick="showPage('seguimiento')">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+      Seguimiento
+    </button>
     <button class="nav-item" id="btnUpdateApp" onclick="updateApp()">
       <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12a9 9 0 11-2.64-6.36"/><polyline points="21 3 21 9 15 9"/></svg>
       Actualizar app
@@ -1082,6 +1086,10 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         Descargar PDF
       </button>
+      <button class="btn btn-primary" onclick="sharePropuestaPDF()" style="flex:1;min-width:200px;padding:13px">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/><line x1="15.4" y1="6.5" x2="8.6" y2="10.5"/></svg>
+        Compartir por WhatsApp
+      </button>
     </div>
 
     <!-- Vista previa -->
@@ -1218,6 +1226,10 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         Descargar PDF
       </button>
+      <button class="btn btn-primary" onclick="exportLocalesPDF(true)" style="flex:1;min-width:200px;padding:13px">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/><line x1="15.4" y1="6.5" x2="8.6" y2="10.5"/></svg>
+        Compartir por WhatsApp
+      </button>
     </div>
 
     <!-- Vista previa -->
@@ -1267,6 +1279,17 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
       <p style="font-size:13px;color:var(--text-secondary)">
         Se descargó un nuevo archivo HTML con el inventario actualizado. <strong>Usa ese archivo a partir de ahora</strong> — esta pestaña del navegador sigue con los datos viejos en memoria.
       </p>
+    </div>
+  </div>
+
+  <div id="page-seguimiento" class="page">
+    <div class="page-header">
+      <div class="breadcrumb">Administración</div>
+      <h2>Seguimiento de clientes</h2>
+      <p>Cada propuesta que descargues o compartas con el nombre del cliente se guarda aquí sola, con su llamada a los 3 días. Todo queda en tu teléfono, funciona sin internet.</p>
+    </div>
+    <div class="card">
+      <div id="segList"></div>
     </div>
   </div>
 
@@ -1818,7 +1841,7 @@ function showPage(id) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.querySelectorAll('.bnav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('page-' + id).classList.add('active');
-  const labels = {unit:0,plans:1,roi:2,amort:3,quote:4,ficha:5,propuesta:6,locales:7,compare:8,sensitivity:9,inventory:10};
+  const labels = {unit:0,plans:1,roi:2,amort:3,quote:4,ficha:5,propuesta:6,locales:7,compare:8,sensitivity:9,inventory:10,seguimiento:11};
   const items = document.querySelectorAll('.nav-item');
   if (labels[id] !== undefined) items[labels[id]].classList.add('active');
   const bnMap = {unit:'bn-unit',plans:'bn-plans',roi:'bn-roi',compare:'bn-compare',amort:'bn-amort',sensitivity:'bn-amort',quote:'bn-quote',ficha:'bn-quote',propuesta:'bn-propuesta',locales:'bn-propuesta'};
@@ -1830,6 +1853,8 @@ function showPage(id) {
   if (id === 'compare' && typeof plans !== 'undefined' && plans.length > 0) {
     populateCompareTable();
   }
+  if (id === 'seguimiento') renderSeguimiento();
+
   if (id === 'sensitivity' && typeof plans !== 'undefined' && plans.length > 0) {
     var roiSel = document.getElementById('roiPlanSelect');
     var pIdx = roiSel && roiSel.value !== '' ? parseInt(roiSel.value) : 0;
@@ -5205,9 +5230,120 @@ function exportPropuestaPDF() {
   if (pMode === 'depto') exportPropuestaDeptoPDF();
   else exportPropuestaPartPDF();
 }
+function sharePropuestaPDF() {
+  if (pMode === 'depto') exportPropuestaDeptoPDF(true);
+  else exportPropuestaPartPDF(true);
+}
+
+
+// ── Compartir PDF por WhatsApp + Seguimiento de clientes ───────────────
+// Compartir: manda el PDF directo a WhatsApp Business con el menú de
+// compartir del teléfono (sin descargarlo). Si el teléfono no lo soporta,
+// descarga el PDF como siempre.
+function sharePDFBlob(doc, filename, text){
+  try {
+    var blob = doc.output('blob');
+    var file = new File([blob], filename, {type: 'application/pdf'});
+    if (navigator.canShare && navigator.canShare({files: [file]})) {
+      navigator.share({files: [file], title: filename, text: text || ''}).catch(function(){});
+      return true;
+    }
+  } catch(e) {}
+  doc.save(filename);
+  return false;
+}
+
+// Seguimiento: guarda a quién se le mandó cada propuesta (en el teléfono,
+// funciona sin internet) y recuerda la llamada a los 3 días.
+var SEGUIMIENTO_KEY = 'toram_seguimiento_v1';
+function loadFollowUps(){ try { return JSON.parse(localStorage.getItem(SEGUIMIENTO_KEY)) || []; } catch(e){ return []; } }
+function saveFollowUps(list){ try { localStorage.setItem(SEGUIMIENTO_KEY, JSON.stringify(list)); } catch(e){} }
+function todayISO(){ var d = new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function addDaysISO(iso, n){ var d = new Date(iso+'T12:00:00'); d.setDate(d.getDate()+n); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function fmtFechaCorta(iso){ var p = String(iso).split('-'); return p.length===3 ? p[2]+'/'+p[1]+'/'+p[0].slice(2) : iso; }
+function escHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function saveFollowUp(type, unit){
+  var client = (type === 'locales') ? lClientData().client : pClientData().client;
+  if (!client || client === 'Cliente') return;
+  var list = loadFollowUps();
+  var today = todayISO();
+  var ex = null;
+  for (var i=0;i<list.length;i++){ if (list[i].status==='pendiente' && list[i].client===client && list[i].type===type && list[i].unit===unit) { ex = list[i]; break; } }
+  if (ex) { ex.date = today; ex.due = addDaysISO(today, 3); }
+  else { list.unshift({id: Date.now()+''+Math.floor(Math.random()*1000), client: client, type: type, unit: unit, date: today, due: addDaysISO(today, 3), status: 'pendiente'}); }
+  saveFollowUps(list);
+  var pg = document.getElementById('page-seguimiento');
+  if (pg && pg.classList.contains('active')) renderSeguimiento();
+}
+function setFollowUpStatus(id, status){
+  var list = loadFollowUps();
+  for (var i=0;i<list.length;i++){ if (list[i].id===id) { list[i].status = status; break; } }
+  saveFollowUps(list); renderSeguimiento();
+}
+function snoozeFollowUp(id){
+  var list = loadFollowUps();
+  for (var i=0;i<list.length;i++){ if (list[i].id===id) { list[i].status='pendiente'; list[i].due = addDaysISO(todayISO(), 3); break; } }
+  saveFollowUps(list); renderSeguimiento();
+}
+function deleteFollowUp(id){
+  saveFollowUps(loadFollowUps().filter(function(f){ return f.id!==id; }));
+  renderSeguimiento();
+}
+function renderSeguimiento(){
+  var box = document.getElementById('segList');
+  if (!box) return;
+  var list = loadFollowUps();
+  var today = todayISO();
+  var pend = list.filter(function(f){ return f.status==='pendiente'; });
+  var vencidos = pend.filter(function(f){ return f.due < today; });
+  var hoy = pend.filter(function(f){ return f.due === today; });
+  var proximos = pend.filter(function(f){ return f.due > today; });
+  var contactados = list.filter(function(f){ return f.status==='contactado'; });
+  var cerrados = list.filter(function(f){ return f.status==='cerrado'; });
+  var typeLabel = {depto:'Departamento', part:'Participaciones', locales:'Local'};
+  function row(f, badge){
+    var badgeTxt = badge==='vencido' ? 'Vencida · llama hoy' : badge==='hoy' ? 'Llama hoy' : 'Llama el '+fmtFechaCorta(f.due);
+    var badgeCol = badge==='vencido' ? '#b3261e' : badge==='hoy' ? '#8a6d00' : '#2d6040';
+    return '<div style="display:flex;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid #eef3ee;flex-wrap:wrap">'
+      + '<div style="flex:1;min-width:180px"><div style="font-weight:700;color:#1a3320">'+escHtml(f.client)+'</div>'
+      + '<div style="font-size:12px;color:#5a7a62">'+typeLabel[f.type]+' · '+escHtml(f.unit)+' · enviada '+fmtFechaCorta(f.date)+'</div></div>'
+      + '<div style="font-size:12px;font-weight:700;color:'+badgeCol+'">'+badgeTxt+'</div>'
+      + '<div style="display:flex;gap:6px;flex-wrap:wrap">'
+      + '<button class="btn btn-outline btn-sm" onclick="setFollowUpStatus(\''+f.id+'\',\'contactado\')">✓ Contactado</button>'
+      + '<button class="btn btn-outline btn-sm" onclick="snoozeFollowUp(\''+f.id+'\')">↻ 3 días</button>'
+      + '<button class="btn btn-outline btn-sm" onclick="setFollowUpStatus(\''+f.id+'\',\'cerrado\')">✓ Cerrado</button>'
+      + '<button class="btn btn-outline btn-sm" onclick="deleteFollowUp(\''+f.id+'\')">✕</button>'
+      + '</div></div>';
+  }
+  function group(title, arr, badge){
+    if (!arr.length) return '';
+    var h = '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#2d6040;margin:18px 0 4px">'+title+' ('+arr.length+')</div>';
+    for (var i=0;i<arr.length;i++) h += row(arr[i], badge);
+    return h;
+  }
+  function simpleGroup(title, arr){
+    if (!arr.length) return '';
+    var h = '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#5a7a62;margin:18px 0 4px">'+title+' ('+arr.length+')</div>';
+    for (var i=0;i<arr.length;i++) h += '<div style="display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid #eef3ee"><div style="flex:1;min-width:180px"><div style="font-weight:700;color:#1a3320">'+escHtml(arr[i].client)+'</div><div style="font-size:12px;color:#5a7a62">'+typeLabel[arr[i].type]+' · '+escHtml(arr[i].unit)+' · enviada '+fmtFechaCorta(arr[i].date)+'</div></div><button class="btn btn-outline btn-sm" onclick="deleteFollowUp(\''+arr[i].id+'\')">✕</button></div>';
+    return h;
+  }
+  var out = '';
+  out += '<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:6px">'
+    + '<div style="flex:1;min-width:110px;background:#fdf3e3;border:1px solid #e8d9b0;border-radius:10px;padding:12px;text-align:center"><div style="font-size:22px;font-weight:700;color:#8a6d00">'+vencidos.length+'</div><div style="font-size:11px;color:#5a7a62">Vencidas</div></div>'
+    + '<div style="flex:1;min-width:110px;background:#e8f5e9;border:1px solid #c8dcc8;border-radius:10px;padding:12px;text-align:center"><div style="font-size:22px;font-weight:700;color:#2d6040">'+hoy.length+'</div><div style="font-size:11px;color:#5a7a62">Para hoy</div></div>'
+    + '<div style="flex:1;min-width:110px;background:#f4f8f4;border:1px solid #deeadc;border-radius:10px;padding:12px;text-align:center"><div style="font-size:22px;font-weight:700;color:#1a3320">'+proximos.length+'</div><div style="font-size:11px;color:#5a7a62">Próximas</div></div>'
+    + '</div>';
+  if (!pend.length) out += '<p style="font-size:13px;color:#5a7a62;margin-top:14px">Sin llamadas pendientes. Cuando descargues o compartas una propuesta con el nombre del cliente, aparece aquí sola con su recordatorio a 3 días.</p>';
+  out += group('Vencidas — llama hoy', vencidos, 'vencido');
+  out += group('Para hoy', hoy, 'hoy');
+  out += group('Próximas', proximos, 'prox');
+  out += simpleGroup('Contactados', contactados);
+  out += simpleGroup('Cerrados', cerrados);
+  box.innerHTML = out;
+}
 
 // ── PDF: Departamento ──────────────────────────────────────────────────────
-function exportPropuestaDeptoPDF() {
+function exportPropuestaDeptoPDF(share) {
   if (!pSelectedUnit || !pSelectedModel) { alert('Elige un modelo y una unidad primero.'); return; }
   var jsPDF = getJsPDF(); if (!jsPDF) return;
   var dpVal = parseFloat(document.getElementById('pDpValue').value) || 0;
@@ -5569,11 +5705,14 @@ function exportPropuestaDeptoPDF() {
   y += 20;
 
   pFooter();
-  doc.save('Toram_Propuesta_' + pClientFileName() + '.pdf');
+  var fname = 'Toram_Propuesta_' + pClientFileName() + '.pdf';
+  saveFollowUp('depto', inv.torre + '-' + inv.num);
+  if (share) { sharePDFBlob(doc, fname, 'Te comparto la propuesta del departamento ' + inv.torre + '-' + inv.num + ' de TORAM Residencial. Cualquier duda, escríbeme. — Cristobal Rafael, Asesor Comercial de TORAM'); }
+  else { doc.save(fname); }
 }
 
 // ── PDF: Participaciones ───────────────────────────────────────────────────
-function exportPropuestaPartPDF() {
+function exportPropuestaPartPDF(share) {
   var jsPDF = getJsPDF(); if (!jsPDF) return;
   var c = pPartCalc();
   var cd = pClientData();
@@ -5764,7 +5903,10 @@ function exportPropuestaPartPDF() {
     doc.text('669 139 3136', W - M, 292, {align:'right'});
   }
 
-  doc.save('Toram_Propuesta_' + pClientFileName() + '.pdf');
+  var fname = 'Toram_Propuesta_' + pClientFileName() + '.pdf';
+  saveFollowUp('part', c.qty + (c.qty === 1 ? ' participación' : ' participaciones'));
+  if (share) { sharePDFBlob(doc, fname, 'Te comparto la propuesta de ' + c.qty + (c.qty === 1 ? ' participación' : ' participaciones') + ' de TORAM Parque Temático. Cualquier duda, escríbeme. — Cristobal Rafael, Asesor Comercial de TORAM'); }
+  else { doc.save(fname); }
 }
 
 // ── FASE 3 · Locales comerciales (Plaza TORAM, ETAPA 1) ────────────────────
@@ -6075,7 +6217,7 @@ function previewLocales() {
 }
 
 // ── PDF: Local comercial ───────────────────────────────────────────────────
-function exportLocalesPDF() {
+function exportLocalesPDF(share) {
   if (!lSelectedLocal) { alert('Elige un local primero.'); return; }
   var jsPDF = getJsPDF(); if (!jsPDF) return;
   var loc = lSelectedLocal;
@@ -6315,7 +6457,10 @@ function exportLocalesPDF() {
   y += vigLines.length * 4;
 
   lFooter();
-  doc.save('Toram_Cotizacion_Local_' + lClientFileName() + '.pdf');
+  var fname = 'Toram_Cotizacion_Local_' + lClientFileName() + '.pdf';
+  saveFollowUp('locales', 'Local ' + loc.id);
+  if (share) { sharePDFBlob(doc, fname, 'Te comparto la cotización del Local ' + loc.id + ' de la Plaza TORAM. Cualquier duda, escríbeme. — Cristobal Rafael, Asesor Comercial de TORAM'); }
+  else { doc.save(fname); }
 }
 
 // Inicialización del generador (el DOM ya existe: el script corre al final del body)
