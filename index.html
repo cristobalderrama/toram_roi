@@ -4805,7 +4805,7 @@ function calcPropuestaROIFlow(inv, opts) {
 // drawROIChart: dibuja una gráfica de barras en el PDF (jsPDF, sin librerías).
 // segA = segmento inferior (renta) o serie única; segB = segmento superior
 // (plusvalía) o null. Devuelve la y donde terminó.
-function drawROIChart(doc, x, y, w, title, labels, segA, segB, legendA, legendB, takeaway) {
+function drawROIChart(doc, x, y, w, title, labels, segA, segB, legendA, legendB, takeaway, barH) {
   // Gráfica pensada para que la entienda cualquiera: título en pregunta,
   // valores completos sobre cada barra (sin abreviaturas), leyenda debajo
   // de los años y una frase-resumen en palabras simples.
@@ -4817,7 +4817,7 @@ function drawROIChart(doc, x, y, w, title, labels, segA, segB, legendA, legendB,
   var n = labels.length;
   var totals = labels.map(function(_, i){ return (segA[i]||0) + (segB ? (segB[i]||0) : 0); });
   var maxV = Math.max.apply(null, totals.concat([1]));
-  var barH = 44;
+  barH = barH || 44;
   var takeLines = takeaway ? doc.splitTextToSize(takeaway, w) : [];
   var legH = segB ? 7 : 0;
   var takeH = takeLines.length ? takeLines.length * 4.5 + 4 : 0;
@@ -4983,6 +4983,17 @@ function buildPropuestaDeptoHTML() {
     var flowAppr = flow.reduce(function(a,f){return a+f.appr;}, 0);
     var takeaway = 'En ' + opts.years + ' años entrarían ' + fmtMXN(flowRent + flowAppr, 0) + ' en total: ' + fmtMXN(flowRent, 0) + ' de renta (verde) y ' + fmtMXN(flowAppr, 0) + ' porque el departamento sube de precio (dorado).';
     roiChartHtmlStr = roiChartHtml('¿Cuánto dinero entra cada año?', flow.map(function(f){return f.label;}), flow.map(function(f){return f.rent;}), flow.map(function(f){return f.appr;}), 'Renta neta', 'Plusvalía', takeaway);
+    var sumCardsHtml = [
+      ['Inversión total', fmtMXN(r0.totalInv)],
+      ['Ganancia neta proyectada (' + opts.years + ' años)', fmtMXN(r0.netGain)],
+      ['ROI anualizado', fmtPct(r0.roiAnn, 2)],
+      ['Ingreso promedio por año', fmtMXN(Math.round((flowRent + flowAppr) / opts.years), 0)]
+    ];
+    roiChartHtmlStr += '<div style="padding:16px 32px;border-top:1px solid #deeadc">' +
+      '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#2d6040;margin-bottom:10px">En resumen</div>' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">' +
+      sumCardsHtml.map(function(cd){ return '<div style="background:#f4f9f4;border:1px solid #c8dcc8;border-radius:6px;padding:10px 12px"><div style="font-size:11px;color:#5a7a62">'+cd[0]+'</div><div style="font-size:16px;font-weight:700;color:#1a3320;margin-top:2px">'+cd[1]+'</div></div>'; }).join('') +
+      '</div></div>';
   }
 
   var imgBlock = imgSrc
@@ -5385,13 +5396,41 @@ function exportPropuestaDeptoPDF() {
     var flowRent = flow.reduce(function(a,f){return a+f.rent;}, 0);
     var flowAppr = flow.reduce(function(a,f){return a+f.appr;}, 0);
     var takeaway = 'En ' + opts.years + ' años entrarían ' + fmtMXN(flowRent + flowAppr, 0) + ' en total: ' + fmtMXN(flowRent, 0) + ' de renta (verde) y ' + fmtMXN(flowAppr, 0) + ' porque el departamento sube de precio (dorado).';
-    y = drawROIChart(doc, M, y + 2, CW, '¿CUÁNTO DINERO ENTRA CADA AÑO?', flow.map(function(f){return f.label;}), flow.map(function(f){return f.rent;}), flow.map(function(f){return f.appr;}), 'Renta neta', 'Plusvalía', takeaway);
+    y = drawROIChart(doc, M, y + 2, CW, '¿CUÁNTO DINERO ENTRA CADA AÑO?', flow.map(function(f){return f.label;}), flow.map(function(f){return f.rent;}), flow.map(function(f){return f.appr;}), 'Renta neta', 'Plusvalía', takeaway, 56);
+
+    // ── EN RESUMEN: los 4 números clave en grande (para cualquiera) ──
+    y += 6;
+    doc.setDrawColor(184,212,184); doc.setLineWidth(0.5);
+    doc.line(M, y, W - M, y);
+    setStyle(7,[45,96,64],true);
+    doc.text('EN RESUMEN', M, y - 1.5);
+    y += 5;
+    var sumCards = [
+      ['Inversión total', fmtMXN(r0.totalInv)],
+      ['Ganancia neta proyectada (' + opts.years + ' años)', fmtMXN(r0.netGain)],
+      ['ROI anualizado', fmtPct(r0.roiAnn, 2)],
+      ['Ingreso promedio por año', fmtMXN(Math.round((flowRent + flowAppr) / opts.years), 0)]
+    ];
+    var cardW = (CW - 6) / 2, cardH = 26;
+    sumCards.forEach(function(cd, ci){
+      var cx = M + (ci % 2) * (cardW + 6);
+      var cy = y + Math.floor(ci / 2) * (cardH + 4);
+      doc.setFillColor(244,249,244);
+      doc.rect(cx, cy, cardW, cardH, 'F');
+      doc.setDrawColor(200,220,200); doc.setLineWidth(0.3);
+      doc.rect(cx, cy, cardW, cardH, 'D');
+      setStyle(7,[90,122,90],false);
+      doc.text(cd[0], cx + 5, cy + 8);
+      setStyle(11,[26,51,32],true);
+      doc.text(cd[1], cx + 5, cy + 19);
+    });
+    y += cardH * 2 + 4 + 4;
   }
 
   // ── PLANO Y ACABADOS (hoja dedicada) ────────────────────────
   var mi = getModelImages(imgKey);
   if (mi.plano || mi.acabados) {
-    var paH = 105; // altura máxima de la fila de imágenes (mm)
+    var paH = 132; // altura máxima de la fila de imágenes (mm)
     var colW = (CW - 8) / 2;
     var planoW = 0, planoH = 0, acabW = 0, acabH = 0;
     if (mi.plano && mi.dims && mi.dims.plano) {
@@ -5405,7 +5444,7 @@ function exportPropuestaDeptoPDF() {
     var rowH = Math.max(planoH, acabH);
     // Hoja dedicada al plano y los renders, contenido centrado verticalmente
     doc.addPage();
-    y = 80;
+    y = 68;
     doc.setDrawColor(184,212,184); doc.setLineWidth(0.5);
     doc.line(M, y, W - M, y);
     setStyle(7,[45,96,64],true);
@@ -5479,7 +5518,10 @@ function exportPropuestaDeptoPDF() {
   setStyle(7,[45,96,64],true);
   doc.text(mapaTxt, M, y);
   doc.link(M, y - 5, doc.getTextWidth(mapaTxt), 7, {url: 'https://cristobalderrama.github.io/Toram/mapa/'});
-  y += 5;
+  y += 8;
+  setStyle(8,[90,122,90],false);
+  var parkLines = doc.splitTextToSize('El parque temático TORAM es el desarrollo de entretenimiento más ambicioso del noroeste de México: cenote, río subterráneo, playa artificial, tirolesa, museo interactivo y más de 10 atracciones en un solo lugar, a minutos del malecón de Mazatlán.', CW);
+  parkLines.forEach(function(ln){ doc.text(ln, M, y); y += 4.5; });
 
   pFooter();
   doc.save('Toram_Propuesta_' + pClientFileName() + '.pdf');
@@ -5609,7 +5651,7 @@ function exportPropuestaPartPDF() {
   y += vigLines.length * 4;
 
   // ── Mapa del parque ──────────────────────────────────────────
-  var mapW = 150, mapH = Math.round(mapW * 675 / 1200);
+  var mapW = 182, mapH = Math.round(mapW * 675 / 1200);
   if (y + mapH + 12 > 268) { doc.addPage(); y = 20; }
   y += 6;
   doc.setDrawColor(184,212,184); doc.setLineWidth(0.5);
@@ -5628,7 +5670,10 @@ function exportPropuestaPartPDF() {
   setStyle(7,[45,96,64],true);
   doc.text(mapaTxt, M, y);
   doc.link(M, y - 5, doc.getTextWidth(mapaTxt), 7, {url: 'https://cristobalderrama.github.io/Toram/mapa/'});
-  y += 5;
+  y += 8;
+  setStyle(8,[90,122,90],false);
+  var parkLines = doc.splitTextToSize('El parque temático TORAM es el desarrollo de entretenimiento más ambicioso del noroeste de México: cenote, río subterráneo, playa artificial, tirolesa, museo interactivo y más de 10 atracciones en un solo lugar, a minutos del malecón de Mazatlán.', CW);
+  parkLines.forEach(function(ln){ doc.text(ln, M, y); y += 4.5; });
 
   // ── Atracciones del parque (franja vertical, hoja dedicada) ──
   if (typeof PART_ATRACCIONES !== 'undefined' && PART_ATRACCIONES.length) {
