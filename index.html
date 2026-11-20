@@ -11,6 +11,8 @@ try {
   var _v = localStorage.getItem('toram_vista_v1');
   if (_v === 'web') document.documentElement.classList.add('vista-web');
   else if (_v === 'movil') document.documentElement.classList.add('vista-movil');
+  var _m = localStorage.getItem('toram_modo_v1');
+  if (_m === 'sencillo') document.documentElement.classList.add('modo-sencillo');
 } catch(e){}
 </script>
 <title>Toram — Calculadora de Inversión v2</title>
@@ -74,7 +76,7 @@ h1,h2,h3,h4{font-family:'Playfair Display',serif;font-weight:600;line-height:1.2
 /* Bottom nav — mobile only */
 .bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--navy);z-index:100;border-top:1px solid rgba(255,255,255,0.1);padding:0;safe-area-inset-bottom:env(safe-area-inset-bottom)}
 .bottom-nav-inner{display:flex;justify-content:space-around;padding:6px 0 calc(6px + env(safe-area-inset-bottom))}
-.bnav-item{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 10px;cursor:pointer;border:none;background:none;color:rgba(200,215,240,0.55);font-family:'Source Sans 3',sans-serif;font-size:10px;font-weight:600;letter-spacing:0.04em;min-width:52px;transition:color 0.15s}
+.bnav-item{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;cursor:pointer;border:none;background:none;color:rgba(200,215,240,0.55);font-family:'Source Sans 3',sans-serif;font-size:10px;font-weight:600;letter-spacing:0.04em;transition:color 0.15s;white-space:nowrap;overflow:hidden}
 .bnav-item.active{color:var(--gold-light)}
 .bnav-item svg{width:20px;height:20px}
 .bnav-dot{width:4px;height:4px;border-radius:50%;background:var(--gold-light);margin-top:1px;opacity:0;transition:opacity 0.15s}
@@ -99,6 +101,13 @@ html.vista-web .bottom-nav{display:none !important}
 html.vista-movil .app-shell{grid-template-columns:1fr !important}
 html.vista-movil .sidebar{display:none !important}
 html.vista-movil .bottom-nav{display:block !important}
+/* Modo sencillo: solo se ven las páginas para vender (Inicio, Unidad,
+   Planes, Propuesta, Locales, Seguimiento, Mi perfil). Todo lo demás sigue
+   existiendo y se ve al cambiar a modo completo. */
+html.modo-sencillo .nav-item.avanzado{display:none}
+html.modo-sencillo .nav-section-avanzado{display:none}
+html.modo-sencillo .bnav-item.avanzado{display:none}
+html.modo-sencillo .more-menu-item.avanzado{display:none}
 html.vista-movil .main{padding:16px 14px calc(80px + env(safe-area-inset-bottom)) !important}
 
 .main{padding:32px 40px;overflow-y:auto}
@@ -305,22 +314,22 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
       Planes
       <div class="bnav-dot"></div>
     </button>
-    <button class="bnav-item" onclick="showPage('roi')" id="bn-roi">
+    <button class="bnav-item avanzado" onclick="showPage('roi')" id="bn-roi">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
       ROI
       <div class="bnav-dot"></div>
     </button>
-    <button class="bnav-item" onclick="showPage('compare')" id="bn-compare">
+    <button class="bnav-item avanzado" onclick="showPage('compare')" id="bn-compare">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l5.1 5.1"/></svg>
       Comparar
       <div class="bnav-dot"></div>
     </button>
-    <button class="bnav-item" onclick="showPage('amort')" id="bn-amort">
+    <button class="bnav-item avanzado" onclick="showPage('amort')" id="bn-amort">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>
       Amort.
       <div class="bnav-dot"></div>
     </button>
-    <button class="bnav-item" onclick="showPage('quote')" id="bn-quote">
+    <button class="bnav-item avanzado" onclick="showPage('quote')" id="bn-quote">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M16 13H8M16 17H8M10 9H8"/></svg>
       Cotizar
       <div class="bnav-dot"></div>
@@ -330,8 +339,8 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
       Propuesta
       <div class="bnav-dot"></div>
     </button>
-    <button class="bnav-item" onclick="toggleMoreMenu()" id="bn-mas">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="5" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.6" fill="currentColor" stroke="none"/></svg>
+    <button class="bnav-item" onclick="toggleMoreMenu()" id="bn-mas" style="color:var(--gold-light)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="5" cy="12" r="2.2" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="2.2" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="2.2" fill="currentColor" stroke="none"/></svg>
       Más
       <div class="bnav-dot"></div>
     </button>
@@ -342,19 +351,21 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 <div id="moreMenu" class="more-menu" onclick="if(event.target===this) closeMoreMenu()">
   <div class="more-menu-sheet">
     <div class="more-menu-title">Más opciones</div>
+    <button class="more-menu-item" onclick="showPage('inicio')">Inicio</button>
     <button class="more-menu-item" onclick="showPage('locales')">Locales</button>
-    <button class="more-menu-item" onclick="showPage('ficha')">Ficha</button>
-    <button class="more-menu-item" onclick="showPage('sensitivity')">Sensibilidad</button>
+    <button class="more-menu-item avanzado" onclick="showPage('ficha')">Ficha</button>
+    <button class="more-menu-item avanzado" onclick="showPage('sensitivity')">Sensibilidad</button>
     <div class="more-menu-sep"></div>
     <div class="more-menu-title">Administración</div>
-    <button class="more-menu-item" onclick="showPage('inventory')">Actualizar Inventario</button>
+    <button class="more-menu-item avanzado" onclick="showPage('inventory')">Actualizar Inventario</button>
     <button class="more-menu-item" onclick="showPage('seguimiento')">Seguimiento</button>
-    <button class="more-menu-item" onclick="showPage('comparativa')">Cotización comparativa</button>
+    <button class="more-menu-item avanzado" onclick="showPage('comparativa')">Cotización comparativa</button>
     <button class="more-menu-item" onclick="showPage('perfil')">Mi perfil</button>
     <button class="more-menu-item" onclick="closeMoreMenu(); updateApp()">Actualizar app</button>
     <div class="more-menu-sep"></div>
     <div class="more-menu-title">Vista</div>
     <button class="more-menu-item" id="vistaToggleMas" onclick="toggleVista()">Ver como web</button>
+    <button class="more-menu-item" id="modoToggleMas" onclick="toggleModo()">Modo sencillo</button>
     <button class="more-menu-close" onclick="closeMoreMenu()">Cerrar</button>
   </div>
 </div>
@@ -367,6 +378,10 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
   </div>
   <nav class="sidebar-nav">
     <div class="nav-section">Herramientas</div>
+    <button class="nav-item" onclick="showPage('inicio')">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+      Inicio
+    </button>
     <button class="nav-item active" onclick="showPage('unit')">
       <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
       Datos de Unidad
@@ -375,20 +390,20 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
       <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg>
       Planes de Financiamiento
     </button>
-    <button class="nav-item" onclick="showPage('roi')">
+    <button class="nav-item avanzado" onclick="showPage('roi')">
       <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
       Análisis de ROI
     </button>
-    <button class="nav-item" onclick="showPage('amort')">
+    <button class="nav-item avanzado" onclick="showPage('amort')">
       <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>
       Tabla de Amortización
     </button>
     <div class="nav-section" style="margin-top:16px">Entregables</div>
-    <button class="nav-item" onclick="showPage('quote')" style="border-left:3px solid var(--gold);color:var(--gold-light)">
+    <button class="nav-item avanzado" onclick="showPage('quote')" style="border-left:3px solid var(--gold);color:var(--gold-light)">
       <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M16 13H8M16 17H8M10 9H8"/></svg>
       Generar Cotización
     </button>
-    <button class="nav-item" onclick="showPage('ficha')">
+    <button class="nav-item avanzado" onclick="showPage('ficha')">
       <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
       Ficha de Depto
     </button>
@@ -400,17 +415,17 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
       <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
       Locales Comerciales
     </button>
-    <div class="nav-section" style="margin-top:16px">Comparativo</div>
-    <button class="nav-item" onclick="showPage('compare')">
+    <div class="nav-section nav-section-avanzado" style="margin-top:16px">Comparativo</div>
+    <button class="nav-item avanzado" onclick="showPage('compare')">
       <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l5.1 5.1"/></svg>
       Tabla Comparativa
     </button>
-    <button class="nav-item" onclick="showPage('sensitivity')">
+    <button class="nav-item avanzado" onclick="showPage('sensitivity')">
       <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg>
       Sensibilidad
     </button>
     <div class="nav-section" style="margin-top:16px">Administración</div>
-    <button class="nav-item" onclick="showPage('inventory')">
+    <button class="nav-item avanzado" onclick="showPage('inventory')">
       <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 8V21H3V8M1 3H23V8H1V3Z"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
       Actualizar Inventario
     </button>
@@ -418,7 +433,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
       <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
       Seguimiento
     </button>
-    <button class="nav-item" onclick="showPage('comparativa')">
+    <button class="nav-item avanzado" onclick="showPage('comparativa')">
       <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="9" x2="9" y2="20"/></svg>
       Cotización comparativa
     </button>
@@ -433,12 +448,40 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
     <div id="updateAppStatus" style="font-size:11px;color:#8fb996;padding:2px 12px 0 12px;min-height:14px"></div>
   </nav>
   <div class="sidebar-footer">
-    Disponibilidad actualizada:<br><strong>T1:</strong> 12-Nov-2026 · <strong>T2:</strong> 19-Nov-2026<br><button onclick="toggleVista()" id="vistaToggleSide" style="margin-top:10px;background:none;border:1px solid rgba(255,255,255,0.35);color:#e8edf5;border-radius:8px;padding:7px 12px;font-size:12px;cursor:pointer">Vista: automática</button><br><span style="opacity:0.6">Exportar PDF desde cada sección.</span>
+    Disponibilidad actualizada:<br><strong>T1:</strong> 12-Nov-2026 · <strong>T2:</strong> 19-Nov-2026<br><button onclick="toggleVista()" id="vistaToggleSide" style="margin-top:10px;background:none;border:1px solid rgba(255,255,255,0.35);color:#e8edf5;border-radius:8px;padding:7px 12px;font-size:12px;cursor:pointer">Vista: automática</button> <button onclick="toggleModo()" id="modoToggleSide" style="margin-top:10px;background:none;border:1px solid rgba(255,255,255,0.35);color:#e8edf5;border-radius:8px;padding:7px 12px;font-size:12px;cursor:pointer">Modo: completo</button><br><span style="opacity:0.6">Exportar PDF desde cada sección.</span>
   </div>
 </aside>
 
 <!-- Main Content -->
 <main class="main">
+
+  <!-- PAGE: Inicio -->
+  <div id="page-inicio" class="page">
+    <div class="page-header">
+      <div class="breadcrumb">TORAM · Parque Temático y Residencial</div>
+      <h2>¿Qué quieres hacer hoy?</h2>
+      <p>Elige una opción y la calculadora te lleva paso a paso. Nada se borra ni se complica: todo sigue aquí.</p>
+    </div>
+    <div class="card" style="display:flex;flex-direction:column;gap:12px">
+      <button class="btn btn-primary" onclick="showPage('unit')" style="padding:18px;text-align:left;font-size:17px">
+        🏢 Cotizar un departamento
+        <span style="display:block;font-size:13px;font-weight:400;opacity:0.85;margin-top:4px">Elige la unidad, el plan y genera la propuesta</span>
+      </button>
+      <button class="btn btn-primary" onclick="showPage('propuesta'); pSetMode('part')" style="padding:18px;text-align:left;font-size:17px">
+        🎡 Cotizar una participación
+        <span style="display:block;font-size:13px;font-weight:400;opacity:0.85;margin-top:4px">Participaciones del parque temático</span>
+      </button>
+      <button class="btn btn-primary" onclick="showPage('locales')" style="padding:18px;text-align:left;font-size:17px">
+        🏬 Cotizar un local
+        <span style="display:block;font-size:13px;font-weight:400;opacity:0.85;margin-top:4px">Locales comerciales, Etapa 1</span>
+      </button>
+      <button class="btn btn-outline" onclick="showPage('seguimiento')" style="padding:14px;text-align:left;font-size:15px">
+        📋 Ver mis seguimientos
+        <span style="display:block;font-size:12px;font-weight:400;opacity:0.8;margin-top:2px">Los clientes a los que les mandé propuesta y su llamada a los 3 días</span>
+      </button>
+      <div style="font-size:13px;color:#5a7a62;text-align:center">¿Eres asesor? Configura tu nombre y teléfono en <a href="javascript:void(0)" onclick="showPage('perfil')" style="color:var(--navy);font-weight:700">Mi perfil</a> para que tus propuestas salgan con tus datos.</div>
+    </div>
+  </div>
 
   <!-- PAGE: Unit Data -->
   <div id="page-unit" class="page active">
@@ -2050,6 +2093,50 @@ function updateVistaLabels(){
   if (m) m.textContent = txtMas;
 }
 
+// Modo sencillo / completo: en sencillo solo se ven las páginas para vender
+// (Inicio, Unidad, Planes, Propuesta, Locales, Seguimiento, Mi perfil).
+// Todo lo demás sigue existiendo y se ve en modo completo. Guardado por
+// teléfono (localStorage). Sin elegir: Cristo (perfil default) sigue en
+// completo; los demás empiezan en sencillo.
+function getModo(){
+  try {
+    var m = localStorage.getItem('toram_modo_v1');
+    if (m === 'sencillo' || m === 'completo') return m;
+  } catch(e){}
+  var p = getPerfil();
+  return (p.name === PERFIL_DEFAULT.name && p.phone === PERFIL_DEFAULT.phone) ? 'completo' : 'sencillo';
+}
+function setModo(mode){
+  try { localStorage.setItem('toram_modo_v1', mode); } catch(e){}
+  applyModo();
+}
+function toggleModo(){
+  setModo(getModo() === 'sencillo' ? 'completo' : 'sencillo');
+}
+function applyModo(){
+  var m = getModo();
+  var h = document.documentElement;
+  h.classList.toggle('modo-sencillo', m === 'sencillo');
+  h.classList.toggle('modo-completo', m === 'completo');
+  updateModoLabels();
+  // Si se pasa a sencillo estando en una página avanzada, volver al inicio.
+  if (m === 'sencillo') {
+    var cur = document.querySelector('.page.active');
+    var pid = (cur && cur.id) ? String(cur.id).replace('page-','') : '';
+    var avanzadas = ['roi','amort','quote','ficha','compare','sensitivity','inventory','comparativa'];
+    if (avanzadas.indexOf(pid) >= 0) showPage('inicio');
+  }
+}
+function updateModoLabels(){
+  var m = getModo();
+  var txtSide = m === 'sencillo' ? 'Modo: sencillo' : 'Modo: completo';
+  var txtMas = m === 'sencillo' ? 'Ver todo (modo completo)' : 'Modo sencillo';
+  var s = document.getElementById('modoToggleSide');
+  if (s) s.textContent = txtSide;
+  var mm = document.getElementById('modoToggleMas');
+  if (mm) mm.textContent = txtMas;
+}
+
 // Menú "Más" (móvil): abre/cierra la hoja con las páginas que no caben
 // en la barra inferior (Locales, Ficha, Sensibilidad y Administración).
 function toggleMoreMenu(){
@@ -2066,7 +2153,7 @@ function showPage(id) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.querySelectorAll('.bnav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('page-' + id).classList.add('active');
-  const labels = {unit:0,plans:1,roi:2,amort:3,quote:4,ficha:5,propuesta:6,locales:7,compare:8,sensitivity:9,inventory:10,seguimiento:11,comparativa:12,perfil:13};
+  const labels = {inicio:0,unit:1,plans:2,roi:3,amort:4,quote:5,ficha:6,propuesta:7,locales:8,compare:9,sensitivity:10,inventory:11,seguimiento:12,comparativa:13,perfil:14};
   const items = document.querySelectorAll('.nav-item');
   if (labels[id] !== undefined) items[labels[id]].classList.add('active');
   const bnMap = {unit:'bn-unit',plans:'bn-plans',roi:'bn-roi',compare:'bn-compare',amort:'bn-amort',sensitivity:'bn-amort',quote:'bn-quote',ficha:'bn-quote',propuesta:'bn-propuesta',locales:'bn-propuesta'};
@@ -5260,6 +5347,7 @@ function savePerfil(){
   };
   try { localStorage.setItem('toram_perfil_v1', JSON.stringify(p)); } catch(e){}
   applyPerfilToInputs();
+  applyModo();
   renderSeguimiento();
   alert('Perfil guardado. Desde ahora tus propuestas, cotizaciones y comparativas salen con tu nombre y tu teléfono.');
 }
@@ -7378,7 +7466,8 @@ function downloadUpdatedCalculatorHTML() {
 window.addEventListener('DOMContentLoaded', function() {
   applyPerfilToInputs();
   updateVistaLabels();
-  showPage('unit');
+  applyModo();
+  showPage(getModo() === 'sencillo' ? 'inicio' : 'unit');
   syncDpDisplay();
   // Logo oficial en la banda de la Propuesta
   var heroLogo = document.getElementById('pHeroLogo');
