@@ -30,11 +30,17 @@ try {
   --gold:#b8922a;
   --gold-light:#d4af5a;
   --gold-pale:#f5edd8;
+  --gold-dark:#8a6d1f;
+  --gold-border:#e8dcb8;
+  --green-dark:#2d6040;
+  --green-text:#1a3320;
+  --green-soft:#5a7a62;
+  --surface:#f4f6fb;
   --cream:#f7f5ef;
   --white:#ffffff;
   --text-primary:#1a2540;
   --text-secondary:#4a5568;
-  --text-muted:#718096;
+  --text-muted:#5f6b7a;
   --text-light:#a0aec0;
   --border:#dde2ec;
   --border-strong:#c8d0e0;
@@ -66,28 +72,29 @@ h1,h2,h3,h4{font-family:'Playfair Display',serif;font-weight:600;line-height:1.2
 .sidebar-logo p{font-size:11px;text-transform:uppercase;letter-spacing:0.12em;color:rgba(200,215,240,0.6);margin-top:4px}
 .sidebar-logo-img{height:38px;width:auto;display:block;margin-bottom:8px}
 .sidebar-nav{padding:16px 0;flex:1}
-.nav-section{padding:8px 24px 4px;font-size:10px;text-transform:uppercase;letter-spacing:0.14em;color:rgba(200,215,240,0.45);margin-top:8px}
+.nav-section{padding:8px 24px 4px;font-size:11px;text-transform:uppercase;letter-spacing:0.14em;color:rgba(200,215,240,0.65);margin-top:8px}
 .nav-item{display:flex;align-items:center;gap:10px;padding:9px 24px;cursor:pointer;transition:background 0.15s,color 0.15s;font-size:13.5px;color:rgba(220,230,248,0.75);border:none;background:none;width:100%;text-align:left}
 .nav-item:hover{background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.95)}
 .nav-item.active{background:rgba(184,144,46,0.18);color:var(--gold-light);border-right:3px solid var(--gold-light)}
 .nav-item .icon{width:18px;height:18px;opacity:0.7;flex-shrink:0}
 .nav-item.active .icon{opacity:1}
-.sidebar-footer{padding:20px 24px;border-top:1px solid rgba(255,255,255,0.08);font-size:11px;color:rgba(200,215,240,0.4)}
+.sidebar-footer{padding:20px 24px;border-top:1px solid rgba(255,255,255,0.08);font-size:11px;color:rgba(200,215,240,0.60)}
+.sidebar-footer button{display:block;width:100%;margin-top:8px}
 
 /* Bottom nav — mobile only */
 .bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--navy);z-index:100;border-top:1px solid rgba(255,255,255,0.1);padding:0;safe-area-inset-bottom:env(safe-area-inset-bottom)}
 .bottom-nav-inner{display:flex;justify-content:space-around;padding:6px 0 calc(6px + env(safe-area-inset-bottom))}
-.bnav-item{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;cursor:pointer;border:none;background:none;color:rgba(200,215,240,0.55);font-family:'Source Sans 3',sans-serif;font-size:10px;font-weight:600;letter-spacing:0.04em;transition:color 0.15s;white-space:nowrap;overflow:hidden}
+.bnav-item{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;cursor:pointer;border:none;background:none;color:rgba(200,215,240,0.70);font-family:'Source Sans 3',sans-serif;font-size:10px;font-weight:600;letter-spacing:0.04em;transition:color 0.15s;white-space:nowrap;overflow:hidden}
 .bnav-item.active{color:var(--gold-light)}
 .bnav-item svg{width:20px;height:20px}
 .bnav-dot{width:4px;height:4px;border-radius:50%;background:var(--gold-light);margin-top:1px;opacity:0;transition:opacity 0.15s}
 .bnav-item.active .bnav-dot{opacity:1}
 .more-menu{display:none;position:fixed;left:0;right:0;top:0;bottom:0;background:rgba(10,20,12,0.55);z-index:200;align-items:flex-end;justify-content:center}
 .more-menu.open{display:flex}
-.more-menu-sheet{background:#fff;width:100%;max-width:520px;border-radius:18px 18px 0 0;padding:18px 18px calc(18px + env(safe-area-inset-bottom));box-shadow:0 -8px 30px rgba(0,0,0,0.25);max-height:75vh;overflow-y:auto}
-.more-menu-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#5a7a62;margin:10px 4px 6px}
+.more-menu-sheet{background:#fff;width:100%;max-width:520px;border-radius:var(--radius-xl) var(--radius-xl) 0 0;padding:18px 18px calc(18px + env(safe-area-inset-bottom));box-shadow:0 -8px 30px rgba(0,0,0,0.25);max-height:75vh;overflow-y:auto}
+.more-menu-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--green-soft);margin:10px 4px 6px}
 .more-menu-title:first-child{margin-top:0}
-.more-menu-item{display:block;width:100%;text-align:left;background:none;border:none;border-bottom:1px solid #eef2ee;padding:13px 6px;font-size:15px;color:#1a3320;cursor:pointer}
+.more-menu-item{display:block;width:100%;text-align:left;background:none;border:none;border-bottom:1px solid #eef2ee;padding:13px 6px;font-size:15px;color:var(--green-text);cursor:pointer}
 .more-menu-item:active{background:#f2f6f2}
 .more-menu-sep{height:1px;background:#dfe8df;margin:12px 0 4px}
 .more-menu-close{display:block;width:100%;margin-top:14px;padding:12px;border:none;border-radius:10px;background:#1a3a22;color:#fff;font-size:15px;font-weight:700;cursor:pointer}
@@ -131,7 +138,7 @@ html.modo-sencillo .more-menu-item.avanzado{display:none}
 }
 html.vista-movil .main{padding:16px 14px calc(80px + env(safe-area-inset-bottom)) !important}
 
-.main{padding:32px 40px;overflow-y:auto}
+.main{padding:32px 40px;overflow-y:auto;max-width:1240px;margin:0 auto;width:100%}
 .page{display:none}
 .page.active{display:block}
 
@@ -143,8 +150,8 @@ html.vista-movil .main{padding:16px 14px calc(80px + env(safe-area-inset-bottom)
 
 /* Cards */
 .card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:26px;box-shadow:var(--shadow-sm)}
-.card-title{font-size:18px;font-weight:700;color:var(--navy);margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid var(--gold);font-family:'Playfair Display',serif}
-.card-subtitle{font-size:12px;color:var(--text-muted);margin-top:-12px;margin-bottom:16px}
+.card-title{font-size:19px;font-weight:700;color:var(--navy);margin-bottom:6px;padding-bottom:10px;border-bottom:3px solid var(--gold);font-family:'Playfair Display',serif}
+.card-subtitle{font-size:12px;color:var(--text-muted);margin-bottom:16px}
 .card + .card{margin-top:20px}
 
 /* Grid */
@@ -180,6 +187,8 @@ html.vista-movil .main{padding:16px 14px calc(80px + env(safe-area-inset-bottom)
   .plans-table th,.plans-table td{padding:8px 8px}
   .comp-table{font-size:11px}
   .comp-table th,.comp-table td{padding:7px 8px}
+  #qRoiFields,#pRoiFields{grid-template-columns:1fr 1fr}
+  .bnav-item{font-size:9px;letter-spacing:.02em}
   .sens-label{width:60px;font-size:11px}
   .sens-val{width:42px;font-size:11px}
   .scroll-y-400{max-height:300px}
@@ -197,9 +206,14 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 20px;border-radius:var(--radius);font-family:'Source Sans 3',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.15s;border:none;outline:none}
 .btn-primary{background:var(--navy);color:var(--white)}
 .btn-primary:hover{background:var(--navy-light)}
-.btn-gold{background:var(--gold);color:var(--white)}
-.btn-gold:hover{background:var(--gold-light)}
+.btn-gold{background:var(--gold);color:var(--navy)}
+.btn-gold:hover{background:var(--gold-light);color:var(--navy)}
 .btn-outline{background:transparent;border:1.5px solid var(--border-strong);color:var(--text-secondary)}
+.btn:focus-visible,.nav-item:focus-visible,.bnav-item:focus-visible,.more-menu-item:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+/* Clases utilitarias: el sistema de diseño vive en el CSS, no en estilos inline */
+.input-lg{width:100%;height:42px;border:1px solid var(--border-strong);border-radius:var(--radius);padding:0 10px;font-size:14px;background:white}
+.field-row{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap}
+.btn-action{flex:1;min-width:200px;padding:13px}
 .btn-outline:hover{border-color:var(--navy);color:var(--navy)}
 .btn-sm{padding:7px 14px;font-size:13px}
 .btn-full{width:100%;margin-top:8px}
@@ -219,19 +233,19 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 
 /* Plans table */
 .plans-table{width:100%;border-collapse:collapse;font-size:13.5px}
-.plans-table th{background:#f4f6fb;padding:10px 14px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);font-weight:600;border-bottom:2px solid var(--border)}
+.plans-table th{background:var(--surface);padding:10px 14px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);font-weight:600;border-bottom:2px solid var(--border)}
 .plans-table td{padding:11px 14px;border-bottom:1px solid var(--border);color:var(--text-primary)}
 .plans-table tr:last-child td{border-bottom:none}
-.plans-table tr:hover td{background:#f8f9fd}
+.plans-table tr:hover td{background:var(--surface)}
 .plans-table .num{text-align:right;font-variant-numeric:tabular-nums}
 .plans-table .badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600}
 .badge-green{background:var(--green-bg);color:var(--green)}
-.badge-gold{background:var(--gold-pale);color:var(--gold)}
+.badge-gold{background:var(--gold-pale);color:var(--navy)}
 .badge-blue{background:var(--blue-bg);color:var(--blue)}
 
 /* Toggle */
 .toggle-wrap{display:flex;align-items:center;gap:10px;cursor:pointer}
-.toggle-track{width:40px;height:22px;border-radius:11px;background:var(--border-strong);position:relative;transition:background 0.2s;flex-shrink:0}
+.toggle-track{width:40px;height:22px;border-radius:999px;background:var(--border-strong);position:relative;transition:background 0.2s;flex-shrink:0}
 .toggle-track.on{background:var(--gold)}
 .toggle-thumb{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:white;transition:left 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2)}
 .toggle-track.on .toggle-thumb{left:21px}
@@ -255,7 +269,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 
 /* Amortization table */
 .amort-table{width:100%;border-collapse:collapse;font-size:12.5px}
-.amort-table th{background:#f4f6fb;padding:7px 10px;text-align:right;font-size:10px;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);font-weight:600;border-bottom:2px solid var(--border)}
+.amort-table th{background:var(--surface);padding:7px 10px;text-align:right;font-size:10px;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);font-weight:600;border-bottom:2px solid var(--border)}
 .amort-table th:first-child{text-align:left}
 .amort-table td{padding:6px 10px;border-bottom:1px solid var(--border);text-align:right;font-variant-numeric:tabular-nums;color:var(--text-secondary)}
 .amort-table td:first-child{text-align:left;color:var(--text-primary)}
@@ -263,12 +277,20 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 .amort-table tr.income-applied td{background:var(--blue-bg)}
 
 /* Comparison table */
+#qRoiFields,#pRoiFields{grid-template-columns:repeat(3,1fr);gap:14px}
 .comp-table{width:100%;border-collapse:collapse;font-size:13px}
-.comp-table th{background:var(--navy);color:rgba(255,255,255,0.85);padding:10px 14px;text-align:center;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;font-weight:600}
+.comp-table th{background:var(--surface);color:var(--text-muted);padding:10px 14px;text-align:center;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;font-weight:600}
 .comp-table th:first-child{text-align:left}
+/* Primera columna fija: al desplazar la tabla en móvil no se pierde el nombre del plan */
+.plans-table th:first-child,.plans-table td:first-child,
+.comp-table th:first-child,.comp-table td:first-child,
+.amort-table th:first-child,.amort-table td:first-child{
+  position:sticky;left:0;background:#fff;z-index:1;
+}
+.plans-table th:first-child,.comp-table th:first-child,.amort-table th:first-child{background:var(--surface)}
 .comp-table td{padding:10px 14px;border-bottom:1px solid var(--border);text-align:center;font-variant-numeric:tabular-nums}
 .comp-table td:first-child{text-align:left;font-weight:600;color:var(--navy)}
-.comp-table tr:hover td{background:#f8f9fd}
+.comp-table tr:hover td{background:var(--surface)}
 .comp-table .pos{color:var(--green);font-weight:600}
 .comp-table .neg{color:var(--red);font-weight:600}
 .comp-table .highlight-row td{background:var(--gold-pale)}
@@ -316,7 +338,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 .o-amort-expl{background:#eef5f0;border:1px solid #c8dcc8;border-left:4px solid var(--green);border-radius:6px;padding:10px 14px;font-size:12.5px;color:#2d4a35;line-height:1.55;margin-bottom:14px}
 
 /* Print / no-screen */
-@media print{.sidebar,.btn{display:none}}
+@media print{.sidebar,.btn,.bottom-nav,.more-menu{display:none}}
 </style>
 </head>
 <body>
@@ -395,7 +417,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 <aside class="sidebar">
   <div class="sidebar-logo">
     <img id="oSidebarLogo" class="sidebar-logo-img" alt="TORAM — Parque Temático y Residencial">
-    <p>Investment Calculator v2</p>
+    <p>Calculadora de Inversión v2</p>
   </div>
   <nav class="sidebar-nav">
     <div class="nav-section">Herramientas</div>
@@ -485,22 +507,22 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
     </div>
     <div class="card" style="display:flex;flex-direction:column;gap:12px">
       <button class="btn btn-primary" onclick="showPage('unit')" style="padding:18px;text-align:left;font-size:17px">
-        🏢 Cotizar un departamento
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="vertical-align:-4px;margin-right:8px"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>Cotizar un departamento
         <span style="display:block;font-size:13px;font-weight:400;opacity:0.85;margin-top:4px">Elige la unidad, el plan y genera la propuesta</span>
       </button>
       <button class="btn btn-primary" onclick="showPage('propuesta'); pSetMode('part')" style="padding:18px;text-align:left;font-size:17px">
-        🎡 Cotizar una participación
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="vertical-align:-4px;margin-right:8px"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>Cotizar una participación
         <span style="display:block;font-size:13px;font-weight:400;opacity:0.85;margin-top:4px">Participaciones del parque temático</span>
       </button>
       <button class="btn btn-primary" onclick="showPage('locales')" style="padding:18px;text-align:left;font-size:17px">
-        🏬 Cotizar un local
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="vertical-align:-4px;margin-right:8px"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>Cotizar un local
         <span style="display:block;font-size:13px;font-weight:400;opacity:0.85;margin-top:4px">Locales comerciales, Etapa 1</span>
       </button>
       <button class="btn btn-outline" onclick="showPage('seguimiento')" style="padding:14px;text-align:left;font-size:15px">
-        📋 Ver mis seguimientos
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="vertical-align:-4px;margin-right:8px"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Ver mis seguimientos
         <span style="display:block;font-size:12px;font-weight:400;opacity:0.8;margin-top:2px">Los clientes a los que les mandé propuesta y su llamada a los 3 días</span>
       </button>
-      <div style="font-size:13px;color:#5a7a62;text-align:center">¿Eres asesor? Configura tu nombre y teléfono en <a href="javascript:void(0)" onclick="showPage('perfil')" style="color:var(--navy);font-weight:700">Mi perfil</a> para que tus propuestas salgan con tus datos.</div>
+      <div style="font-size:13px;color:var(--green-soft);text-align:center">¿Eres asesor? Configura tu nombre y teléfono en <a href="javascript:void(0)" onclick="showPage('perfil')" style="color:var(--navy);font-weight:700">Mi perfil</a> para que tus propuestas salgan con tus datos.</div>
     </div>
   </div>
 
@@ -524,7 +546,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
         <div id="searchDropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--white);border:1px solid var(--border-strong);border-radius:var(--radius);box-shadow:var(--shadow);z-index:50;max-height:260px;overflow-y:auto"></div>
       </div>
       <!-- Unit info chip -->
-      <div id="unitChip" style="display:none;background:#f4f6fb;border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;margin-bottom:12px">
+      <div id="unitChip" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;margin-bottom:12px">
         <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
           <div id="chipTorreTag"></div>
           <div style="font-size:15px;font-weight:600;color:var(--navy)" id="chipName"></div>
@@ -567,18 +589,18 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
       </div>
 
       <!-- Down payment input row (dynamic) -->
-      <div style="margin-top:16px;background:#f8f9fd;border-radius:var(--radius);padding:16px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;align-items:end" id="dpRow">
+      <div style="margin-top:16px;background:var(--surface);border-radius:var(--radius);padding:16px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;align-items:end" id="dpRow">
         <div class="field">
           <span class="label" id="dpLabel">Enganche <span class="label-hint">(%)</span></span>
           <input type="number" id="dpValue" value="15" min="0" step="0.5" oninput="syncDpDisplay()">
         </div>
         <div class="field">
           <span class="label" id="dpEquivLabel">Equivale a</span>
-          <input type="text" id="dpEquiv" readonly style="background:#eef0f7;color:var(--text-secondary);cursor:default" placeholder="—">
+          <input type="text" id="dpEquiv" readonly style="background:var(--surface);color:var(--text-secondary);cursor:default" placeholder="—">
         </div>
         <div class="field">
           <span class="label">A financiar</span>
-          <input type="text" id="dpFinanced" readonly style="background:#eef0f7;color:var(--text-secondary);cursor:default" placeholder="—">
+          <input type="text" id="dpFinanced" readonly style="background:var(--surface);color:var(--text-secondary);cursor:default" placeholder="—">
         </div>
       </div>
 
@@ -597,7 +619,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
     <div class="page-header">
       <div class="breadcrumb">Calculadora</div>
       <h2>Planes de Financiamiento</h2>
-      <p id="plansSubtitle">Configure la unidad primero para ver los planes disponibles.</p>
+      <p id="plansSubtitle">Configura la unidad primero para ver los planes disponibles.</p>
     </div>
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
@@ -623,7 +645,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
             </tr>
           </thead>
           <tbody id="plansBody">
-            <tr><td colspan="9" style="padding:24px;text-align:center;color:var(--text-muted)">Configure la unidad y haga clic en "Calcular Planes".</td></tr>
+            <tr><td colspan="9" style="padding:24px;text-align:center;color:var(--text-muted)">Configura la unidad y toca «Calcular Planes».</td></tr>
           </tbody>
         </table>
       </div>
@@ -645,7 +667,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
       <div class="grid-3" style="gap:16px;margin-bottom:16px">
         <div class="field">
           <span class="label">Plan a analizar</span>
-          <select id="roiPlanSelect"><option value="0">— Calcule planes primero —</option></select>
+          <select id="roiPlanSelect"><option value="0">— Calcula planes primero —</option></select>
         </div>
         <div class="field">
           <span class="label">Años de tenencia</span>
@@ -736,12 +758,12 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 
             <hr class="divider">
             <div class="section-title">Alivio de Flujo (Escenario A)</div>
-            <div class="card-subtitle" style="margin-top:-12px;margin-bottom:12px;font-size:12px;color:var(--text-muted)">Los ingresos cubren la mensualidad. Se mide el ahorro en desembolso de bolsillo.</div>
+            <div class="card-subtitle" style="margin-bottom:12px;font-size:12px;color:var(--text-muted)">Los ingresos cubren la mensualidad. Se mide el ahorro en desembolso de bolsillo.</div>
             <div class="grid-4" id="sc2-flowrelief-metrics" style="margin-bottom:20px"></div>
 
             <hr class="divider">
             <div class="section-title">Amortización Acelerada (Escenario B)</div>
-            <div class="card-subtitle" style="margin-top:-12px;margin-bottom:12px;font-size:12px;color:var(--text-muted)">Los ingresos se aplican como abono extra al capital, reduciendo el saldo y los intereses generados.</div>
+            <div class="card-subtitle" style="margin-bottom:12px;font-size:12px;color:var(--text-muted)">Los ingresos se aplican como abono extra al capital, reduciendo el saldo y los intereses generados.</div>
             <div class="grid-4" id="sc2-accel-metrics" style="margin-bottom:20px"></div>
 
             <div id="sc2-payoff-alert" class="alert" style="margin-bottom:20px"></div>
@@ -835,7 +857,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
             </tr>
           </thead>
           <tbody id="compareBody">
-            <tr><td colspan="10" style="padding:24px;text-align:center;color:var(--text-muted)">Calcule el ROI para ver la comparativa.</td></tr>
+            <tr><td colspan="10" style="padding:24px;text-align:center;color:var(--text-muted)">Calcula el ROI para ver la comparativa.</td></tr>
           </tbody>
         </table>
       </div>
@@ -924,7 +946,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
         <div class="section-title">Unidades en esta cotización</div>
         <div id="quoteCartList"></div>
       </div>
-      <div id="quoteEmpty" style="padding:20px;text-align:center;color:var(--text-muted);font-size:13px;background:#f8f9fd;border-radius:var(--radius)">
+      <div id="quoteEmpty" style="padding:20px;text-align:center;color:var(--text-muted);font-size:13px;background:var(--surface);border-radius:var(--radius)">
         Agrega al menos una unidad para generar la cotización.
       </div>
       <div class="o-apartado-note"><strong>Apartado (a cuenta del total): $50,000</strong> por departamento. No es un costo adicional: al firmar el contrato se abona al valor total. Los planes se calculan sobre el precio completo, sin sumar el apartado.</div>
@@ -939,7 +961,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
           <span class="toggle-label">Incluir análisis de ROI en cotización</span>
         </label>
       </div>
-      <div id="qRoiFields" style="display:none;grid-template-columns:repeat(3,1fr);gap:14px">
+      <div id="qRoiFields" style="display:none">
         <div class="field">
           <span class="label">Años de tenencia</span>
           <input type="number" id="qRoiYears" value="5" min="1" max="20">
@@ -969,15 +991,15 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 
     <!-- Preview + Generate -->
     <div style="display:flex;gap:12px;margin-top:20px;flex-wrap:wrap">
-      <button class="btn btn-primary" onclick="previewQuote()" style="flex:1;min-width:200px;padding:13px">
+      <button class="btn btn-primary btn-action" onclick="previewQuote()" >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
         Vista previa
       </button>
-      <button class="btn btn-gold" onclick="exportQuotePDF()" style="flex:1;min-width:200px;padding:13px">
+      <button class="btn btn-gold btn-action" onclick="exportQuotePDF()" >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         Descargar PDF Cotización
       </button>
-      <button class="btn btn-primary" onclick="exportQuotePDF(true)" style="flex:1;min-width:200px;padding:13px">
+      <button class="btn btn-outline btn-action" onclick="exportQuotePDF(true)" >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/><line x1="15.4" y1="6.5" x2="8.6" y2="10.5"/></svg>
         Compartir por WhatsApp
       </button>
@@ -1000,7 +1022,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 
     <div class="card">
       <div class="card-title">Seleccionar unidad</div>
-      <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:16px">
+      <div class="field-row" style="margin-bottom:16px">
         <div class="field" style="flex:1;min-width:200px;position:relative">
           <span class="label">Buscar unidad</span>
           <input type="text" id="fichaSearch" placeholder="Ej: 1103-A, T1-709…" autocomplete="off"
@@ -1020,7 +1042,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
           PDF
         </button>
       </div>
-      <div id="fichaSelected" style="display:none;padding:10px 14px;background:#f4f6fb;border-radius:var(--radius);font-size:13px;color:var(--text-secondary)">
+      <div id="fichaSelected" style="display:none;padding:10px 14px;background:var(--surface);border-radius:var(--radius);font-size:13px;color:var(--text-secondary)">
         Ninguna unidad seleccionada
       </div>
       <div class="o-apartado-note"><strong>Apartado (a cuenta del total): $50,000</strong> por departamento. No es un costo adicional: al firmar el contrato se abona al valor total.</div>
@@ -1036,15 +1058,14 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
     <style>
       /* Propuesta: pulido tipográfico y de color, SOLO esta página (selectores con #page-propuesta; no toca el CSS global). */
       #page-propuesta .page-header h2{letter-spacing:.01em}
-      #page-propuesta .card-title{font-size:19px;font-weight:700;padding-bottom:10px;border-bottom:3px solid var(--gold)}
       #page-propuesta .p-tab{font-family:'Playfair Display',Georgia,serif;font-size:16px;font-weight:600;letter-spacing:.02em}
       #page-propuesta .p-tab.active{background:var(--navy);color:#fff;border-color:var(--navy)}
       #page-propuesta .p-tab:not(.active){background:var(--white);color:var(--navy);border:1px solid var(--border-strong)}
       #page-propuesta .p-price{font-family:'Playfair Display',Georgia,serif;font-size:32px;font-weight:700;line-height:1.1;color:var(--navy)}
       #page-propuesta .p-figure{font-family:'Playfair Display',Georgia,serif;font-size:22px;font-weight:700;line-height:1.15;color:var(--navy)}
-      #page-propuesta .p-kicker{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+      #page-propuesta .p-kicker{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-dark)}
       #page-propuesta .p-note{font-size:12px;color:var(--text-muted);line-height:1.5}
-      #page-propuesta .p-summary{background:var(--gold-pale);border:1px solid #e8dcb8;border-radius:var(--radius);padding:16px 18px}
+      #page-propuesta .p-summary{background:var(--gold-pale);border:1px solid var(--gold-border);border-radius:var(--radius);padding:16px 18px}
       #page-propuesta .p-summary .p-price{color:var(--navy)}
       #page-propuesta .p-modelimg{width:100%;max-height:300px;object-fit:cover;display:block;border-radius:var(--radius);border:1px solid var(--border)}
       #page-propuesta .p-hero{background:var(--navy);border-radius:var(--radius);padding:22px 24px;display:flex;gap:22px;align-items:center;margin-bottom:16px;border-bottom:4px solid var(--gold)}
@@ -1099,16 +1120,16 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
     <div id="pDeptoPanel" style="margin-top:16px">
       <div class="card">
         <div class="card-title">Seleccionar modelo de departamento</div>
-        <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:16px">
+        <div class="field-row" style="margin-bottom:16px">
           <div class="field" style="flex:1;min-width:220px">
             <span class="label">Modelo</span>
-            <select id="pModelSelect" onchange="pOnModelChange()" style="width:100%;height:42px;border:1px solid var(--border-strong);border-radius:var(--radius);padding:0 10px;font-size:14px;background:white">
+            <select id="pModelSelect" onchange="pOnModelChange()" class="input-lg">
               <option value="">— Elige un modelo —</option>
             </select>
           </div>
           <div class="field" style="flex:1;min-width:220px">
             <span class="label">Unidad (todas, la más económica primero)</span>
-            <select id="pUnitSelect" onchange="pOnUnitChange()" style="width:100%;height:42px;border:1px solid var(--border-strong);border-radius:var(--radius);padding:0 10px;font-size:14px;background:white" disabled>
+            <select id="pUnitSelect" onchange="pOnUnitChange()" class="input-lg" disabled>
               <option value="">— Primero elige un modelo —</option>
             </select>
           </div>
@@ -1123,7 +1144,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
           </div>
         </div>
         <div id="pModelInfo" style="display:none"></div>
-        <div id="pUnitInfo" style="display:none;margin-top:12px;padding:10px 14px;background:#f4f6fb;border-radius:var(--radius);font-size:13px;color:var(--text-secondary)"></div>
+        <div id="pUnitInfo" style="display:none;margin-top:12px;padding:10px 14px;background:var(--surface);border-radius:var(--radius);font-size:13px;color:var(--text-secondary)"></div>
       </div>
 
       <!-- Supuestos ROI para la propuesta -->
@@ -1135,7 +1156,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
             <span class="toggle-label">Incluir análisis de ROI en la propuesta</span>
           </label>
         </div>
-        <div id="pRoiFields" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px">
+        <div id="pRoiFields" style="display:grid">
           <div class="field">
             <span class="label">Años de tenencia</span>
             <input type="number" id="pRoiYears" value="5" min="1" max="20">
@@ -1172,10 +1193,10 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
           Precio por participación según paquete. Sin descuento por pago de contado: la participación siempre cuesta lo mismo.
           Financiamiento directo: 30% de enganche y el resto a 20 o 24 meses sin intereses.
         </p>
-        <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:16px">
+        <div class="field-row" style="margin-bottom:16px">
           <div class="field" style="flex:1;min-width:200px">
             <span class="label">Cantidad de participaciones</span>
-            <select id="pPartQtySel" onchange="pOnPartQtySel()" style="width:100%;height:42px;border:1px solid var(--border-strong);border-radius:var(--radius);padding:0 10px;font-size:14px;background:white">
+            <select id="pPartQtySel" onchange="pOnPartQtySel()" class="input-lg">
               <option value="1">1 participación — $1,150,000 c/u</option>
               <option value="3">3 participaciones — $1,075,000 c/u</option>
               <option value="5">5 participaciones — $1,050,000 c/u</option>
@@ -1192,14 +1213,14 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
           </div>
           <div class="field" style="flex:1;min-width:200px">
             <span class="label">Forma de pago</span>
-            <select id="pPartPay" onchange="pOnPartPay()" style="width:100%;height:42px;border:1px solid var(--border-strong);border-radius:var(--radius);padding:0 10px;font-size:14px;background:white">
+            <select id="pPartPay" onchange="pOnPartPay()" class="input-lg">
               <option value="contado">Contado</option>
               <option value="fin">Financiamiento directo (30% enganche + MSI)</option>
             </select>
           </div>
           <div class="field" id="pPartMsiWrap" style="width:150px;display:none">
             <span class="label">Meses sin intereses</span>
-            <select id="pPartMsi" onchange="pUpdatePartSummary()" style="width:100%;height:42px;border:1px solid var(--border-strong);border-radius:var(--radius);padding:0 10px;font-size:14px;background:white">
+            <select id="pPartMsi" onchange="pUpdatePartSummary()" class="input-lg">
               <option value="24">24 MSI</option>
               <option value="20">20 MSI</option>
             </select>
@@ -1211,15 +1232,15 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 
     <!-- Acciones -->
     <div style="display:flex;gap:12px;margin-top:20px;flex-wrap:wrap">
-      <button class="btn btn-primary" onclick="previewPropuesta()" style="flex:1;min-width:200px;padding:13px">
+      <button class="btn btn-primary btn-action" onclick="previewPropuesta()" >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
         Generar propuesta
       </button>
-      <button class="btn btn-gold" onclick="exportPropuestaPDF()" style="flex:1;min-width:200px;padding:13px">
+      <button class="btn btn-gold btn-action" onclick="exportPropuestaPDF()" >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         Descargar PDF
       </button>
-      <button class="btn btn-primary" onclick="sharePropuestaPDF()" style="flex:1;min-width:200px;padding:13px">
+      <button class="btn btn-outline btn-action" onclick="sharePropuestaPDF()" >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/><line x1="15.4" y1="6.5" x2="8.6" y2="10.5"/></svg>
         Compartir por WhatsApp
       </button>
@@ -1235,7 +1256,6 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
   <div id="page-locales" class="page">
     <style>
       /* Locales: pulido tipográfico y de color, SOLO esta página (selectores con #page-locales; no toca el CSS global). */
-      #page-locales .card-title{font-size:19px;font-weight:700;padding-bottom:10px;border-bottom:3px solid var(--gold)}
       #page-locales .l-hero{background:var(--navy);border-radius:var(--radius);padding:22px 24px;display:flex;gap:22px;align-items:center;margin-bottom:16px;border-bottom:4px solid var(--gold)}
       #page-locales .l-hero-logo{height:56px;width:auto;flex-shrink:0}
       #page-locales .l-hero-kicker{font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-light)}
@@ -1243,10 +1263,10 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
       #page-locales .l-hero p{font-size:13px;line-height:1.5;color:rgba(255,255,255,.78);margin:0}
       #page-locales .l-price{font-family:'Playfair Display',Georgia,serif;font-size:32px;font-weight:700;line-height:1.1;color:var(--navy)}
       #page-locales .l-figure{font-family:'Playfair Display',Georgia,serif;font-size:22px;font-weight:700;line-height:1.15;color:var(--navy)}
-      #page-locales .l-kicker{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+      #page-locales .l-kicker{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-dark)}
       #page-locales .l-note{font-size:12px;color:var(--text-muted);line-height:1.5}
       #page-locales .l-planoimg{width:100%;display:block;border-radius:var(--radius);border:1px solid var(--border)}
-      #page-locales .l-stat{background:var(--gold-pale);border:1px solid #e8dcb8;border-radius:var(--radius);padding:14px 16px;text-align:center}
+      #page-locales .l-stat{background:var(--gold-pale);border:1px solid var(--gold-border);border-radius:var(--radius);padding:14px 16px;text-align:center}
       #page-locales .l-stat-num{font-family:'Playfair Display',Georgia,serif;font-size:26px;font-weight:700;line-height:1.1;color:var(--navy)}
       #page-locales .l-stat-lbl{font-size:11px;color:var(--text-secondary);margin-top:4px;line-height:1.4}
       #page-locales .l-badge{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px}
@@ -1310,16 +1330,16 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
     <!-- Selector de local -->
     <div class="card" style="margin-top:16px">
       <div class="card-title">Seleccionar local comercial</div>
-      <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:16px">
+      <div class="field-row" style="margin-bottom:16px">
         <div class="field" style="flex:1;min-width:240px">
           <span class="label">Local (disponibles primero, del más económico al más caro)</span>
-          <select id="lLocalSelect" onchange="lOnLocalChange()" style="width:100%;height:42px;border:1px solid var(--border-strong);border-radius:var(--radius);padding:0 10px;font-size:14px;background:white">
+          <select id="lLocalSelect" onchange="lOnLocalChange()" class="input-lg">
             <option value="">— Elige un local —</option>
           </select>
         </div>
         <div class="field" style="flex:1;min-width:200px">
           <span class="label">Plan a cotizar <span class="label-hint">(para el PDF)</span></span>
-          <select id="lPlanSelect" onchange="lOnPlanChange()" style="width:100%;height:42px;border:1px solid var(--border-strong);border-radius:var(--radius);padding:0 10px;font-size:14px;background:white">
+          <select id="lPlanSelect" onchange="lOnPlanChange()" class="input-lg">
             <option value="0">Pago de Contado — 20% dto.</option>
             <option value="1">Pago 6 Meses — 15% dto.</option>
             <option value="2">Pago 12 Meses — 10% dto.</option>
@@ -1351,15 +1371,15 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 
     <!-- Acciones -->
     <div style="display:flex;gap:12px;margin-top:20px;flex-wrap:wrap">
-      <button class="btn btn-primary" onclick="previewLocales()" style="flex:1;min-width:200px;padding:13px">
+      <button class="btn btn-primary btn-action" onclick="previewLocales()" >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
         Generar cotización
       </button>
-      <button class="btn btn-gold" onclick="exportLocalesPDF()" style="flex:1;min-width:200px;padding:13px">
+      <button class="btn btn-gold btn-action" onclick="exportLocalesPDF()" >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         Descargar PDF
       </button>
-      <button class="btn btn-primary" onclick="exportLocalesPDF(true)" style="flex:1;min-width:200px;padding:13px">
+      <button class="btn btn-outline btn-action" onclick="exportLocalesPDF(true)" >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/><line x1="15.4" y1="6.5" x2="8.6" y2="10.5"/></svg>
         Compartir por WhatsApp
       </button>
@@ -1430,12 +1450,12 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
         <span class="label">Teléfono / WhatsApp</span>
         <input type="text" id="pfPhone" value="669 139 3136" style="width:100%;height:42px;border:1px solid var(--border-strong);border-radius:var(--radius);padding:0 10px;font-size:14px">
       </div>
-      <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:#1a3320;margin-bottom:16px;cursor:pointer">
-        <input type="checkbox" id="pfShowQR" checked onchange="savePerfil()" style="width:18px;height:18px;accent-color:#2d6040">
+      <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--green-text);margin-bottom:16px;cursor:pointer">
+        <input type="checkbox" id="pfShowQR" checked onchange="savePerfil()" style="width:18px;height:18px;accent-color:var(--green-dark)">
         Incluir el QR al mapa interactivo en los PDFs
       </label>
       <button class="btn btn-primary" onclick="savePerfil()" style="padding:12px 24px">Guardar mi perfil</button>
-      <div style="font-size:12px;color:#5a7a62;margin-top:12px">Cada quien guarda el suyo en su propio teléfono. Para instalar la app en otro teléfono (Android o iPhone), abre https://cristobalderrama.github.io/toram_roi/ en el navegador y agrégala a la pantalla de inicio.</div>
+      <div style="font-size:12px;color:var(--green-soft);margin-top:12px">Cada quien guarda el suyo en su propio teléfono. Para instalar la app en otro teléfono (Android o iPhone), abre https://cristobalderrama.github.io/toram_roi/ en el navegador y agrégala a la pantalla de inicio.</div>
     </div>
   </div>
 
@@ -1446,7 +1466,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
       <p>Cada propuesta que descargues o compartas con el nombre del cliente se guarda aquí sola, con su llamada a los 3 días. Todo queda en tu teléfono, funciona sin internet.</p>
     </div>
     <div class="card">
-      <div id="segPerfil" style="font-size:12px;color:#5a7a62;margin-bottom:12px"></div>
+      <div id="segPerfil" style="font-size:12px;color:var(--green-soft);margin-bottom:12px"></div>
       <div id="segList"></div>
     </div>
   </div>
@@ -1481,13 +1501,13 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
       <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:12px">
         <div class="field" style="flex:1;min-width:220px">
           <span class="label">Modelo</span>
-          <select id="cModelSelect" onchange="cOnModelChange()" style="width:100%;height:42px;border:1px solid var(--border-strong);border-radius:var(--radius);padding:0 10px;font-size:14px;background:white">
+          <select id="cModelSelect" onchange="cOnModelChange()" class="input-lg">
             <option value="">— Elige un modelo —</option>
           </select>
         </div>
         <div class="field" style="flex:1;min-width:220px">
           <span class="label">Unidad</span>
-          <select id="cUnitSelect" style="width:100%;height:42px;border:1px solid var(--border-strong);border-radius:var(--radius);padding:0 10px;font-size:14px;background:white">
+          <select id="cUnitSelect" class="input-lg">
             <option value="">— Primero elige un modelo —</option>
           </select>
         </div>
@@ -1495,19 +1515,19 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
           <span class="label">Renta mensual estimada ($)</span>
           <input type="number" id="cRentInput" value="45000" step="1000" min="0" style="width:100%;height:42px;border:1px solid var(--border-strong);border-radius:var(--radius);padding:0 10px;font-size:14px">
         </div>
-        <button class="btn btn-primary" onclick="cAddUnit()" style="padding:12px 18px">+ Agregar unidad</button>
+        <button class="btn btn-gold" onclick="cAddUnit()" style="padding:12px 18px">+ Agregar unidad</button>
       </div>
       <div id="cUnitsList" style="display:flex;gap:8px;flex-wrap:wrap"></div>
       <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-top:16px">
         <div class="field" style="flex:1;min-width:240px">
           <span class="label">Plan de financiamiento (el mismo para todas las unidades)</span>
-          <select id="cPlanSelect" onchange="renderComparativa()" style="width:100%;height:42px;border:1px solid var(--border-strong);border-radius:var(--radius);padding:0 10px;font-size:14px;background:white">
+          <select id="cPlanSelect" onchange="renderComparativa()" class="input-lg">
             <option value="">— Cargando planes —</option>
           </select>
         </div>
-        <div style="font-size:12px;color:#5a7a62;padding-bottom:12px">Enganche del 15%</div>
-        <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:#1a3320;padding-bottom:12px;cursor:pointer">
-          <input type="checkbox" id="cGainToggle" checked onchange="renderComparativa()" style="width:18px;height:18px;accent-color:#2d6040">
+        <div style="font-size:12px;color:var(--green-soft);padding-bottom:12px">Enganche del 15%</div>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--green-text);padding-bottom:12px;cursor:pointer">
+          <input type="checkbox" id="cGainToggle" checked onchange="renderComparativa()" style="width:18px;height:18px;accent-color:var(--green-dark)">
           Mostrar ganancia proyectada a 5 años
         </label>
       </div>
@@ -1515,15 +1535,15 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 
     <!-- Acciones -->
     <div style="display:flex;gap:12px;margin-top:20px;flex-wrap:wrap">
-      <button class="btn btn-primary" onclick="previewComparativa()" style="flex:1;min-width:200px;padding:13px">
+      <button class="btn btn-primary btn-action" onclick="previewComparativa()" >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
         Generar vista previa
       </button>
-      <button class="btn btn-gold" onclick="exportComparativaPDF()" style="flex:1;min-width:200px;padding:13px">
+      <button class="btn btn-gold btn-action" onclick="exportComparativaPDF()" >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         Descargar PDF
       </button>
-      <button class="btn btn-primary" onclick="shareComparativaPDF()" style="flex:1;min-width:200px;padding:13px">
+      <button class="btn btn-outline btn-action" onclick="shareComparativaPDF()" >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/><line x1="15.4" y1="6.5" x2="8.6" y2="10.5"/></svg>
         Compartir por WhatsApp
       </button>
@@ -2457,7 +2477,7 @@ function calcScenario2(planIdx) {
 
 // ── Calculate ROI ───────────────────────────────────────────────────────────
 function calculateROI() {
-  if (plans.length === 0) { alert('Calcule primero los planes de financiamiento.'); return; }
+  if (plans.length === 0) { alert('Calcula primero los planes de financiamiento.'); return; }
   const planIdx  = parseInt(document.getElementById('roiPlanSelect').value);
   const p        = plans[planIdx];
   const roiYears = parseInt(document.getElementById('roiYears').value);
@@ -2630,7 +2650,7 @@ function renderTimeline(planIdx, roiYears, opStart, delivery, sc2) {
   ];
   const tl = document.getElementById('roiTimeline');
   tl.innerHTML = segs.map(function(s){
-    return s.pct > 0 ? '<div class="timeline-seg '+s.cls+'" style="width:'+s.pct+'%">'+(s.pct>8?s.label:'')+'</div>' : '';
+    return s.pct > 0 ? '<div class="timeline-seg '+s.cls+'" style="width:'+s.pct+'%">'+(s.pct>15?s.label:'')+'</div>' : '';
   }).join('');
 
   const leg = document.getElementById('roiTimelineLegend');
@@ -2815,17 +2835,17 @@ function renderSensitivity() {
 
 // ── PDF Exports ─────────────────────────────────────────────────────────────
 function exportPlansPDF() {
-  if (plans.length === 0) { alert('Calcule primero los planes.'); return; }
+  if (plans.length === 0) { alert('Calcula primero los planes.'); return; }
   const jsPDF = getJsPDF(); if (!jsPDF) return;
   const doc  = new jsPDF({ orientation: 'landscape' });
   const unit = document.getElementById('unitName').value;
   const price= parseFloat(document.getElementById('listPrice').value);
   const W = doc.internal.pageSize.getWidth(), M = 16;
 
-  doc.setFillColor(26,37,64); doc.rect(0,0,W,28,'F');
+  doc.setFillColor(26,58,34); doc.rect(0,0,W,28,'F');
   doc.setFont('helvetica','bold'); doc.setFontSize(18); doc.setTextColor(212,168,75);
   doc.text('TORAM — Planes de Financiamiento', M, 13);
-  doc.setFontSize(9); doc.setTextColor(180,195,220); doc.setFont('helvetica','normal');
+  doc.setFontSize(9); doc.setTextColor(180,210,160); doc.setFont('helvetica','normal');
   doc.text('Unidad: '+unit+'   |   Precio de lista: $'+fmt(price)+'   |   Torre '+document.getElementById('tower').value, M, 21);
 
   let y = 36;
@@ -2865,7 +2885,7 @@ function exportPlansPDF() {
 }
 
 function exportAmortPDF() {
-  if (plans.length === 0) { alert('Calcule primero los planes.'); return; }
+  if (plans.length === 0) { alert('Calcula primero los planes.'); return; }
   const jsPDF = getJsPDF(); if (!jsPDF) return;
   const doc     = new jsPDF({ orientation: 'landscape' });
   const planIdx = parseInt(document.getElementById('amortPlanSelect').value);
@@ -2874,10 +2894,10 @@ function exportAmortPDF() {
   const rows    = buildAmortSchedule(planIdx, amortShowScenario2, 0, opStart);
   const W = doc.internal.pageSize.getWidth(), M = 14;
 
-  doc.setFillColor(26,37,64); doc.rect(0,0,W,26,'F');
+  doc.setFillColor(26,58,34); doc.rect(0,0,W,26,'F');
   doc.setFont('helvetica','bold'); doc.setFontSize(15); doc.setTextColor(212,168,75);
   doc.text('TORAM — Amortización: '+p.name, M, 12);
-  doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(180,195,220);
+  doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(180,210,160);
   doc.text((amortShowScenario2?'Escenario 2 (con abono)':'Estándar')+'   |   Plazo: '+p.months+'m   |   Tasa: '+(p.interestRate||0)+'%', M, 20);
 
   const headers = ['Mes','Saldo Inicial','Interés','Capital','Abono Extra','Cuota','Saldo Final'];
@@ -2906,16 +2926,16 @@ function exportAmortPDF() {
 }
 
 function exportComparePDF() {
-  if (plans.length === 0) { alert('Calcule primero.'); return; }
+  if (plans.length === 0) { alert('Calcula primero.'); return; }
   const jsPDF = getJsPDF(); if (!jsPDF) return;
   const doc      = new jsPDF({ orientation: 'landscape' });
   const W = doc.internal.pageSize.getWidth(), M = 12;
   const roiYears = parseInt(document.getElementById('roiYears').value);
 
-  doc.setFillColor(26,37,64); doc.rect(0,0,W,26,'F');
+  doc.setFillColor(26,58,34); doc.rect(0,0,W,26,'F');
   doc.setFont('helvetica','bold'); doc.setFontSize(15); doc.setTextColor(212,168,75);
   doc.text('TORAM — Tabla Comparativa de ROI', M, 12);
-  doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(180,195,220);
+  doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(180,210,160);
   doc.text('Horizonte: '+roiYears+' años   |   '+document.getElementById('unitName').value, M, 20);
 
   const headers = ['Plan','Enganche','Mensualidad','Intereses','Plusvalía','Ingr.Netos','Gan.Neta','ROI Anual','Sc2 ROI'];
@@ -3009,7 +3029,7 @@ function onSearchInput() {
     var availBadge = '<span style="font-size:10px;font-weight:700;padding:1px 7px;border-radius:999px;background:'+avail.bg+';color:'+avail.color+'">'+avail.status+'</span>';
     return '<div onclick="selectUnit(\''+d.torre+'\',\''+d.num+'\')" ' +
       'style="padding:9px 14px;cursor:pointer;border-bottom:0.5px solid var(--border);font-size:13.5px;display:flex;align-items:center;gap:10px" ' +
-      'onmouseover="this.style.background=\'#f4f6fb\'" onmouseout="this.style.background=\'\'">' +
+      'onmouseover="this.style.background=\'var(--surface)\'" onmouseout="this.style.background=\'\'">' +
       '<span style="font-size:11px;font-weight:700;padding:2px 7px;border-radius:999px;background:'+tbg+';color:'+tcol+'">'+d.torre+'</span>' +
       '<span style="font-weight:600;color:var(--navy)">Depto '+d.num+'</span>' +
       '<span style="color:var(--text-muted)">'+d.tipo+'</span>' +
@@ -3104,7 +3124,7 @@ function onQSearchInput() {
     const col = d.torre==='T1' ? 'var(--blue)'      : 'var(--green)';
     return '<div onclick="qSelectUnit(\''+d.torre+'\',\''+d.num+'\')" ' +
       'style="padding:9px 14px;cursor:pointer;border-bottom:0.5px solid var(--border);font-size:13px;display:flex;align-items:center;gap:8px" ' +
-      'onmouseover="this.style.background=\'#f4f6fb\'" onmouseout="this.style.background=\'\'">' +
+      'onmouseover="this.style.background=\'var(--surface)\'" onmouseout="this.style.background=\'\'">' +
       '<span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:999px;background:'+bg+';color:'+col+'">'+d.torre+'</span>' +
       '<strong>Depto '+d.num+'</strong>' +
       '<span style="color:var(--text-muted)">'+d.tipo+'</span>' +
@@ -3208,7 +3228,7 @@ function renderQuoteCart() {
     var imgHtml = UNIT_IMAGES[imgKey]
       ? '<img src="'+UNIT_IMAGES[imgKey]+'" style="width:80px;height:54px;object-fit:cover;border-radius:4px;flex-shrink:0;border:1px solid var(--border)">'
       : '';
-    return '<div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:#f8f9fd;border-radius:var(--radius);margin-bottom:8px;flex-wrap:wrap">' +
+    return '<div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--surface);border-radius:var(--radius);margin-bottom:8px;flex-wrap:wrap">' +
       imgHtml +
       '<span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:'+tbg+';color:'+tcol+'">'+u.inv.torre+'</span>' +
       '<strong style="color:var(--navy)">Depto '+u.inv.num+'</strong>' +
@@ -3284,10 +3304,10 @@ function buildQuoteHTML() {
     var availBadge = '<span style="font-size:10px;font-weight:700;padding:1px 7px;border-radius:999px;background:'+avail.bg+';color:'+avail.color+'">'+avail.status+'</span>';
     return '<tr style="background:'+bg+'">' +
       imgCell +
-      '<td style="padding:11px 14px;font-weight:700;color:#1a3320;border-bottom:1px solid #deeadc">'+u.inv.torre+'-'+u.inv.num+'<div style="margin-top:3px">'+availBadge+'</div></td>' +
+      '<td style="padding:11px 14px;font-weight:700;color:var(--green-text);border-bottom:1px solid #deeadc">'+u.inv.torre+'-'+u.inv.num+'<div style="margin-top:3px">'+availBadge+'</div></td>' +
       '<td style="padding:11px 14px;color:#3a5a42;border-bottom:1px solid #deeadc">'+u.inv.tipo.replace('DEPTO ','')+' · '+u.inv.m2+' m² · '+u.inv.vista+'</td>' +
       '<td style="padding:11px 14px;text-align:right;border-bottom:1px solid #deeadc;color:#4a6a52">'+fmtMXN(u.inv.precio)+'</td>' +
-      '<td style="padding:11px 14px;text-align:right;border-bottom:1px solid #deeadc;font-weight:600;color:#1a3320">'+fmtMXN(p0.finalPrice)+'</td>' +
+      '<td style="padding:11px 14px;text-align:right;border-bottom:1px solid #deeadc;font-weight:600;color:var(--green-text)">'+fmtMXN(p0.finalPrice)+'</td>' +
       '<td style="padding:11px 14px;text-align:right;border-bottom:1px solid #deeadc;font-weight:700;color:#1a6640">'+fmtMXN(p0.downPayment)+'</td>' +
       '<td style="padding:11px 14px;text-align:right;border-bottom:1px solid #deeadc;color:#3a5a42">'+fmtPct(p0.dpPctEff,1)+'</td>' +
       '</tr>';
@@ -3305,7 +3325,7 @@ function buildQuoteHTML() {
   var grpAEnd = quoteUnits[0].plans.filter(function(p){ return p.disc===20; }).length;
   var colSpanA = 2 + quoteUnits.length;
 
-  planRows += '<tr><td colspan="'+colSpanA+'" style="padding:7px 14px 4px;background:#e8f2e8;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#2d6040;border-bottom:1px solid #c8dcc8">' +
+  planRows += '<tr><td colspan="'+colSpanA+'" style="padding:7px 14px 4px;background:#e8f2e8;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--green-dark);border-bottom:1px solid #c8dcc8">' +
     'Grupo A — 20% Descuento · Contado y Financiamientos con interés (mismo precio final y enganche)</td></tr>';
 
   for (var pi=0; pi<planCount; pi++) {
@@ -3316,7 +3336,7 @@ function buildQuoteHTML() {
 
     // Insert Group B header before MSI plans
     if (pi === grpAEnd) {
-      planRows += '<tr><td colspan="'+colSpanA+'" style="padding:7px 14px 4px;background:#eef5f0;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#2d6040;border-bottom:1px solid #c8dcc8;border-top:2px solid #b8d4b8">' +
+      planRows += '<tr><td colspan="'+colSpanA+'" style="padding:7px 14px 4px;background:#eef5f0;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--green-dark);border-bottom:1px solid #c8dcc8;border-top:2px solid #b8d4b8">' +
         'Grupo B — Descuento escalonado · Meses sin intereses (precio final y enganche distintos por plan)</td></tr>';
     }
 
@@ -3335,7 +3355,7 @@ function buildQuoteHTML() {
       ? '<strong>'+refPlan.name+'</strong>'+discBadge+t2tag+'<div style="font-size:10px;color:#8aaa92;margin-top:1px">'+refPlan.rate+'% anual · '+refPlan.months+' meses</div>'
       : '<strong>'+refPlan.name+'</strong>'+discBadge+'<div style="font-size:10px;color:#1a8850;margin-top:1px">Sin intereses · '+refPlan.months+' pagos</div>';
 
-    var dpCell = '<td style="padding:10px 12px;text-align:right;border-bottom:1px solid #deeadc;font-size:12px;color:#5a7a62">'+
+    var dpCell = '<td style="padding:10px 12px;text-align:right;border-bottom:1px solid #deeadc;font-size:12px;color:var(--green-soft)">'+
       fmtPct(refPlan.dpPctEff,0)+'% s/precio c/dto'+
       '<div style="font-size:10px;color:#8aaa92">'+fmtMXN(refPlan.downPayment)+'</div></td>';
 
@@ -3345,7 +3365,7 @@ function buildQuoteHTML() {
       if (!p.available) return '<td style="padding:10px 12px;text-align:center;border-bottom:1px solid #deeadc;font-size:11px;color:#aaa">No disponible<div style="font-size:9px;color:#ccc">Solo Torre 2</div></td>';
       if (p.financed <= 0.01) return '<td style="padding:10px 12px;text-align:center;border-bottom:1px solid #deeadc;font-weight:700;color:#1a6640">Cubierto ✓</td>';
       return '<td style="padding:10px 12px;text-align:right;border-bottom:1px solid #deeadc">' +
-        '<div style="font-weight:700;color:#1a3320">'+fmtMXN(p.monthlyPayment)+'</div>' +
+        '<div style="font-weight:700;color:var(--green-text)">'+fmtMXN(p.monthlyPayment)+'</div>' +
         '<div style="font-size:10px;color:#8aaa92">Eng: '+fmtMXN(p.downPayment)+'</div>' +
         '<div style="font-size:10px;color:#aabcaa">'+p.months+' pagos</div></td>';
     }).join('');
@@ -3377,10 +3397,10 @@ function buildQuoteHTML() {
           '<div style="font-weight:700;font-size:14px;color:'+col+'">'+fmtPct(r.roiAnn,1)+'/año</div>'+
           '<div style="font-size:10px;color:#8aaa92">Gan: '+fmtMXN(r.netGain)+'</div></td>';
       }).join('');
-      roiRows += '<tr style="background:'+rbg+'"><td style="padding:10px 14px;border-bottom:1px solid #deeadc;white-space:nowrap"><strong style="color:#1a3320">'+refP.name+'</strong><div style="font-size:10px;color:#8aaa92">'+refP.rate+'% · '+refP.months+' meses</div></td><td style="padding:10px 12px;text-align:right;border-bottom:1px solid #deeadc;font-size:11px;color:#5a7a62">'+fmtMXN(refP.downPayment)+'</td>'+rcells+'</tr>';
+      roiRows += '<tr style="background:'+rbg+'"><td style="padding:10px 14px;border-bottom:1px solid #deeadc;white-space:nowrap"><strong style="color:var(--green-text)">'+refP.name+'</strong><div style="font-size:10px;color:#8aaa92">'+refP.rate+'% · '+refP.months+' meses</div></td><td style="padding:10px 12px;text-align:right;border-bottom:1px solid #deeadc;font-size:11px;color:var(--green-soft)">'+fmtMXN(refP.downPayment)+'</td>'+rcells+'</tr>';
     }
     roiSection = '<div style="margin-top:28px">'+
-      '<div style="font-size:11px;font-weight:700;letter-spacing:0.1em;color:#2d6040;text-transform:uppercase;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid #b8d4b8">Análisis de Retorno — Horizonte '+roiYears+' años · Apreciación '+appr+'% · Renta '+fmtMXN(rent)+'/mes</div>'+
+      '<div style="font-size:11px;font-weight:700;letter-spacing:0.1em;color:var(--green-dark);text-transform:uppercase;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid #b8d4b8">Análisis de Retorno — Horizonte '+roiYears+' años · Apreciación '+appr+'% · Renta '+fmtMXN(rent)+'/mes</div>'+
       '<table style="width:100%;border-collapse:collapse;font-size:13px">'+
       '<thead><tr style="background:#2d5a38"><th style="padding:10px 14px;text-align:left;color:rgba(255,255,255,0.85);font-size:11px;font-weight:600">Plan</th>'+
       '<th style="padding:10px 12px;text-align:right;color:rgba(255,255,255,0.75);font-size:11px;font-weight:600">Enganche</th>'+unitThs+'</tr></thead>'+
@@ -3390,7 +3410,7 @@ function buildQuoteHTML() {
 
   var advisorHtml = advisor ? '<div style="font-size:11px;color:rgba(255,255,255,0.55);margin-top:3px">Asesor: '+advisor+'</div>' : '';
 
-  return '<div style="font-family:Arial,sans-serif;background:white;max-width:960px;margin:0 auto;color:#1a3320">' +
+  return '<div style="font-family:Arial,sans-serif;background:white;max-width:960px;margin:0 auto;color:var(--green-text)">' +
     '<div style="background:linear-gradient(135deg,#1a3a22 0%,#2d5a38 55%,#3a6e45 100%);padding:30px 40px 24px;position:relative;overflow:hidden">' +
     '<div style="display:flex;justify-content:space-between;align-items:flex-start;position:relative;flex-wrap:wrap;gap:12px">' +
     '<div><div style="font-size:40px;font-weight:900;letter-spacing:0.05em;color:white;line-height:1">TORAM</div>' +
@@ -3399,10 +3419,10 @@ function buildQuoteHTML() {
     '<div style="font-size:12px;color:rgba(255,255,255,0.75)">'+date+'</div>'+advisorHtml+'</div></div></div>' +
     '<div style="background:#eef5ee;border-bottom:2px solid #c8dcc8;padding:16px 40px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">' +
     '<div><div style="font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#4a7a52;margin-bottom:3px">Cliente</div>' +
-    '<div style="font-size:20px;font-weight:700;color:#1a3320;line-height:1.1">'+client+'</div></div>' +
+    '<div style="font-size:20px;font-weight:700;color:var(--green-text);line-height:1.1">'+client+'</div></div>' +
     '<div style="max-width:360px;text-align:right"><div style="font-size:12.5px;color:#4a6a50;font-style:italic;line-height:1.5">'+note+'</div></div></div>' +
     '<div style="padding:28px 40px 32px">' +
-    '<div style="font-size:11px;font-weight:700;letter-spacing:0.1em;color:#2d6040;text-transform:uppercase;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid #b8d4b8">Descripción de Unidades</div>' +
+    '<div style="font-size:11px;font-weight:700;letter-spacing:0.1em;color:var(--green-dark);text-transform:uppercase;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid #b8d4b8">Descripción de Unidades</div>' +
     '<table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:28px">' +
     '<thead><tr style="background:#2d5a38">' +
     '<th style="padding:10px 10px;width:90px;color:rgba(255,255,255,0.6);font-size:10px;font-weight:500">Planta</th>' +
@@ -3414,7 +3434,7 @@ function buildQuoteHTML() {
     '<th style="padding:10px 12px;text-align:right;color:rgba(255,255,255,0.75);font-size:11px;font-weight:600">% Eng.</th>' +
     '</tr></thead><tbody>'+unitRows+'</tbody></table>' +
     '<div style="background:#fdf8e7;border:1px solid #e8d9a0;border-left:4px solid #b8922a;border-radius:6px;padding:10px 14px;font-size:12px;color:#5a4a1a;margin-bottom:28px"><strong>Apartado (a cuenta del total): '+fmtMXN(50000)+' por departamento</strong> ('+quoteUnits.length+(quoteUnits.length===1?' unidad':' unidades')+' = '+fmtMXN(50000*quoteUnits.length)+'). No es un costo adicional: al firmar el contrato se abona al valor total.</div>' +
-    '<div style="font-size:11px;font-weight:700;letter-spacing:0.1em;color:#2d6040;text-transform:uppercase;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid #b8d4b8">Planes de Financiamiento · Mensualidad</div>' +
+    '<div style="font-size:11px;font-weight:700;letter-spacing:0.1em;color:var(--green-dark);text-transform:uppercase;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid #b8d4b8">Planes de Financiamiento · Mensualidad</div>' +
     '<table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:6px">' +
     '<thead><tr style="background:#2d5a38"><th style="padding:10px 14px;text-align:left;color:rgba(255,255,255,0.85);font-size:11px;font-weight:600">Plan</th>' +
     '<th style="padding:10px 12px;text-align:right;color:rgba(255,255,255,0.75);font-size:11px;font-weight:600">Enganche ref.</th>'+unitThs+'</tr></thead>' +
@@ -4473,7 +4493,7 @@ function onFichaSearchInput() {
     var av   = getAvailability(d.torre, d.num);
     return '<div onclick="fichaSelectUnit(\''+d.torre+'\',\''+d.num+'\')" '+
       'style="padding:9px 14px;cursor:pointer;border-bottom:0.5px solid var(--border);font-size:13px;display:flex;align-items:center;gap:8px" '+
-      'onmouseover="this.style.background=\'#f4f6fb\'" onmouseout="this.style.background=\'\'">' +
+      'onmouseover="this.style.background=\'var(--surface)\'" onmouseout="this.style.background=\'\'">' +
       '<span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:999px;background:'+tbg+';color:'+tcol+'">'+d.torre+'</span>' +
       '<strong>Depto '+d.num+'</strong>' +
       '<span style="color:var(--text-muted);font-size:12px">'+d.tipo+' · '+d.m2+'m²</span>' +
@@ -4524,19 +4544,19 @@ function buildFichaHTML(inv, dpPct) {
   plans.forEach(function(p, pi) {
     if (p.t2only && !isTower2) return;
     if (pi === grpAEnd) {
-      planRowsHtml += '<tr><td colspan="5" style="padding:5px 12px 3px;background:#eef5f0;font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#2d6040;border-bottom:1px solid #c8dcc8">Meses sin intereses — descuento escalonado</td></tr>';
+      planRowsHtml += '<tr><td colspan="5" style="padding:5px 12px 3px;background:#eef5f0;font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--green-dark);border-bottom:1px solid #c8dcc8">Meses sin intereses — descuento escalonado</td></tr>';
     }
     if (pi === 0) {
-      planRowsHtml += '<tr><td colspan="5" style="padding:5px 12px 3px;background:#e8f2e8;font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#2d6040;border-bottom:1px solid #c8dcc8">Contado y financiamientos directos — 20% descuento</td></tr>';
+      planRowsHtml += '<tr><td colspan="5" style="padding:5px 12px 3px;background:#e8f2e8;font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--green-dark);border-bottom:1px solid #c8dcc8">Contado y financiamientos directos — 20% descuento</td></tr>';
     }
     var bg = pi%2===0?'#ffffff':'#f7fbf7';
     var mpText = p.financed<=0.01 ? '<span style="color:#1a6640;font-weight:700">Cubierto</span>' : fmtMXN(p.monthlyPayment);
     var rateText = p.rate>0 ? p.rate+'% anual' : 'Sin intereses';
     planRowsHtml += '<tr style="background:'+bg+'">' +
-      '<td style="padding:8px 12px;font-weight:600;color:#1a3320;border-bottom:1px solid #deeadc;font-size:12px">'+p.name+'</td>' +
-      '<td style="padding:8px 12px;text-align:right;border-bottom:1px solid #deeadc;font-size:11px;color:#5a7a62">'+fmtMXN(p.downPayment)+'<div style="font-size:9px;color:#9ab0a0">'+fmtPct(p.dpPctEff,0)+'%</div></td>' +
-      '<td style="padding:8px 12px;text-align:right;border-bottom:1px solid #deeadc;font-size:12px;font-weight:700;color:#1a3320">'+mpText+'</td>' +
-      '<td style="padding:8px 12px;text-align:right;border-bottom:1px solid #deeadc;font-size:11px;color:#5a7a62">'+p.months+'m</td>' +
+      '<td style="padding:8px 12px;font-weight:600;color:var(--green-text);border-bottom:1px solid #deeadc;font-size:12px">'+p.name+'</td>' +
+      '<td style="padding:8px 12px;text-align:right;border-bottom:1px solid #deeadc;font-size:11px;color:var(--green-soft)">'+fmtMXN(p.downPayment)+'<div style="font-size:9px;color:#9ab0a0">'+fmtPct(p.dpPctEff,0)+'%</div></td>' +
+      '<td style="padding:8px 12px;text-align:right;border-bottom:1px solid #deeadc;font-size:12px;font-weight:700;color:var(--green-text)">'+mpText+'</td>' +
+      '<td style="padding:8px 12px;text-align:right;border-bottom:1px solid #deeadc;font-size:11px;color:var(--green-soft)">'+p.months+'m</td>' +
       '<td style="padding:8px 12px;text-align:right;border-bottom:1px solid #deeadc;font-size:11px;color:#7a9a82">'+rateText+'</td>' +
       '</tr>';
   });
@@ -4545,7 +4565,7 @@ function buildFichaHTML(inv, dpPct) {
     ? '<img src="'+imgSrc+'" style="width:100%;max-height:280px;object-fit:cover;display:block">'
     : '<div style="height:120px;background:#f0f4f0;display:flex;align-items:center;justify-content:center;color:#9ab0a0;font-size:13px">Planta no disponible</div>';
 
-  return '<div style="font-family:Arial,sans-serif;background:white;color:#1a3320;max-width:800px;margin:0 auto">' +
+  return '<div style="font-family:Arial,sans-serif;background:white;color:var(--green-text);max-width:800px;margin:0 auto">' +
 
   // Header
   '<div style="background:linear-gradient(135deg,#1a3a22 0%,#2d5a38 55%,#3a6e45 100%);padding:24px 32px;display:flex;justify-content:space-between;align-items:flex-end">' +
@@ -4564,21 +4584,21 @@ function buildFichaHTML(inv, dpPct) {
   '<div style="border-right:1px solid #deeadc">' +
   '<div style="overflow:hidden">'+imgBlock+'</div>' +
   '<div style="padding:20px 24px">' +
-  '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#2d6040;margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Especificaciones</div>' +
+  '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-dark);margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Especificaciones</div>' +
   '<table style="width:100%;border-collapse:collapse;font-size:13px">' +
-  '<tr><td style="padding:6px 0;color:#5a7a62;border-bottom:1px solid #eef3ee">Precio de lista</td><td style="padding:6px 0;text-align:right;font-weight:700;color:#1a3320;border-bottom:1px solid #eef3ee">'+fmtMXN(inv.precio)+'</td></tr>' +
-  '<tr><td style="padding:6px 0;color:#5a7a62;border-bottom:1px solid #eef3ee">Recámaras</td><td style="padding:6px 0;text-align:right;font-weight:600;color:#1a3320;border-bottom:1px solid #eef3ee">'+recLabel+'</td></tr>' +
-  '<tr><td style="padding:6px 0;color:#5a7a62;border-bottom:1px solid #eef3ee">Superficie</td><td style="padding:6px 0;text-align:right;font-weight:600;color:#1a3320;border-bottom:1px solid #eef3ee">'+inv.m2+' m²</td></tr>' +
-  '<tr><td style="padding:6px 0;color:#5a7a62;border-bottom:1px solid #eef3ee">Vista</td><td style="padding:6px 0;text-align:right;font-weight:600;color:#1a3320;border-bottom:1px solid #eef3ee">'+inv.vista+'</td></tr>' +
-  '<tr><td style="padding:6px 0;color:#5a7a62;border-bottom:1px solid #eef3ee">Torre</td><td style="padding:6px 0;text-align:right;font-weight:600;color:#1a3320;border-bottom:1px solid #eef3ee">'+inv.torre+' · '+(inv.torre==='T1'?'Entrega 24m':'Entrega 42m')+'</td></tr>' +
-  '<tr><td style="padding:6px 0;color:#5a7a62;border-bottom:1px solid #eef3ee">Precio c/Dto 20%</td><td style="padding:6px 0;text-align:right;font-weight:700;color:#1a6640;border-bottom:1px solid #eef3ee">'+fmtMXN(plans[0].finalPrice)+'</td></tr>' +
-  '<tr><td style="padding:6px 0;color:#5a7a62;border-bottom:1px solid #eef3ee">Apartado (a cuenta del total)</td><td style="padding:6px 0;text-align:right;font-weight:700;color:#1a3320;border-bottom:1px solid #eef3ee">'+fmtMXN(50000)+'</td></tr>' +
+  '<tr><td style="padding:6px 0;color:var(--green-soft);border-bottom:1px solid #eef3ee">Precio de lista</td><td style="padding:6px 0;text-align:right;font-weight:700;color:var(--green-text);border-bottom:1px solid #eef3ee">'+fmtMXN(inv.precio)+'</td></tr>' +
+  '<tr><td style="padding:6px 0;color:var(--green-soft);border-bottom:1px solid #eef3ee">Recámaras</td><td style="padding:6px 0;text-align:right;font-weight:600;color:var(--green-text);border-bottom:1px solid #eef3ee">'+recLabel+'</td></tr>' +
+  '<tr><td style="padding:6px 0;color:var(--green-soft);border-bottom:1px solid #eef3ee">Superficie</td><td style="padding:6px 0;text-align:right;font-weight:600;color:var(--green-text);border-bottom:1px solid #eef3ee">'+inv.m2+' m²</td></tr>' +
+  '<tr><td style="padding:6px 0;color:var(--green-soft);border-bottom:1px solid #eef3ee">Vista</td><td style="padding:6px 0;text-align:right;font-weight:600;color:var(--green-text);border-bottom:1px solid #eef3ee">'+inv.vista+'</td></tr>' +
+  '<tr><td style="padding:6px 0;color:var(--green-soft);border-bottom:1px solid #eef3ee">Torre</td><td style="padding:6px 0;text-align:right;font-weight:600;color:var(--green-text);border-bottom:1px solid #eef3ee">'+inv.torre+' · '+(inv.torre==='T1'?'Entrega 24m':'Entrega 42m')+'</td></tr>' +
+  '<tr><td style="padding:6px 0;color:var(--green-soft);border-bottom:1px solid #eef3ee">Precio c/Dto 20%</td><td style="padding:6px 0;text-align:right;font-weight:700;color:#1a6640;border-bottom:1px solid #eef3ee">'+fmtMXN(plans[0].finalPrice)+'</td></tr>' +
+  '<tr><td style="padding:6px 0;color:var(--green-soft);border-bottom:1px solid #eef3ee">Apartado (a cuenta del total)</td><td style="padding:6px 0;text-align:right;font-weight:700;color:var(--green-text);border-bottom:1px solid #eef3ee">'+fmtMXN(50000)+'</td></tr>' +
   '<tr><td colspan="2" style="padding:6px 0;font-size:11px;color:#7a9a82">No es un costo adicional: al firmar el contrato se abona al valor total.</td></tr>' +
   '</table></div></div>' +
 
   // Right: plans
   '<div style="padding:20px 24px">' +
-  '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#2d6040;margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Planes de Financiamiento · Eng. '+dpPct+'%</div>' +
+  '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-dark);margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Planes de Financiamiento · Eng. '+dpPct+'%</div>' +
   '<table style="width:100%;border-collapse:collapse;font-size:12px">' +
   '<thead><tr style="background:#2d5a38">' +
   '<th style="padding:7px 12px;text-align:left;color:rgba(255,255,255,0.85);font-size:10px;font-weight:600">Plan</th>' +
@@ -5120,7 +5140,7 @@ function pUpdatePartSummary() {
   if (!el) return;
   var roiRows = PARTI.roi.map(function(r){
     return '<tr style="background:#fff">' +
-      '<td style="padding:8px 12px;font-weight:700;color:#1a3320;border-bottom:1px solid #eef3ee">'+r.year+'</td>' +
+      '<td style="padding:8px 12px;font-weight:700;color:var(--green-text);border-bottom:1px solid #eef3ee">'+r.year+'</td>' +
       '<td style="padding:8px 12px;text-align:right;border-bottom:1px solid #eef3ee">'+fmtMXN(r.annual*c.qty)+'</td>' +
       '<td style="padding:8px 12px;text-align:right;border-bottom:1px solid #eef3ee">'+fmtMXN(r.monthly*c.qty)+'</td>' +
       '<td style="padding:8px 12px;text-align:right;font-weight:700;color:#1a6640;border-bottom:1px solid #eef3ee">'+fmtPct(r.pct,2)+'</td></tr>';
@@ -5309,20 +5329,20 @@ function roiChartHtml(title, labels, segA, segB, legendA, legendB, takeaway) {
     var valPad = (stagH && i % 2 === 1) ? 'padding-top:13px;' : '';
     var yearLb = (i % yearStepH === 0) ? lb : '&nbsp;';
     return '<div style="flex:1;min-width:0;text-align:center">' +
-      '<div style="font-size:'+valFs+'px;font-weight:700;color:#1a3320;margin-bottom:4px;white-space:nowrap;height:26px;'+valPad+'">'+fmtMXN(t, 0)+'</div>' +
+      '<div style="font-size:'+valFs+'px;font-weight:700;color:var(--green-text);margin-bottom:4px;white-space:nowrap;height:26px;'+valPad+'">'+fmtMXN(t, 0)+'</div>' +
       '<div style="display:flex;flex-direction:column;justify-content:flex-end;height:'+H+'px">'+segs+'</div>' +
-      '<div style="font-size:11px;color:#5a7a62;margin-top:6px;border-top:1px solid #deeadc;padding-top:4px">'+yearLb+'</div>' +
+      '<div style="font-size:11px;color:var(--green-soft);margin-top:6px;border-top:1px solid #deeadc;padding-top:4px">'+yearLb+'</div>' +
     '</div>';
   }).join('');
   var legend = '';
   if (segB) {
-    legend = '<div style="display:flex;gap:16px;justify-content:center;margin-top:10px;font-size:11px;color:#5a7a62">' +
+    legend = '<div style="display:flex;gap:16px;justify-content:center;margin-top:10px;font-size:11px;color:var(--green-soft)">' +
       '<span><span style="display:inline-block;width:10px;height:10px;background:#2d5a38;border-radius:2px;margin-right:4px"></span>'+legendA+'</span>' +
       '<span><span style="display:inline-block;width:10px;height:10px;background:#b8922a;border-radius:2px;margin-right:4px"></span>'+legendB+'</span></div>';
   }
-  var take = takeaway ? '<div style="font-size:12px;font-weight:700;color:#1a3320;margin-top:10px">'+takeaway+'</div>' : '';
+  var take = takeaway ? '<div style="font-size:12px;font-weight:700;color:var(--green-text);margin-top:10px">'+takeaway+'</div>' : '';
   return '<div style="padding:20px 32px;border-top:1px solid #deeadc">' +
-    '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#2d6040;margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">'+title+'</div>' +
+    '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-dark);margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">'+title+'</div>' +
     '<div style="display:flex;gap:12px;align-items:flex-end">'+bars+'</div>' +
     legend + take +
     '<div style="font-size:10px;color:#7a9a82;margin-top:8px">Proyecciones basadas en el desempeño esperado; no constituyen garantía.</div>' +
@@ -5417,19 +5437,19 @@ function buildPropuestaDeptoHTML() {
   plans.forEach(function(p, pi) {
     if (p.t2only && !isTower2) return;
     if (pi === grpAEnd) {
-      planRowsHtml += '<tr><td colspan="5" style="padding:5px 12px 3px;background:#eef5f0;font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#2d6040;border-bottom:1px solid #c8dcc8">Meses sin intereses — descuento escalonado</td></tr>';
+      planRowsHtml += '<tr><td colspan="5" style="padding:5px 12px 3px;background:#eef5f0;font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--green-dark);border-bottom:1px solid #c8dcc8">Meses sin intereses — descuento escalonado</td></tr>';
     }
     if (pi === 0) {
-      planRowsHtml += '<tr><td colspan="5" style="padding:5px 12px 3px;background:#e8f2e8;font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#2d6040;border-bottom:1px solid #c8dcc8">Contado y financiamientos directos — 20% descuento</td></tr>';
+      planRowsHtml += '<tr><td colspan="5" style="padding:5px 12px 3px;background:#e8f2e8;font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--green-dark);border-bottom:1px solid #c8dcc8">Contado y financiamientos directos — 20% descuento</td></tr>';
     }
     var bg = pi%2===0?'#ffffff':'#f7fbf7';
     var mpText = p.financed<=0.01 ? '<span style="color:#1a6640;font-weight:700">Cubierto</span>' : fmtMXN(p.monthlyPayment);
     var rateText = p.rate>0 ? p.rate+'% anual' : 'Sin intereses';
     planRowsHtml += '<tr style="background:'+bg+'">' +
-      '<td style="padding:8px 12px;font-weight:600;color:#1a3320;border-bottom:1px solid #deeadc;font-size:12px">'+p.name+'</td>' +
-      '<td style="padding:8px 12px;text-align:right;border-bottom:1px solid #deeadc;font-size:11px;color:#5a7a62">'+fmtMXN(p.downPayment)+'<div style="font-size:9px;color:#9ab0a0">'+fmtPct(p.dpPctEff,0)+'%</div></td>' +
-      '<td style="padding:8px 12px;text-align:right;border-bottom:1px solid #deeadc;font-size:12px;font-weight:700;color:#1a3320">'+mpText+'</td>' +
-      '<td style="padding:8px 12px;text-align:right;border-bottom:1px solid #deeadc;font-size:11px;color:#5a7a62">'+p.months+'m</td>' +
+      '<td style="padding:8px 12px;font-weight:600;color:var(--green-text);border-bottom:1px solid #deeadc;font-size:12px">'+p.name+'</td>' +
+      '<td style="padding:8px 12px;text-align:right;border-bottom:1px solid #deeadc;font-size:11px;color:var(--green-soft)">'+fmtMXN(p.downPayment)+'<div style="font-size:9px;color:#9ab0a0">'+fmtPct(p.dpPctEff,0)+'%</div></td>' +
+      '<td style="padding:8px 12px;text-align:right;border-bottom:1px solid #deeadc;font-size:12px;font-weight:700;color:var(--green-text)">'+mpText+'</td>' +
+      '<td style="padding:8px 12px;text-align:right;border-bottom:1px solid #deeadc;font-size:11px;color:var(--green-soft)">'+p.months+'m</td>' +
       '<td style="padding:8px 12px;text-align:right;border-bottom:1px solid #deeadc;font-size:11px;color:#7a9a82">'+rateText+'</td>' +
       '</tr>';
   });
@@ -5440,14 +5460,14 @@ function buildPropuestaDeptoHTML() {
     var r0 = roi[0]; // Escenario: Pago de Contado
     roiHtml =
       '<div style="padding:20px 32px;border-top:1px solid #deeadc">' +
-      '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#2d6040;margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Análisis de Retorno — Pago de Contado · Horizonte '+opts.years+' años</div>' +
+      '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-dark);margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Análisis de Retorno — Pago de Contado · Horizonte '+opts.years+' años</div>' +
       '<table style="width:100%;border-collapse:collapse;font-size:13px">' +
-      '<tr><td style="padding:6px 0;color:#5a7a62;border-bottom:1px solid #eef3ee">Plusvalía proyectada ('+fmtPct(opts.appr,1)+' anual)</td><td style="padding:6px 0;text-align:right;font-weight:700;color:#1a3320;border-bottom:1px solid #eef3ee">'+fmtMXN(r0.appGain)+'</td></tr>' +
-      '<tr><td style="padding:6px 0;color:#5a7a62;border-bottom:1px solid #eef3ee">Ingresos netos por renta</td><td style="padding:6px 0;text-align:right;font-weight:600;color:#1a3320;border-bottom:1px solid #eef3ee">'+fmtMXN(r0.netInc)+'</td></tr>' +
-      '<tr><td style="padding:6px 0;color:#5a7a62;border-bottom:1px solid #eef3ee">Costo de escrituración ('+fmtPct(opts.escPct,1)+')</td><td style="padding:6px 0;text-align:right;font-weight:600;color:#1a3320;border-bottom:1px solid #eef3ee">'+fmtMXN(r0.escCost)+'</td></tr>' +
-      '<tr><td style="padding:6px 0;color:#5a7a62;border-bottom:1px solid #eef3ee">Total invertido</td><td style="padding:6px 0;text-align:right;font-weight:600;color:#1a3320;border-bottom:1px solid #eef3ee">'+fmtMXN(r0.totalInv)+'</td></tr>' +
-      '<tr><td style="padding:6px 0;color:#5a7a62">Ganancia neta proyectada</td><td style="padding:6px 0;text-align:right;font-weight:700;color:#1a6640">'+fmtMXN(r0.netGain)+'</td></tr>' +
-      '<tr><td style="padding:6px 0;color:#5a7a62">ROI anualizado</td><td style="padding:6px 0;text-align:right;font-weight:700;color:#1a6640">'+fmtPct(r0.roiAnn,2)+'</td></tr>' +
+      '<tr><td style="padding:6px 0;color:var(--green-soft);border-bottom:1px solid #eef3ee">Plusvalía proyectada ('+fmtPct(opts.appr,1)+' anual)</td><td style="padding:6px 0;text-align:right;font-weight:700;color:var(--green-text);border-bottom:1px solid #eef3ee">'+fmtMXN(r0.appGain)+'</td></tr>' +
+      '<tr><td style="padding:6px 0;color:var(--green-soft);border-bottom:1px solid #eef3ee">Ingresos netos por renta</td><td style="padding:6px 0;text-align:right;font-weight:600;color:var(--green-text);border-bottom:1px solid #eef3ee">'+fmtMXN(r0.netInc)+'</td></tr>' +
+      '<tr><td style="padding:6px 0;color:var(--green-soft);border-bottom:1px solid #eef3ee">Costo de escrituración ('+fmtPct(opts.escPct,1)+')</td><td style="padding:6px 0;text-align:right;font-weight:600;color:var(--green-text);border-bottom:1px solid #eef3ee">'+fmtMXN(r0.escCost)+'</td></tr>' +
+      '<tr><td style="padding:6px 0;color:var(--green-soft);border-bottom:1px solid #eef3ee">Total invertido</td><td style="padding:6px 0;text-align:right;font-weight:600;color:var(--green-text);border-bottom:1px solid #eef3ee">'+fmtMXN(r0.totalInv)+'</td></tr>' +
+      '<tr><td style="padding:6px 0;color:var(--green-soft)">Ganancia neta proyectada</td><td style="padding:6px 0;text-align:right;font-weight:700;color:#1a6640">'+fmtMXN(r0.netGain)+'</td></tr>' +
+      '<tr><td style="padding:6px 0;color:var(--green-soft)">ROI anualizado</td><td style="padding:6px 0;text-align:right;font-weight:700;color:#1a6640">'+fmtPct(r0.roiAnn,2)+'</td></tr>' +
       '</table>' +
       '<div style="font-size:10px;color:#7a9a82;margin-top:8px">Proyecciones basadas en el desempeño esperado; no constituyen garantía.</div>' +
       '</div>';
@@ -5466,9 +5486,9 @@ function buildPropuestaDeptoHTML() {
       ['Ingreso promedio por año', fmtMXN(Math.round((flowRent + flowAppr) / opts.years), 0)]
     ];
     roiChartHtmlStr += '<div style="padding:16px 32px;border-top:1px solid #deeadc">' +
-      '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#2d6040;margin-bottom:10px">En resumen</div>' +
+      '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-dark);margin-bottom:10px">En resumen</div>' +
       '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">' +
-      sumCardsHtml.map(function(cd){ return '<div style="background:#f4f9f4;border:1px solid #c8dcc8;border-radius:6px;padding:10px 12px"><div style="font-size:11px;color:#5a7a62">'+cd[0]+'</div><div style="font-size:16px;font-weight:700;color:#1a3320;margin-top:2px">'+cd[1]+'</div></div>'; }).join('') +
+      sumCardsHtml.map(function(cd){ return '<div style="background:#f4f9f4;border:1px solid #c8dcc8;border-radius:6px;padding:10px 12px"><div style="font-size:11px;color:var(--green-soft)">'+cd[0]+'</div><div style="font-size:16px;font-weight:700;color:var(--green-text);margin-top:2px">'+cd[1]+'</div></div>'; }).join('') +
       '</div></div>';
   }
 
@@ -5481,16 +5501,16 @@ function buildPropuestaDeptoHTML() {
   if (mi.plano || mi.acabados) {
     planoAcabadosHtml =
       '<div style="padding:20px 32px;border-top:1px solid #deeadc">' +
-      '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#2d6040;margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Plano y acabados — ' + m.nombre + '</div>' +
+      '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-dark);margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Plano y acabados — ' + m.nombre + '</div>' +
       '<div style="display:flex;gap:16px;align-items:flex-start">' +
-      (mi.plano ? '<div style="flex:1;text-align:center"><img src="' + mi.plano + '" style="max-width:100%;max-height:340px;object-fit:contain;display:block;margin:0 auto;border:1px solid #deeadc;border-radius:4px" alt="Plano del modelo"><div style="font-size:11px;color:#5a7a62;margin-top:8px">Plano — ' + m.nombre + ' (' + m.m2 + ' m²)</div></div>' : '') +
-      (mi.acabados ? '<div style="flex:1;text-align:center"><img src="' + mi.acabados + '" style="max-width:100%;max-height:340px;object-fit:contain;display:block;margin:0 auto;border:1px solid #deeadc;border-radius:4px" alt="Acabados del modelo"><div style="font-size:11px;color:#5a7a62;margin-top:8px">Acabados — renders ilustrativos del modelo</div></div>' : '') +
+      (mi.plano ? '<div style="flex:1;text-align:center"><img src="' + mi.plano + '" style="max-width:100%;max-height:340px;object-fit:contain;display:block;margin:0 auto;border:1px solid #deeadc;border-radius:4px" alt="Plano del modelo"><div style="font-size:11px;color:var(--green-soft);margin-top:8px">Plano — ' + m.nombre + ' (' + m.m2 + ' m²)</div></div>' : '') +
+      (mi.acabados ? '<div style="flex:1;text-align:center"><img src="' + mi.acabados + '" style="max-width:100%;max-height:340px;object-fit:contain;display:block;margin:0 auto;border:1px solid #deeadc;border-radius:4px" alt="Acabados del modelo"><div style="font-size:11px;color:var(--green-soft);margin-top:8px">Acabados — renders ilustrativos del modelo</div></div>' : '') +
       '</div></div>';
   }
 
-  var noteHtml = cd.note ? '<div style="font-size:12px;color:#5a7a62;margin-top:4px">'+cd.note+'</div>' : '';
+  var noteHtml = cd.note ? '<div style="font-size:12px;color:var(--green-soft);margin-top:4px">'+cd.note+'</div>' : '';
 
-  return '<div style="font-family:\'Source Sans 3\',Arial,sans-serif;background:white;color:#1a3320;max-width:800px;margin:0 auto">' +
+  return '<div style="font-family:\'Source Sans 3\',Arial,sans-serif;background:white;color:var(--green-text);max-width:800px;margin:0 auto">' +
   '<div style="background:linear-gradient(135deg,#1a3a22 0%,#2d5a38 55%,#3a6e45 100%);padding:24px 32px">' +
   '<div style="display:flex;justify-content:space-between;align-items:flex-end">' +
   '<div><div style="font-family:\'Playfair Display\',Georgia,serif;font-size:28px;font-weight:700;color:white;line-height:1;letter-spacing:0.05em">TORAM</div>' +
@@ -5508,19 +5528,19 @@ function buildPropuestaDeptoHTML() {
   '<div style="border-right:1px solid #deeadc">' +
   '<div style="overflow:hidden">'+imgBlock+'</div>' +
   '<div style="padding:20px 24px">' +
-  '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#2d6040;margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Especificaciones</div>' +
+  '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-dark);margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Especificaciones</div>' +
   '<table style="width:100%;border-collapse:collapse;font-size:13px">' +
-  '<tr><td style="padding:6px 0;color:#5a7a62;border-bottom:1px solid #eef3ee">Precio de lista</td><td style="padding:6px 0;text-align:right;font-weight:700;color:#1a3320;border-bottom:1px solid #eef3ee">'+fmtMXN(inv.precio)+'</td></tr>' +
-  '<tr><td style="padding:6px 0;color:#5a7a62;border-bottom:1px solid #eef3ee">Modelo</td><td style="padding:6px 0;text-align:right;font-weight:600;color:#1a3320;border-bottom:1px solid #eef3ee">'+m.nombre+'</td></tr>' +
-  '<tr><td style="padding:6px 0;color:#5a7a62;border-bottom:1px solid #eef3ee">Recámaras</td><td style="padding:6px 0;text-align:right;font-weight:600;color:#1a3320;border-bottom:1px solid #eef3ee">'+recLabel+'</td></tr>' +
-  '<tr><td style="padding:6px 0;color:#5a7a62;border-bottom:1px solid #eef3ee">Superficie</td><td style="padding:6px 0;text-align:right;font-weight:600;color:#1a3320;border-bottom:1px solid #eef3ee">'+m.m2+' m²</td></tr>' +
-  '<tr><td style="padding:6px 0;color:#5a7a62;border-bottom:1px solid #eef3ee">Vista</td><td style="padding:6px 0;text-align:right;font-weight:600;color:#1a3320;border-bottom:1px solid #eef3ee">'+m.vista+'</td></tr>' +
-  '<tr><td style="padding:6px 0;color:#5a7a62;border-bottom:1px solid #eef3ee">Baños</td><td style="padding:6px 0;text-align:right;font-weight:600;color:#1a3320;border-bottom:1px solid #eef3ee">'+m.banos+'</td></tr>' +
-  '<tr><td style="padding:6px 0;color:#5a7a62;border-bottom:1px solid #eef3ee">Torre</td><td style="padding:6px 0;text-align:right;font-weight:600;color:#1a3320;border-bottom:1px solid #eef3ee">'+inv.torre+' · '+(inv.torre==='T1'?'Entrega 24m':'Entrega 42m')+'</td></tr>' +
-  '<tr><td style="padding:6px 0;color:#5a7a62">Precio c/Dto 20%</td><td style="padding:6px 0;text-align:right;font-weight:700;color:#1a6640">'+fmtMXN(plans[0].finalPrice)+'</td></tr>' +
+  '<tr><td style="padding:6px 0;color:var(--green-soft);border-bottom:1px solid #eef3ee">Precio de lista</td><td style="padding:6px 0;text-align:right;font-weight:700;color:var(--green-text);border-bottom:1px solid #eef3ee">'+fmtMXN(inv.precio)+'</td></tr>' +
+  '<tr><td style="padding:6px 0;color:var(--green-soft);border-bottom:1px solid #eef3ee">Modelo</td><td style="padding:6px 0;text-align:right;font-weight:600;color:var(--green-text);border-bottom:1px solid #eef3ee">'+m.nombre+'</td></tr>' +
+  '<tr><td style="padding:6px 0;color:var(--green-soft);border-bottom:1px solid #eef3ee">Recámaras</td><td style="padding:6px 0;text-align:right;font-weight:600;color:var(--green-text);border-bottom:1px solid #eef3ee">'+recLabel+'</td></tr>' +
+  '<tr><td style="padding:6px 0;color:var(--green-soft);border-bottom:1px solid #eef3ee">Superficie</td><td style="padding:6px 0;text-align:right;font-weight:600;color:var(--green-text);border-bottom:1px solid #eef3ee">'+m.m2+' m²</td></tr>' +
+  '<tr><td style="padding:6px 0;color:var(--green-soft);border-bottom:1px solid #eef3ee">Vista</td><td style="padding:6px 0;text-align:right;font-weight:600;color:var(--green-text);border-bottom:1px solid #eef3ee">'+m.vista+'</td></tr>' +
+  '<tr><td style="padding:6px 0;color:var(--green-soft);border-bottom:1px solid #eef3ee">Baños</td><td style="padding:6px 0;text-align:right;font-weight:600;color:var(--green-text);border-bottom:1px solid #eef3ee">'+m.banos+'</td></tr>' +
+  '<tr><td style="padding:6px 0;color:var(--green-soft);border-bottom:1px solid #eef3ee">Torre</td><td style="padding:6px 0;text-align:right;font-weight:600;color:var(--green-text);border-bottom:1px solid #eef3ee">'+inv.torre+' · '+(inv.torre==='T1'?'Entrega 24m':'Entrega 42m')+'</td></tr>' +
+  '<tr><td style="padding:6px 0;color:var(--green-soft)">Precio c/Dto 20%</td><td style="padding:6px 0;text-align:right;font-weight:700;color:#1a6640">'+fmtMXN(plans[0].finalPrice)+'</td></tr>' +
   '</table></div></div>' +
   '<div style="padding:20px 24px">' +
-  '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#2d6040;margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Planes de Financiamiento · Eng. '+pDpDesc()+'</div>' +
+  '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-dark);margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Planes de Financiamiento · Eng. '+pDpDesc()+'</div>' +
   '<table style="width:100%;border-collapse:collapse;font-size:12px">' +
   '<thead><tr style="background:#2d5a38">' +
   '<th style="padding:7px 12px;text-align:left;color:rgba(255,255,255,0.85);font-size:10px;font-weight:600">Plan</th>' +
@@ -5531,16 +5551,16 @@ function buildPropuestaDeptoHTML() {
   '</tr></thead><tbody>'+planRowsHtml+'</tbody></table></div></div>' +
   planoAcabadosHtml +
   '<div style="padding:20px 32px;border-top:1px solid #deeadc">' +
-  '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#2d6040;margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Amenidades — Planta de conjunto alberca Torre 1 y 2</div>' +
+  '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-dark);margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Amenidades — Planta de conjunto alberca Torre 1 y 2</div>' +
   '<img src="'+AMENITIES_IMG+'" style="width:100%;display:block;border-radius:4px;border:1px solid #deeadc" alt="Planta de amenidades">' +
-  '<div style="font-size:11px;color:#5a7a62;margin-top:8px">Alberca, cancha de pádel, restaurante, gym, parque infantil, baños y asadores.</div>' +
+  '<div style="font-size:11px;color:var(--green-soft);margin-top:8px">Alberca, cancha de pádel, restaurante, gym, parque infantil, baños y asadores.</div>' +
   '</div>' +
   roiHtml + roiChartHtmlStr +
   '<div style="padding:20px 32px;border-top:1px solid #deeadc">' +
-  '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#2d6040;margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Conoce el parque</div>' +
+  '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-dark);margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Conoce el parque</div>' +
   '<img src="'+PARK_MAP_IMG+'" style="width:100%;display:block;border-radius:4px;border:1px solid #deeadc" alt="Mapa del parque TORAM">' +
-  '<div style="font-size:11px;color:#5a7a62;margin-top:8px">TORAM Parque Temático · Mazatlán — el desarrollo completo: parque, plaza y residencial.</div>' +
-  (perfilShowQR() ? '<div style="display:flex;align-items:center;gap:12px;margin-top:12px"><img src="'+MAPA_QR_IMG+'" style="width:64px;height:64px" alt="QR mapa interactivo"><div><div style="font-size:12px;font-weight:700;color:#2d6040">Escanea el código con tu celular</div><div style="font-size:11px;color:#5a7a62">para recorrer el parque en el mapa interactivo.</div></div></div>' : '') +
+  '<div style="font-size:11px;color:var(--green-soft);margin-top:8px">TORAM Parque Temático · Mazatlán — el desarrollo completo: parque, plaza y residencial.</div>' +
+  (perfilShowQR() ? '<div style="display:flex;align-items:center;gap:12px;margin-top:12px"><img src="'+MAPA_QR_IMG+'" style="width:64px;height:64px" alt="QR mapa interactivo"><div><div style="font-size:12px;font-weight:700;color:var(--green-dark)">Escanea el código con tu celular</div><div style="font-size:11px;color:var(--green-soft)">para recorrer el parque en el mapa interactivo.</div></div></div>' : '') +
   '</div>' +
   '<div style="background:#1a3a22;padding:12px 32px;display:flex;justify-content:space-between;align-items:center">' +
   '<div style="font-size:10px;color:rgba(255,255,255,0.4)">TORAM Residencial · Proyecciones basadas en el desempeño esperado; no constituyen garantía.</div>' +
@@ -5555,7 +5575,7 @@ function buildPropuestaPartHTML() {
   var cd = pClientData();
   var roiRows = PARTI.roi.map(function(r){
     return '<tr style="background:#fff">' +
-      '<td style="padding:8px 12px;font-weight:700;color:#1a3320;border-bottom:1px solid #eef3ee">'+r.year+'</td>' +
+      '<td style="padding:8px 12px;font-weight:700;color:var(--green-text);border-bottom:1px solid #eef3ee">'+r.year+'</td>' +
       '<td style="padding:8px 12px;text-align:right;border-bottom:1px solid #eef3ee">'+fmtMXN(r.annual*c.qty)+'</td>' +
       '<td style="padding:8px 12px;text-align:right;border-bottom:1px solid #eef3ee">'+fmtMXN(r.monthly*c.qty)+'</td>' +
       '<td style="padding:8px 12px;text-align:right;font-weight:700;color:#1a6640;border-bottom:1px solid #eef3ee">'+fmtPct(r.pct,2)+'</td></tr>';
@@ -5563,27 +5583,27 @@ function buildPropuestaPartHTML() {
   var payRows = '';
   if (c.pay === 'fin') {
     payRows =
-      '<tr><td style="padding:6px 0;color:#5a7a62;border-bottom:1px solid #eef3ee">Enganche (30%)</td><td style="padding:6px 0;text-align:right;font-weight:700;color:#1a3320;border-bottom:1px solid #eef3ee">'+fmtMXN(c.down)+'</td></tr>' +
-      '<tr><td style="padding:6px 0;color:#5a7a62;border-bottom:1px solid #eef3ee">A financiar (70%)</td><td style="padding:6px 0;text-align:right;font-weight:600;color:#1a3320;border-bottom:1px solid #eef3ee">'+fmtMXN(c.financed)+'</td></tr>' +
-      '<tr><td style="padding:6px 0;color:#5a7a62">Mensualidad ('+c.msi+' MSI)</td><td style="padding:6px 0;text-align:right;font-weight:700;color:#1a6640">'+fmtMXN(c.monthly)+'</td></tr>';
+      '<tr><td style="padding:6px 0;color:var(--green-soft);border-bottom:1px solid #eef3ee">Enganche (30%)</td><td style="padding:6px 0;text-align:right;font-weight:700;color:var(--green-text);border-bottom:1px solid #eef3ee">'+fmtMXN(c.down)+'</td></tr>' +
+      '<tr><td style="padding:6px 0;color:var(--green-soft);border-bottom:1px solid #eef3ee">A financiar (70%)</td><td style="padding:6px 0;text-align:right;font-weight:600;color:var(--green-text);border-bottom:1px solid #eef3ee">'+fmtMXN(c.financed)+'</td></tr>' +
+      '<tr><td style="padding:6px 0;color:var(--green-soft)">Mensualidad ('+c.msi+' MSI)</td><td style="padding:6px 0;text-align:right;font-weight:700;color:#1a6640">'+fmtMXN(c.monthly)+'</td></tr>';
   } else {
     payRows =
-      '<tr><td style="padding:6px 0;color:#5a7a62">Pago de contado</td><td style="padding:6px 0;text-align:right;font-weight:700;color:#1a6640">'+fmtMXN(c.total)+'</td></tr>';
+      '<tr><td style="padding:6px 0;color:var(--green-soft)">Pago de contado</td><td style="padding:6px 0;text-align:right;font-weight:700;color:#1a6640">'+fmtMXN(c.total)+'</td></tr>';
   }
-  var noteHtml = cd.note ? '<div style="font-size:12px;color:#5a7a62;margin-top:4px">'+cd.note+'</div>' : '';
+  var noteHtml = cd.note ? '<div style="font-size:12px;color:var(--green-soft);margin-top:4px">'+cd.note+'</div>' : '';
   var partTotal = PARTI.roi.reduce(function(a,r){return a + r.annual * c.qty;}, 0);
   var partTake = 'En 4 años (2027–2030), tus ' + c.qty + (c.qty === 1 ? ' participación' : ' participaciones') + ' te dejarían ' + fmtMXN(partTotal, 0) + ' en total.';
   var partChartHtml = roiChartHtml('¿Cuánto ganas cada año?', PARTI.roi.map(function(r){return String(r.year);}), PARTI.roi.map(function(r){return r.annual * c.qty;}), null, '', '', partTake);
   var atrHtml = '';
   if (typeof PART_ATRACCIONES !== 'undefined' && PART_ATRACCIONES.length) {
     atrHtml = '<div style="padding:20px 32px;border-top:1px solid #deeadc">' +
-      '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#2d6040;margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Atracciones del parque</div>' +
+      '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-dark);margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Atracciones del parque</div>' +
       PART_ATRACCIONES.map(function(at){
-        return '<div style="text-align:center;margin-bottom:16px"><img src="' + at.src + '" style="width:100%;max-width:420px;display:block;margin:0 auto;border-radius:4px;border:1px solid #deeadc" alt="' + at.label + '"><div style="font-size:11px;color:#5a7a62;margin-top:6px">' + at.label + '</div></div>';
+        return '<div style="text-align:center;margin-bottom:16px"><img src="' + at.src + '" style="width:100%;max-width:420px;display:block;margin:0 auto;border-radius:4px;border:1px solid #deeadc" alt="' + at.label + '"><div style="font-size:11px;color:var(--green-soft);margin-top:6px">' + at.label + '</div></div>';
       }).join('') +
       '</div>';
   }
-  return '<div style="font-family:\'Source Sans 3\',Arial,sans-serif;background:white;color:#1a3320;max-width:800px;margin:0 auto">' +
+  return '<div style="font-family:\'Source Sans 3\',Arial,sans-serif;background:white;color:var(--green-text);max-width:800px;margin:0 auto">' +
   '<div style="background:linear-gradient(135deg,#1a3a22 0%,#2d5a38 55%,#3a6e45 100%);padding:24px 32px">' +
   '<div style="display:flex;justify-content:space-between;align-items:flex-end">' +
   '<div><div style="font-family:\'Playfair Display\',Georgia,serif;font-size:28px;font-weight:700;color:white;line-height:1;letter-spacing:0.05em">TORAM</div>' +
@@ -5597,15 +5617,15 @@ function buildPropuestaPartHTML() {
   '<div style="font-size:12px;color:rgba(255,255,255,0.75);margin-top:2px">Asesor: '+cd.advisor+' · '+cd.dateStr+'</div>' + noteHtml +
   '</div></div>' +
   '<div style="padding:20px 32px">' +
-  '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#2d6040;margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Tu inversión</div>' +
+  '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-dark);margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Tu inversión</div>' +
   '<table style="width:100%;border-collapse:collapse;font-size:13px">' +
-  '<tr><td style="padding:6px 0;color:#5a7a62;border-bottom:1px solid #eef3ee">Cantidad</td><td style="padding:6px 0;text-align:right;font-weight:600;color:#1a3320;border-bottom:1px solid #eef3ee">'+c.qty+(c.qty===1?' participación':' participaciones')+'</td></tr>' +
-  '<tr><td style="padding:6px 0;color:#5a7a62;border-bottom:1px solid #eef3ee">Precio por participación</td><td style="padding:6px 0;text-align:right;font-weight:600;color:#1a3320;border-bottom:1px solid #eef3ee">'+fmtMXN(c.unitPrice)+'</td></tr>' +
-  '<tr><td style="padding:6px 0;color:#5a7a62;border-bottom:1px solid #eef3ee">Inversión total</td><td style="padding:6px 0;text-align:right;font-weight:700;color:#1a3320;border-bottom:1px solid #eef3ee">'+fmtMXN(c.total)+'</td></tr>' +
-  '<tr><td style="padding:6px 0;color:#5a7a62;border-bottom:1px solid #eef3ee">Apartado (a cuenta del total)</td><td style="padding:6px 0;text-align:right;font-weight:600;color:#1a3320;border-bottom:1px solid #eef3ee">'+fmtMXN(c.admin)+' ('+fmtMXN(PARTI.adminPerUnit)+' c/u)</td></tr>' +
+  '<tr><td style="padding:6px 0;color:var(--green-soft);border-bottom:1px solid #eef3ee">Cantidad</td><td style="padding:6px 0;text-align:right;font-weight:600;color:var(--green-text);border-bottom:1px solid #eef3ee">'+c.qty+(c.qty===1?' participación':' participaciones')+'</td></tr>' +
+  '<tr><td style="padding:6px 0;color:var(--green-soft);border-bottom:1px solid #eef3ee">Precio por participación</td><td style="padding:6px 0;text-align:right;font-weight:600;color:var(--green-text);border-bottom:1px solid #eef3ee">'+fmtMXN(c.unitPrice)+'</td></tr>' +
+  '<tr><td style="padding:6px 0;color:var(--green-soft);border-bottom:1px solid #eef3ee">Inversión total</td><td style="padding:6px 0;text-align:right;font-weight:700;color:var(--green-text);border-bottom:1px solid #eef3ee">'+fmtMXN(c.total)+'</td></tr>' +
+  '<tr><td style="padding:6px 0;color:var(--green-soft);border-bottom:1px solid #eef3ee">Apartado (a cuenta del total)</td><td style="padding:6px 0;text-align:right;font-weight:600;color:var(--green-text);border-bottom:1px solid #eef3ee">'+fmtMXN(c.admin)+' ('+fmtMXN(PARTI.adminPerUnit)+' c/u)</td></tr>' +
   payRows +
   '</table>' +
-  '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#2d6040;margin:18px 0 12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Proyección de rendimiento — oficial</div>' +
+  '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-dark);margin:18px 0 12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Proyección de rendimiento — oficial</div>' +
   '<table style="width:100%;border-collapse:collapse;font-size:12px">' +
   '<thead><tr style="background:#2d5a38">' +
   '<th style="padding:7px 12px;text-align:left;color:rgba(255,255,255,0.85);font-size:10px;font-weight:600">Año</th>' +
@@ -5617,10 +5637,10 @@ function buildPropuestaPartHTML() {
   '<div style="font-size:10px;color:#7a9a82;margin-top:8px">Proyecciones basadas en el desempeño esperado del parque; no constituyen garantía. Cada participación equivale al 0.05% del ingreso neto del parque, con pagos trimestrales.</div>' +
   '</div>' +
   '<div style="padding:20px 32px;border-top:1px solid #deeadc">' +
-  '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#2d6040;margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Conoce el parque</div>' +
+  '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-dark);margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Conoce el parque</div>' +
   '<img src="'+PARK_MAP_IMG+'" style="width:100%;display:block;border-radius:4px;border:1px solid #deeadc" alt="Mapa del parque TORAM">' +
-  '<div style="font-size:11px;color:#5a7a62;margin-top:8px">El parque es la inversión: atracciones, cenote, playa y experiencias en Mazatlán.</div>' +
-  (perfilShowQR() ? '<div style="display:flex;align-items:center;gap:12px;margin-top:12px"><img src="'+MAPA_QR_IMG+'" style="width:64px;height:64px" alt="QR mapa interactivo"><div><div style="font-size:12px;font-weight:700;color:#2d6040">Escanea el código con tu celular</div><div style="font-size:11px;color:#5a7a62">para recorrer el parque en el mapa interactivo.</div></div></div>' : '') +
+  '<div style="font-size:11px;color:var(--green-soft);margin-top:8px">El parque es la inversión: atracciones, cenote, playa y experiencias en Mazatlán.</div>' +
+  (perfilShowQR() ? '<div style="display:flex;align-items:center;gap:12px;margin-top:12px"><img src="'+MAPA_QR_IMG+'" style="width:64px;height:64px" alt="QR mapa interactivo"><div><div style="font-size:12px;font-weight:700;color:var(--green-dark)">Escanea el código con tu celular</div><div style="font-size:11px;color:var(--green-soft)">para recorrer el parque en el mapa interactivo.</div></div></div>' : '') +
   '</div>' +
   atrHtml +
   '<div style="background:#1a3a22;padding:12px 32px;display:flex;justify-content:space-between;align-items:center">' +
@@ -5730,10 +5750,10 @@ function renderSeguimiento(){
   var typeLabel = {depto:'Departamento', part:'Participaciones', locales:'Local', comparativa:'Comparativa', cotizacion:'Cotización'};
   function row(f, badge){
     var badgeTxt = badge==='vencido' ? 'Vencida · llama hoy' : badge==='hoy' ? 'Llama hoy' : 'Llama el '+fmtFechaCorta(f.due);
-    var badgeCol = badge==='vencido' ? '#b3261e' : badge==='hoy' ? '#8a6d00' : '#2d6040';
+    var badgeCol = badge==='vencido' ? '#b3261e' : badge==='hoy' ? '#8a6d00' : 'var(--green-dark)';
     return '<div style="display:flex;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid #eef3ee;flex-wrap:wrap">'
-      + '<div style="flex:1;min-width:180px"><div style="font-weight:700;color:#1a3320">'+escHtml(f.client)+'</div>'
-      + '<div style="font-size:12px;color:#5a7a62">'+typeLabel[f.type]+' · '+escHtml(f.unit)+' · enviada '+fmtFechaCorta(f.date)+'</div></div>'
+      + '<div style="flex:1;min-width:180px"><div style="font-weight:700;color:var(--green-text)">'+escHtml(f.client)+'</div>'
+      + '<div style="font-size:12px;color:var(--green-soft)">'+typeLabel[f.type]+' · '+escHtml(f.unit)+' · enviada '+fmtFechaCorta(f.date)+'</div></div>'
       + '<div style="font-size:12px;font-weight:700;color:'+badgeCol+'">'+badgeTxt+'</div>'
       + '<div style="display:flex;gap:6px;flex-wrap:wrap">'
       + '<button class="btn btn-outline btn-sm" onclick="setFollowUpStatus(\''+f.id+'\',\'contactado\')">✓ Contactado</button>'
@@ -5744,23 +5764,23 @@ function renderSeguimiento(){
   }
   function group(title, arr, badge){
     if (!arr.length) return '';
-    var h = '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#2d6040;margin:18px 0 4px">'+title+' ('+arr.length+')</div>';
+    var h = '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-dark);margin:18px 0 4px">'+title+' ('+arr.length+')</div>';
     for (var i=0;i<arr.length;i++) h += row(arr[i], badge);
     return h;
   }
   function simpleGroup(title, arr){
     if (!arr.length) return '';
-    var h = '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#5a7a62;margin:18px 0 4px">'+title+' ('+arr.length+')</div>';
-    for (var i=0;i<arr.length;i++) h += '<div style="display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid #eef3ee"><div style="flex:1;min-width:180px"><div style="font-weight:700;color:#1a3320">'+escHtml(arr[i].client)+'</div><div style="font-size:12px;color:#5a7a62">'+typeLabel[arr[i].type]+' · '+escHtml(arr[i].unit)+' · enviada '+fmtFechaCorta(arr[i].date)+'</div></div><button class="btn btn-outline btn-sm" onclick="deleteFollowUp(\''+arr[i].id+'\')">✕</button></div>';
+    var h = '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-soft);margin:18px 0 4px">'+title+' ('+arr.length+')</div>';
+    for (var i=0;i<arr.length;i++) h += '<div style="display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid #eef3ee"><div style="flex:1;min-width:180px"><div style="font-weight:700;color:var(--green-text)">'+escHtml(arr[i].client)+'</div><div style="font-size:12px;color:var(--green-soft)">'+typeLabel[arr[i].type]+' · '+escHtml(arr[i].unit)+' · enviada '+fmtFechaCorta(arr[i].date)+'</div></div><button class="btn btn-outline btn-sm" onclick="deleteFollowUp(\''+arr[i].id+'\')">✕</button></div>';
     return h;
   }
   var out = '';
   out += '<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:6px">'
-    + '<div style="flex:1;min-width:110px;background:#fdf3e3;border:1px solid #e8d9b0;border-radius:10px;padding:12px;text-align:center"><div style="font-size:22px;font-weight:700;color:#8a6d00">'+vencidos.length+'</div><div style="font-size:11px;color:#5a7a62">Vencidas</div></div>'
-    + '<div style="flex:1;min-width:110px;background:#e8f5e9;border:1px solid #c8dcc8;border-radius:10px;padding:12px;text-align:center"><div style="font-size:22px;font-weight:700;color:#2d6040">'+hoy.length+'</div><div style="font-size:11px;color:#5a7a62">Para hoy</div></div>'
-    + '<div style="flex:1;min-width:110px;background:#f4f8f4;border:1px solid #deeadc;border-radius:10px;padding:12px;text-align:center"><div style="font-size:22px;font-weight:700;color:#1a3320">'+proximos.length+'</div><div style="font-size:11px;color:#5a7a62">Próximas</div></div>'
+    + '<div style="flex:1;min-width:110px;background:#fdf3e3;border:1px solid #e8d9b0;border-radius:10px;padding:12px;text-align:center"><div style="font-size:22px;font-weight:700;color:#8a6d00">'+vencidos.length+'</div><div style="font-size:11px;color:var(--green-soft)">Vencidas</div></div>'
+    + '<div style="flex:1;min-width:110px;background:#e8f5e9;border:1px solid #c8dcc8;border-radius:10px;padding:12px;text-align:center"><div style="font-size:22px;font-weight:700;color:var(--green-dark)">'+hoy.length+'</div><div style="font-size:11px;color:var(--green-soft)">Para hoy</div></div>'
+    + '<div style="flex:1;min-width:110px;background:#f4f8f4;border:1px solid #deeadc;border-radius:10px;padding:12px;text-align:center"><div style="font-size:22px;font-weight:700;color:var(--green-text)">'+proximos.length+'</div><div style="font-size:11px;color:var(--green-soft)">Próximas</div></div>'
     + '</div>';
-  if (!pend.length) out += '<p style="font-size:13px;color:#5a7a62;margin-top:14px">Sin llamadas pendientes. Cuando descargues o compartas una propuesta con el nombre del cliente, aparece aquí sola con su recordatorio a 3 días.</p>';
+  if (!pend.length) out += '<p style="font-size:13px;color:var(--green-soft);margin-top:14px">Sin llamadas pendientes. Cuando descargues o compartas una propuesta con el nombre del cliente, aparece aquí sola con su recordatorio a 3 días.</p>';
   out += group('Vencidas — llama hoy', vencidos, 'vencido');
   out += group('Para hoy', hoy, 'hoy');
   out += group('Próximas', proximos, 'prox');
@@ -5883,14 +5903,14 @@ function cBestIdx(rows){
   return best;
 }
 function cUnitsListHtml(){
-  if (!cUnits.length) return '<span style="font-size:13px;color:#5a7a62">Aún no hay unidades. Elige un modelo y una unidad, pon su renta mensual estimada y toca "+ Agregar unidad".</span>';
+  if (!cUnits.length) return '<span style="font-size:13px;color:var(--green-soft)">Aún no hay unidades. Elige un modelo y una unidad, pon su renta mensual estimada y toca "+ Agregar unidad".</span>';
   var h = '';
   cUnits.forEach(function(item, i){
     var u = item.inv;
-    h += '<span style="display:inline-flex;align-items:center;gap:8px;background:#e8f5e9;border:1px solid #c8dcc8;border-radius:12px;padding:6px 6px 6px 12px;font-size:13px;font-weight:600;color:#1a3320">'
+    h += '<span style="display:inline-flex;align-items:center;gap:8px;background:#e8f5e9;border:1px solid #c8dcc8;border-radius:12px;padding:6px 6px 6px 12px;font-size:13px;font-weight:600;color:var(--green-text)">'
       + u.torre+'-'+u.num+' · '+fmtMXN(u.precio)
-      + ' <label style="font-weight:400;font-size:12px;color:#5a7a62">Renta $ <input type="number" value="'+(item.rent||0)+'" step="1000" min="0" onchange="cSetRent('+i+', this.value)" style="width:90px;height:28px;border:1px solid #c8dcc8;border-radius:6px;padding:0 6px;font-size:12px"></label>'
-      + ' <button onclick="cRemoveUnit('+i+')" style="border:none;background:#1a3320;color:white;width:20px;height:20px;border-radius:50%;cursor:pointer;font-size:11px;line-height:1">✕</button></span>';
+      + ' <label style="font-weight:400;font-size:12px;color:var(--green-soft)">Renta $ <input type="number" value="'+(item.rent||0)+'" step="1000" min="0" onchange="cSetRent('+i+', this.value)" style="width:90px;height:28px;border:1px solid #c8dcc8;border-radius:6px;padding:0 6px;font-size:12px"></label>'
+      + ' <button onclick="cRemoveUnit('+i+')" style="border:none;background:var(--green-text);color:white;width:20px;height:20px;border-radius:50%;cursor:pointer;font-size:11px;line-height:1">✕</button></span>';
   });
   return h;
 }
@@ -5900,7 +5920,7 @@ function renderComparativa(){
   var box = document.getElementById('cPreviewContent');
   if (!box) return;
   if (cUnits.length < 2) {
-    box.innerHTML = '<div style="padding:24px;font-size:14px;color:#5a7a62">Agrega al menos 2 unidades para ver la comparación.</div>';
+    box.innerHTML = '<div style="padding:24px;font-size:14px;color:var(--green-soft)">Agrega al menos 2 unidades para ver la comparación.</div>';
     return;
   }
   var rows = cComputeRows();
@@ -5908,9 +5928,9 @@ function renderComparativa(){
   var gainOn = cGainOn();
   var planName = rows[0].plan.name;
   var h = '<div style="padding:24px 24px 8px">'
-    + '<div style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#2d6040;font-weight:700">TORAM Residencial · Cotización comparativa</div>'
-    + '<div style="font-size:22px;font-weight:800;color:#1a3320;margin:6px 0 2px">¿Cuál te conviene más?</div>'
-    + '<div style="font-size:13px;color:#5a7a62">Para '+escHtml(cClientData().client)+' · '+escHtml(cClientData().dateStr)+' · Plan: '+escHtml(planName)+' · Enganche del 15%</div>'
+    + '<div style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--green-dark);font-weight:700">TORAM Residencial · Cotización comparativa</div>'
+    + '<div style="font-size:22px;font-weight:800;color:var(--green-text);margin:6px 0 2px">¿Cuál te conviene más?</div>'
+    + '<div style="font-size:13px;color:var(--green-soft)">Para '+escHtml(cClientData().client)+' · '+escHtml(cClientData().dateStr)+' · Plan: '+escHtml(planName)+' · Enganche del 15%</div>'
     + '</div>';
   h += '<div style="padding:8px 24px 24px;overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:13px">'
     + '<thead><tr style="background:#0e1a12;color:white">'
@@ -5932,7 +5952,7 @@ function renderComparativa(){
     var mensual = r.plan.available ? fmtMXN(r.plan.monthlyPayment, 0) : 'No disponible';
     var ganancia = r.plan.available ? fmtMXN(r.netGain, 0) : '—';
     h += '<tr style="background:'+bg+';border-bottom:1px solid #eef3ee">'
-      + '<td style="padding:10px 8px;font-weight:700;color:#1a3320">'+unitCell+'</td>'
+      + '<td style="padding:10px 8px;font-weight:700;color:var(--green-text)">'+unitCell+'</td>'
       + '<td style="padding:10px 8px">'+(r.m ? r.m.nombre : '—')+'</td>'
       + '<td style="text-align:right;padding:10px 8px">'+(r.m ? r.m.m2 : r.u.m2)+'</td>'
       + '<td style="padding:10px 8px">'+vista+'</td>'
@@ -5940,7 +5960,7 @@ function renderComparativa(){
       + '<td style="text-align:right;padding:10px 8px">'+fmtMXN(r.plan.downPayment, 0)+'</td>'
       + '<td style="text-align:right;padding:10px 8px;font-weight:600">'+mensual+'</td>'
       + '<td style="text-align:right;padding:10px 8px">'+fmtMXN(r.rent, 0)+'</td>'
-      + (gainOn ? '<td style="text-align:right;padding:10px 8px;font-weight:700;color:#2d6040">'+ganancia+'</td>' : '')
+      + (gainOn ? '<td style="text-align:right;padding:10px 8px;font-weight:700;color:var(--green-dark)">'+ganancia+'</td>' : '')
       + '</tr>';
   });
   h += '</tbody></table></div>';
@@ -5955,9 +5975,9 @@ function renderComparativa(){
       var bestRow = availRows.reduce(function(a,b){ return b.netGain > a.netGain ? b : a; });
       sumTxt += ' La que más te deja en 5 años es <strong>' + bestRow.u.torre + '-' + bestRow.u.num + '</strong> con <strong>' + fmtMXN(bestRow.netGain, 0) + '</strong> de ganancia.';
     }
-    h += '<div style="padding:0 24px 24px;font-size:14px;line-height:1.5;color:#1a3320"><strong>En resumen:</strong> ' + sumTxt + '</div>';
+    h += '<div style="padding:0 24px 24px;font-size:14px;line-height:1.5;color:var(--green-text)"><strong>En resumen:</strong> ' + sumTxt + '</div>';
   }
-  h += '<div style="padding:0 24px 24px;font-size:12px;color:#5a7a62">Vigencia: 3 días a partir de la emisión (válida hasta el '+vigenciaHastaTxt()+'). Después de esa fecha, precios y disponibilidad pueden cambiar. Proyección a 5 años, no es una garantía de rendimiento.</div>';
+  h += '<div style="padding:0 24px 24px;font-size:12px;color:var(--green-soft)">Vigencia: 3 días a partir de la emisión (válida hasta el '+vigenciaHastaTxt()+'). Después de esa fecha, precios y disponibilidad pueden cambiar. Proyección a 5 años, no es una garantía de rendimiento.</div>';
   box.innerHTML = h;
 }
 function previewComparativa(){
@@ -6762,9 +6782,9 @@ function lPopulateLocales() {
         : '<span class="l-badge l-badge-no">Apartado</span>';
       var bg = x.estatus === 'DISPONIBLE' ? '#ffffff' : '#fdf8f2';
       return '<tr style="background:'+bg+'">' +
-        '<td style="padding:7px 12px;font-weight:700;color:#1a3320;border-bottom:1px solid #deeadc">Local '+x.local+'</td>' +
-        '<td style="padding:7px 12px;text-align:right;border-bottom:1px solid #deeadc;color:#5a7a62">'+x.m2+' m²</td>' +
-        '<td style="padding:7px 12px;text-align:right;border-bottom:1px solid #deeadc;font-weight:600;color:#1a3320">'+fmtMXN(x.precio_lista)+'</td>' +
+        '<td style="padding:7px 12px;font-weight:700;color:var(--green-text);border-bottom:1px solid #deeadc">Local '+x.local+'</td>' +
+        '<td style="padding:7px 12px;text-align:right;border-bottom:1px solid #deeadc;color:var(--green-soft)">'+x.m2+' m²</td>' +
+        '<td style="padding:7px 12px;text-align:right;border-bottom:1px solid #deeadc;font-weight:600;color:var(--green-text)">'+fmtMXN(x.precio_lista)+'</td>' +
         '<td style="padding:7px 12px;text-align:right;border-bottom:1px solid #deeadc">'+badge+'</td></tr>';
     }).join('');
     tbl.innerHTML = '<table style="width:100%;border-collapse:collapse;font-size:13px">' +
@@ -6826,11 +6846,11 @@ function lRenderPlansTable(plans) {
     var plazoText = p.meses === 0 ? 'Pago único' : p.meses + ' meses';
     var mark = i === lSelectedPlanIdx ? ' ★' : '';
     return '<tr style="background:'+bg+';cursor:pointer" onclick="lSelectPlanRow('+i+')">' +
-      '<td style="padding:8px 12px;font-weight:600;color:#1a3320;border-bottom:1px solid #deeadc;font-size:12px">'+p.nombre+mark+'</td>' +
-      '<td style="padding:8px 12px;text-align:right;border-bottom:1px solid #deeadc;font-size:12px;font-weight:700;color:#1a3320">'+fmtMXN(p.precioConDesc)+'</td>' +
-      '<td style="padding:8px 12px;text-align:right;border-bottom:1px solid #deeadc;font-size:11px;color:#5a7a62">'+fmtMXN(p.enganche)+'</td>' +
-      '<td style="padding:8px 12px;text-align:right;border-bottom:1px solid #deeadc;font-size:11px;color:#5a7a62">'+fmtMXN(p.resto)+'</td>' +
-      '<td style="padding:8px 12px;text-align:right;border-bottom:1px solid #deeadc;font-size:12px;font-weight:700;color:#1a3320">'+mensText+'</td>' +
+      '<td style="padding:8px 12px;font-weight:600;color:var(--green-text);border-bottom:1px solid #deeadc;font-size:12px">'+p.nombre+mark+'</td>' +
+      '<td style="padding:8px 12px;text-align:right;border-bottom:1px solid #deeadc;font-size:12px;font-weight:700;color:var(--green-text)">'+fmtMXN(p.precioConDesc)+'</td>' +
+      '<td style="padding:8px 12px;text-align:right;border-bottom:1px solid #deeadc;font-size:11px;color:var(--green-soft)">'+fmtMXN(p.enganche)+'</td>' +
+      '<td style="padding:8px 12px;text-align:right;border-bottom:1px solid #deeadc;font-size:11px;color:var(--green-soft)">'+fmtMXN(p.resto)+'</td>' +
+      '<td style="padding:8px 12px;text-align:right;border-bottom:1px solid #deeadc;font-size:12px;font-weight:700;color:var(--green-text)">'+mensText+'</td>' +
       '<td style="padding:8px 12px;text-align:right;border-bottom:1px solid #deeadc;font-size:11px;color:#7a9a82">'+plazoText+'</td>' +
       '</tr>';
   }).join('');
@@ -6897,11 +6917,11 @@ function buildLocalesHTML() {
     var plazoText = p.meses === 0 ? 'Pago único' : p.meses + ' meses';
     var mark = i === lSelectedPlanIdx ? ' ★ Plan a cotizar' : '';
     return '<tr style="background:'+bg+'">' +
-      '<td style="padding:8px 12px;font-weight:600;color:#1a3320;border-bottom:1px solid #deeadc;font-size:12px">'+p.nombre+mark+'</td>' +
-      '<td style="padding:8px 12px;text-align:right;border-bottom:1px solid #deeadc;font-size:12px;font-weight:700;color:#1a3320">'+fmtMXN(p.precioConDesc)+'</td>' +
-      '<td style="padding:8px 12px;text-align:right;border-bottom:1px solid #deeadc;font-size:11px;color:#5a7a62">'+fmtMXN(p.enganche)+'</td>' +
-      '<td style="padding:8px 12px;text-align:right;border-bottom:1px solid #deeadc;font-size:11px;color:#5a7a62">'+fmtMXN(p.resto)+'</td>' +
-      '<td style="padding:8px 12px;text-align:right;border-bottom:1px solid #deeadc;font-size:12px;font-weight:700;color:#1a3320">'+mensText+'</td>' +
+      '<td style="padding:8px 12px;font-weight:600;color:var(--green-text);border-bottom:1px solid #deeadc;font-size:12px">'+p.nombre+mark+'</td>' +
+      '<td style="padding:8px 12px;text-align:right;border-bottom:1px solid #deeadc;font-size:12px;font-weight:700;color:var(--green-text)">'+fmtMXN(p.precioConDesc)+'</td>' +
+      '<td style="padding:8px 12px;text-align:right;border-bottom:1px solid #deeadc;font-size:11px;color:var(--green-soft)">'+fmtMXN(p.enganche)+'</td>' +
+      '<td style="padding:8px 12px;text-align:right;border-bottom:1px solid #deeadc;font-size:11px;color:var(--green-soft)">'+fmtMXN(p.resto)+'</td>' +
+      '<td style="padding:8px 12px;text-align:right;border-bottom:1px solid #deeadc;font-size:12px;font-weight:700;color:var(--green-text)">'+mensText+'</td>' +
       '<td style="padding:8px 12px;text-align:right;border-bottom:1px solid #deeadc;font-size:11px;color:#7a9a82">'+plazoText+'</td>' +
       '</tr>';
   }).join('');
@@ -6909,14 +6929,14 @@ function buildLocalesHTML() {
     var bg = i%2===0?'#ffffff':'#f7fbf7';
     var tag = (i === sched.length-1 && sched.length > 1) ? ' <span style="font-size:9px;color:#9a5b00">(ajustada)</span>' : '';
     return '<tr style="background:'+bg+'">' +
-      '<td style="padding:6px 12px;border-bottom:1px solid #eef3ee;font-size:12px;color:#5a7a62">'+r.no+'</td>' +
-      '<td style="padding:6px 12px;text-align:right;border-bottom:1px solid #eef3ee;font-size:12px;font-weight:600;color:#1a3320">'+fmtMXN(r.pago)+tag+'</td>' +
-      '<td style="padding:6px 12px;text-align:right;border-bottom:1px solid #eef3ee;font-size:12px;color:#5a7a62">'+fmtMXN(r.saldo)+'</td>' +
+      '<td style="padding:6px 12px;border-bottom:1px solid #eef3ee;font-size:12px;color:var(--green-soft)">'+r.no+'</td>' +
+      '<td style="padding:6px 12px;text-align:right;border-bottom:1px solid #eef3ee;font-size:12px;font-weight:600;color:var(--green-text)">'+fmtMXN(r.pago)+tag+'</td>' +
+      '<td style="padding:6px 12px;text-align:right;border-bottom:1px solid #eef3ee;font-size:12px;color:var(--green-soft)">'+fmtMXN(r.saldo)+'</td>' +
       '</tr>';
   }).join('');
-  var noteHtml = cd.note ? '<div style="font-size:12px;color:#5a7a62;margin-top:4px">'+cd.note+'</div>' : '';
+  var noteHtml = cd.note ? '<div style="font-size:12px;color:var(--green-soft);margin-top:4px">'+cd.note+'</div>' : '';
   var schedTitle = plan.meses === 0 ? 'Pago único' : 'Tabla de mensualidades — ' + plan.nombre;
-  return '<div style="font-family:\'Source Sans 3\',Arial,sans-serif;background:white;color:#1a3320;max-width:800px;margin:0 auto">' +
+  return '<div style="font-family:\'Source Sans 3\',Arial,sans-serif;background:white;color:var(--green-text);max-width:800px;margin:0 auto">' +
   '<div style="background:linear-gradient(135deg,#1a3a22 0%,#2d5a38 55%,#3a6e45 100%);padding:24px 32px">' +
   '<div style="display:flex;justify-content:space-between;align-items:flex-end">' +
   '<div><div style="font-family:\'Playfair Display\',Georgia,serif;font-size:28px;font-weight:700;color:white;line-height:1;letter-spacing:0.05em">TORAM</div>' +
@@ -6933,19 +6953,19 @@ function buildLocalesHTML() {
   '</div></div>' +
   '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0">' +
   '<div style="border-right:1px solid #deeadc;padding:20px 24px">' +
-  '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#2d6040;margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Datos del local</div>' +
+  '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-dark);margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Datos del local</div>' +
   '<table style="width:100%;border-collapse:collapse;font-size:13px">' +
-  '<tr><td style="padding:6px 0;color:#5a7a62;border-bottom:1px solid #eef3ee">Local</td><td style="padding:6px 0;text-align:right;font-weight:700;color:#1a3320;border-bottom:1px solid #eef3ee">Local '+loc.local+'</td></tr>' +
-  '<tr><td style="padding:6px 0;color:#5a7a62;border-bottom:1px solid #eef3ee">Superficie</td><td style="padding:6px 0;text-align:right;font-weight:600;color:#1a3320;border-bottom:1px solid #eef3ee">'+loc.m2+' m²</td></tr>' +
-  '<tr><td style="padding:6px 0;color:#5a7a62;border-bottom:1px solid #eef3ee">Precio por m²</td><td style="padding:6px 0;text-align:right;font-weight:600;color:#1a3320;border-bottom:1px solid #eef3ee">'+fmtMXN(LOCALES_PRECIO_M2)+'</td></tr>' +
-  '<tr><td style="padding:6px 0;color:#5a7a62;border-bottom:1px solid #eef3ee">Precio de lista</td><td style="padding:6px 0;text-align:right;font-weight:700;color:#1a3320;border-bottom:1px solid #eef3ee">'+fmtMXN(loc.precio_lista)+'</td></tr>' +
-  '<tr><td style="padding:6px 0;color:#5a7a62;border-bottom:1px solid #eef3ee">Plan a cotizar</td><td style="padding:6px 0;text-align:right;font-weight:600;color:#1a3320;border-bottom:1px solid #eef3ee">'+plan.nombre+'</td></tr>' +
-  '<tr><td style="padding:6px 0;color:#5a7a62;border-bottom:1px solid #eef3ee">Precio con descuento</td><td style="padding:6px 0;text-align:right;font-weight:700;color:#1a6640;border-bottom:1px solid #eef3ee">'+fmtMXN(plan.precioConDesc)+'</td></tr>' +
-  '<tr><td style="padding:6px 0;color:#5a7a62;border-bottom:1px solid #eef3ee">Enganche (15%)</td><td style="padding:6px 0;text-align:right;font-weight:600;color:#1a3320;border-bottom:1px solid #eef3ee">'+fmtMXN(plan.enganche)+'</td></tr>' +
-  '<tr><td style="padding:6px 0;color:#5a7a62">Resto (85%)</td><td style="padding:6px 0;text-align:right;font-weight:600;color:#1a3320">'+fmtMXN(plan.resto)+'</td></tr>' +
+  '<tr><td style="padding:6px 0;color:var(--green-soft);border-bottom:1px solid #eef3ee">Local</td><td style="padding:6px 0;text-align:right;font-weight:700;color:var(--green-text);border-bottom:1px solid #eef3ee">Local '+loc.local+'</td></tr>' +
+  '<tr><td style="padding:6px 0;color:var(--green-soft);border-bottom:1px solid #eef3ee">Superficie</td><td style="padding:6px 0;text-align:right;font-weight:600;color:var(--green-text);border-bottom:1px solid #eef3ee">'+loc.m2+' m²</td></tr>' +
+  '<tr><td style="padding:6px 0;color:var(--green-soft);border-bottom:1px solid #eef3ee">Precio por m²</td><td style="padding:6px 0;text-align:right;font-weight:600;color:var(--green-text);border-bottom:1px solid #eef3ee">'+fmtMXN(LOCALES_PRECIO_M2)+'</td></tr>' +
+  '<tr><td style="padding:6px 0;color:var(--green-soft);border-bottom:1px solid #eef3ee">Precio de lista</td><td style="padding:6px 0;text-align:right;font-weight:700;color:var(--green-text);border-bottom:1px solid #eef3ee">'+fmtMXN(loc.precio_lista)+'</td></tr>' +
+  '<tr><td style="padding:6px 0;color:var(--green-soft);border-bottom:1px solid #eef3ee">Plan a cotizar</td><td style="padding:6px 0;text-align:right;font-weight:600;color:var(--green-text);border-bottom:1px solid #eef3ee">'+plan.nombre+'</td></tr>' +
+  '<tr><td style="padding:6px 0;color:var(--green-soft);border-bottom:1px solid #eef3ee">Precio con descuento</td><td style="padding:6px 0;text-align:right;font-weight:700;color:#1a6640;border-bottom:1px solid #eef3ee">'+fmtMXN(plan.precioConDesc)+'</td></tr>' +
+  '<tr><td style="padding:6px 0;color:var(--green-soft);border-bottom:1px solid #eef3ee">Enganche (15%)</td><td style="padding:6px 0;text-align:right;font-weight:600;color:var(--green-text);border-bottom:1px solid #eef3ee">'+fmtMXN(plan.enganche)+'</td></tr>' +
+  '<tr><td style="padding:6px 0;color:var(--green-soft)">Resto (85%)</td><td style="padding:6px 0;text-align:right;font-weight:600;color:var(--green-text)">'+fmtMXN(plan.resto)+'</td></tr>' +
   '</table></div>' +
   '<div style="padding:20px 24px">' +
-  '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#2d6040;margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Planes de pago · Sin intereses</div>' +
+  '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-dark);margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Planes de pago · Sin intereses</div>' +
   '<table style="width:100%;border-collapse:collapse;font-size:12px">' +
   '<thead><tr style="background:#2d5a38">' +
   '<th style="padding:7px 12px;text-align:left;color:rgba(255,255,255,0.85);font-size:10px;font-weight:600">Plan</th>' +
@@ -6956,27 +6976,27 @@ function buildLocalesHTML() {
   '<th style="padding:7px 8px;text-align:right;color:rgba(255,255,255,0.75);font-size:10px;font-weight:600">Plazo</th>' +
   '</tr></thead><tbody>'+planRowsHtml+'</tbody></table></div></div>' +
   '<div style="padding:20px 32px;border-top:1px solid #deeadc">' +
-  '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#2d6040;margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">'+schedTitle+'</div>' +
+  '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-dark);margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">'+schedTitle+'</div>' +
   '<table style="width:100%;border-collapse:collapse;font-size:12px">' +
   '<thead><tr style="background:#2d5a38">' +
   '<th style="padding:7px 12px;text-align:left;color:rgba(255,255,255,0.85);font-size:10px;font-weight:600">No.</th>' +
   '<th style="padding:7px 12px;text-align:right;color:rgba(255,255,255,0.9);font-size:10px;font-weight:600">Mensualidad</th>' +
   '<th style="padding:7px 12px;text-align:right;color:rgba(255,255,255,0.75);font-size:10px;font-weight:600">Saldo insoluto</th>' +
   '</tr></thead><tbody>'+schedRowsHtml+'</tbody></table>' +
-  '<div style="font-size:11px;color:#5a7a62;margin-top:8px">Enganche '+fmtMXN(plan.enganche)+' + suma de mensualidades '+fmtMXN(plan.resto)+' = precio con descuento '+fmtMXN(plan.precioConDesc)+'.</div>' +
+  '<div style="font-size:11px;color:var(--green-soft);margin-top:8px">Enganche '+fmtMXN(plan.enganche)+' + suma de mensualidades '+fmtMXN(plan.resto)+' = precio con descuento '+fmtMXN(plan.precioConDesc)+'.</div>' +
   '</div>' +
   '<div style="padding:20px 32px;border-top:1px solid #deeadc">' +
-  '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#2d6040;margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Plano de la plaza — ETAPA 1</div>' +
+  '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-dark);margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Plano de la plaza — ETAPA 1</div>' +
   '<img src="'+PLAZA_PLANO_IMG+'" style="width:100%;display:block;border-radius:4px;border:1px solid #deeadc" alt="Plano de la plaza comercial TORAM, ETAPA 1">' +
   '<div style="padding:20px 32px;border-top:1px solid #deeadc">' +
-  '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#2d6040;margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Renders de la plaza</div>' +
-  PLAZA_RENDERS.map(function(rd){ return '<div style="margin-bottom:14px"><img src="'+rd.src+'" style="width:100%;max-width:520px;display:block;margin:0 auto;border-radius:4px;border:1px solid #deeadc" alt="'+rd.label+' de la plaza comercial TORAM"><div style="font-size:11px;color:#5a7a62;margin-top:4px;text-align:center">'+rd.label+'</div></div>'; }).join('') +
+  '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-dark);margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Renders de la plaza</div>' +
+  PLAZA_RENDERS.map(function(rd){ return '<div style="margin-bottom:14px"><img src="'+rd.src+'" style="width:100%;max-width:520px;display:block;margin:0 auto;border-radius:4px;border:1px solid #deeadc" alt="'+rd.label+' de la plaza comercial TORAM"><div style="font-size:11px;color:var(--green-soft);margin-top:4px;text-align:center">'+rd.label+'</div></div>'; }).join('') +
   '</div>' +
-  '<div style="font-size:11px;color:#5a7a62;margin-top:8px">Los locales marcados en amarillo en el plano son los apartados. La leyenda del plano dice &ldquo;vendidos&rdquo;; la tabla de precios es la fuente de disponibilidad.</div>' +
+  '<div style="font-size:11px;color:var(--green-soft);margin-top:8px">Los locales marcados en amarillo en el plano son los apartados. La leyenda del plano dice &ldquo;vendidos&rdquo;; la tabla de precios es la fuente de disponibilidad.</div>' +
   '</div>' +
   '<div style="padding:20px 32px;border-top:1px solid #deeadc">' +
-  '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#2d6040;margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">La plaza</div>' +
-  '<div style="font-size:12px;line-height:1.6;color:#5a7a62">Plaza comercial dentro del parque, con acceso y operación independiente. 21 locales en ETAPA 1, el corazón comercial de la experiencia TORAM, con flujo mixto de turismo, residentes y experiencias del parque. Visitantes diarios estimados: 2026: 1,600 · 2027: 1,920 · 2028: 2,304 · 2029: 2,765. Más de 1,000 departamentos en el desarrollo y más de 4 millones de turistas al año en Mazatlán.</div>' +
+  '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-dark);margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">La plaza</div>' +
+  '<div style="font-size:12px;line-height:1.6;color:var(--green-soft)">Plaza comercial dentro del parque, con acceso y operación independiente. 21 locales en ETAPA 1, el corazón comercial de la experiencia TORAM, con flujo mixto de turismo, residentes y experiencias del parque. Visitantes diarios estimados: 2026: 1,600 · 2027: 1,920 · 2028: 2,304 · 2029: 2,765. Más de 1,000 departamentos en el desarrollo y más de 4 millones de turistas al año en Mazatlán.</div>' +
   '<div style="font-size:10px;color:#7a9a82;margin-top:10px">Vigencia 3 días · Sujeto a disponibilidad · Precios sin intereses · Descuentos sobre precio de lista · 669 139 3136</div>' +
   '</div>' +
   '</div>';
