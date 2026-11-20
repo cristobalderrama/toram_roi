@@ -161,6 +161,49 @@ html.vista-movil .main{padding:16px 14px calc(80px + env(safe-area-inset-bottom)
 #page-inicio .breadcrumb{color:var(--gold-light);position:relative;z-index:1}
 .inicio-map{position:absolute;top:0;right:0;height:100%;width:auto;opacity:0.08;pointer-events:none}
 
+/* Glosario en el lugar (Ola 1 · 4.2): "?" junto al término, frase en español
+   llano. CSS-only: se muestra al pasar el mouse, al tocar (focus) o al
+   mantener pulsado (active). Sin JS, sin cambiar cálculos. */
+.gloss{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border:1px solid var(--gold);border-radius:50%;color:var(--navy);font-size:11px;font-weight:700;line-height:1;cursor:help;position:relative;vertical-align:1px;margin-left:4px;font-family:'IBM Plex Sans',sans-serif}
+.gloss-tip{display:none;position:absolute;bottom:22px;left:50%;transform:translateX(-50%);width:220px;max-width:70vw;background:var(--navy);color:#fff;font-size:12px;font-weight:400;line-height:1.5;padding:10px 12px;border-radius:2px;z-index:50;text-align:left;white-space:normal;box-shadow:0 4px 16px rgba(0,0,0,.25)}
+.gloss:hover .gloss-tip,.gloss:focus .gloss-tip,.gloss:active .gloss-tip{display:block}
+.gloss:focus{outline:2px solid var(--gold);outline-offset:2px}
+/* Dentro de una tabla (scroll-x recorta hacia arriba): el tip abre hacia abajo. */
+th .gloss-tip{bottom:auto;top:22px}
+/* Botón Guardar PDF + nombre de archivo debajo (Ola 1 · 2.3) */
+.pdf-action-wrap{flex:1;min-width:200px;display:flex;flex-direction:column}
+.pdf-action-wrap .btn{width:100%;padding:13px}
+
+/* Subtítulo de una línea en los entregables del sidebar (Ola 1 · 1.1) */
+.nav-sub{display:block;font-family:var(--font-mono);font-size:10px;color:var(--text-muted);margin-top:2px;line-height:1.3}
+.nav-item.active .nav-sub{color:rgba(255,255,255,.65)}
+
+/* Inicio por el cliente (Ola 1 · 3.3): las 3 opciones como filas de ledger
+   numeradas, no como botones grandes. La acción es la misma de siempre. */
+.inicio-rows{border-top:1px solid var(--hairline);margin-top:8px}
+.inicio-row{display:flex;align-items:center;gap:16px;width:100%;text-align:left;background:var(--paper-card);border:none;border-bottom:1px solid var(--hairline);padding:16px 8px;cursor:pointer;font-family:inherit;color:inherit}
+.inicio-row:hover{background:var(--surface-muted)}
+.inicio-num{font-family:var(--font-mono);font-size:12px;color:var(--gold-dark);letter-spacing:.05em}
+.inicio-txt{display:flex;flex-direction:column;gap:2px;flex:1}
+.inicio-txt strong{font-size:17px;color:var(--navy);font-weight:600}
+.inicio-sub{font-size:12px;color:var(--text-muted)}
+.inicio-arrow{color:var(--navy);font-size:18px;font-weight:600}
+.inicio-block{margin-top:20px}
+.inicio-block-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin-bottom:8px}
+.inicio-card{display:block;width:100%;text-align:left;background:var(--paper-card);border:1px solid var(--hairline);border-left:3px solid var(--gold);border-radius:2px;padding:14px 16px;cursor:pointer;font-family:inherit;color:inherit}
+.inicio-card:hover{background:var(--surface-muted)}
+.inicio-card strong{font-size:15px;color:var(--navy);font-weight:600}
+.inicio-card p{font-size:13px;color:var(--text-secondary);margin-top:3px}
+.inicio-firstuse{background:var(--surface-muted);border:1px dashed var(--border-strong);border-radius:2px;padding:14px 16px;margin-top:20px}
+.inicio-firstuse strong{font-size:15px;color:var(--navy)}
+.inicio-firstuse p{font-size:13px;color:var(--text-secondary);margin-top:3px}
+.inicio-firstuse a{color:var(--navy);font-weight:600}
+
+/* Agrupación de supuestos del ROI (Ola 1 · 4.3) */
+.roi-group{margin-top:16px}
+.roi-group:first-of-type{margin-top:0}
+.roi-group-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--hairline)}
+
 /* Cards */
 .card{background:var(--paper-card);border:1px solid var(--hairline);border-radius:var(--radius-lg);padding:26px;box-shadow:none}
 .card-title{font-size:19px;font-weight:700;color:var(--navy);margin-bottom:6px;padding-bottom:10px;border-bottom:3px solid var(--gold);font-family:'Cormorant Garamond',serif}
@@ -189,6 +232,7 @@ html.vista-movil .main{padding:16px 14px calc(80px + env(safe-area-inset-bottom)
   .metric-value{font-size:20px}
   .metric-label{font-size:10px}
   .btn-full{font-size:14px;padding:12px}
+  .btn:not(.btn-sm){min-height:48px}
   .scenario-tabs{width:100%}
   .scenario-tab{flex:1;padding:8px 6px;font-size:12px}
   #dpRow{grid-template-columns:1fr 1fr!important}
@@ -236,13 +280,20 @@ input[type=number],input[type=text],select{border:1px solid var(--border-strong)
 input:focus,select:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(184,144,46,0.12)}
 select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23718096' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px}
 
-/* Buttons */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 20px;border-radius:var(--radius);font-family:'IBM Plex Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.15s;border:none;outline:none}
-.btn-primary{background:var(--navy);color:var(--white)}
+/* Buttons — jerarquía fija en 3 niveles (Ola 1 · 2.1):
+   1º Primario: verde oscuro + texto marfil + filete dorado de 1 px debajo.
+   2º Secundario: contorno hairline, texto verde.
+   3º Terciario: solo texto con flecha. Radio 2 px, sin sombras ni degradados.
+   El dorado nunca es un relleno de botón: solo acento. */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 20px;border-radius:2px;font-family:'IBM Plex Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.15s;border:none;outline:none}
+.btn-primary{background:var(--navy);color:var(--white);border-bottom:1px solid var(--gold)}
 .btn-primary:hover{background:var(--navy-light)}
-.btn-gold{background:var(--gold);color:var(--navy)}
-.btn-gold:hover{background:var(--gold-light);color:var(--navy)}
-.btn-outline{background:transparent;border:1.5px solid var(--border-strong);color:var(--text-secondary)}
+.btn-gold{background:var(--navy);color:var(--white);border-bottom:1px solid var(--gold)}
+.btn-gold:hover{background:var(--navy-light);color:var(--white)}
+.btn-outline{background:transparent;border:1px solid var(--border-strong);color:var(--text-secondary)}
+.btn-tertiary{background:none;border:none;color:var(--navy);font-weight:600;padding:8px 4px;text-align:left;font-family:'IBM Plex Sans',sans-serif;font-size:14px;cursor:pointer}
+.btn-tertiary:hover{text-decoration:underline}
+.btn-file-hint{font-family:var(--font-mono);font-size:11px;color:var(--text-muted);margin-top:6px;text-align:center;word-break:break-all}
 .btn:focus-visible,.nav-item:focus-visible,.bnav-item:focus-visible,.more-menu-item:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 /* Clases utilitarias: el sistema de diseño vive en el CSS, no en estilos inline */
 .input-lg{width:100%;height:42px;border:1px solid var(--border-strong);border-radius:var(--radius);padding:0 10px;font-size:16px;background:white}
@@ -412,7 +463,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
     </button>
     <button class="bnav-item avanzado" onclick="showPage('amort')" id="bn-amort">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>
-      Amort.
+      Calendario
       <div class="bnav-dot"></div>
     </button>
     <button class="bnav-item avanzado" onclick="showPage('quote')" id="bn-quote">
@@ -436,17 +487,23 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 <!-- Menú "Más" (móvil): las páginas que no caben en la barra inferior -->
 <div id="moreMenu" class="more-menu" onclick="if(event.target===this) closeMoreMenu()">
   <div class="more-menu-sheet">
-    <div class="more-menu-title">Más opciones</div>
+    <div class="more-menu-title">Calcular</div>
     <button class="more-menu-item" onclick="showPage('inicio')">Inicio</button>
-    <button class="more-menu-item" onclick="showPage('locales')">Locales</button>
-    <button class="more-menu-item avanzado" onclick="showPage('ficha')">Ficha</button>
-    <button class="more-menu-item avanzado" onclick="showPage('sensitivity')">Sensibilidad</button>
     <div class="more-menu-sep"></div>
-    <div class="more-menu-title">Administración</div>
-    <button class="more-menu-item avanzado" onclick="showPage('inventory')">Actualizar Inventario</button>
-    <button class="more-menu-item" onclick="showPage('seguimiento')">Seguimiento</button>
+    <div class="more-menu-title">Enviar al cliente</div>
+    <button class="more-menu-item" onclick="showPage('locales')">Locales comerciales</button>
+    <button class="more-menu-item avanzado" onclick="showPage('ficha')">Ficha de depto</button>
     <button class="more-menu-item avanzado" onclick="showPage('comparativa')">Cotización comparativa</button>
+    <div class="more-menu-sep"></div>
+    <div class="more-menu-title">Comparar</div>
+    <button class="more-menu-item avanzado" onclick="showPage('sensitivity')">¿Y si cambian los supuestos?</button>
+    <div class="more-menu-sep"></div>
+    <div class="more-menu-title">Mi trabajo</div>
+    <button class="more-menu-item" onclick="showPage('seguimiento')">Seguimiento</button>
     <button class="more-menu-item" onclick="showPage('perfil')">Mi perfil</button>
+    <div class="more-menu-sep"></div>
+    <div class="more-menu-title">Coordinación</div>
+    <button class="more-menu-item avanzado" onclick="showPage('inventory')">Actualizar inventario</button>
     <button class="more-menu-item" onclick="closeMoreMenu(); updateApp()">Actualizar app</button>
     <div class="more-menu-sep"></div>
     <div class="more-menu-title">Vista</div>
@@ -463,69 +520,70 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
     <p>Calculadora de Inversión v2</p>
   </div>
   <nav class="sidebar-nav">
-    <div class="nav-section">Herramientas</div>
+    <div class="nav-section">Calcular</div>
     <button class="nav-item" onclick="showPage('inicio')">
       <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
       Inicio
     </button>
     <button class="nav-item active" onclick="showPage('unit')">
       <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
-      Datos de Unidad
+      Unidad
     </button>
     <button class="nav-item" onclick="showPage('plans')">
       <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg>
-      Planes de Financiamiento
+      Planes de pago
     </button>
     <button class="nav-item avanzado" onclick="showPage('roi')">
       <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-      Análisis de ROI
+      Rentabilidad (ROI)
     </button>
     <button class="nav-item avanzado" onclick="showPage('amort')">
       <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>
-      Tabla de Amortización
+      Calendario de pagos
     </button>
-    <div class="nav-section" style="margin-top:16px">Entregables</div>
+    <div class="nav-section" style="margin-top:16px">Enviar al cliente</div>
     <button class="nav-item avanzado" onclick="showPage('quote')" style="border-left:3px solid var(--gold);color:var(--gold-light)">
       <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M16 13H8M16 17H8M10 9H8"/></svg>
-      Generar Cotización
+      Cotización<span class="nav-sub">Precios y planes</span>
     </button>
     <button class="nav-item avanzado" onclick="showPage('ficha')">
       <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
-      Ficha de Depto
+      Ficha de depto<span class="nav-sub">Una hoja técnica</span>
     </button>
     <button class="nav-item" onclick="showPage('propuesta')" style="border-left:3px solid var(--gold);color:var(--gold-light)">
       <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-      Generador de Propuestas
+      Propuesta<span class="nav-sub">Documento completo con portada</span>
     </button>
     <button class="nav-item" onclick="showPage('locales')" style="border-left:3px solid var(--gold);color:var(--gold-light)">
       <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-      Locales Comerciales
+      Locales comerciales<span class="nav-sub">21 locales · Etapa 1</span>
     </button>
-    <div class="nav-section nav-section-avanzado" style="margin-top:16px">Comparativo</div>
+    <button class="nav-item avanzado" onclick="showPage('comparativa')">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="9" x2="9" y2="20"/></svg>
+      Cotización comparativa<span class="nav-sub">Hasta 4 unidades lado a lado</span>
+    </button>
+    <div class="nav-section nav-section-avanzado" style="margin-top:16px">Comparar</div>
     <button class="nav-item avanzado" onclick="showPage('compare')">
       <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l5.1 5.1"/></svg>
-      Tabla Comparativa
+      Planes lado a lado
     </button>
     <button class="nav-item avanzado" onclick="showPage('sensitivity')">
       <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg>
-      Sensibilidad
+      ¿Y si cambian los supuestos?
     </button>
-    <div class="nav-section" style="margin-top:16px">Administración</div>
-    <button class="nav-item avanzado" onclick="showPage('inventory')">
-      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 8V21H3V8M1 3H23V8H1V3Z"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
-      Actualizar Inventario
-    </button>
+    <div class="nav-section" style="margin-top:16px">Mi trabajo</div>
     <button class="nav-item" onclick="showPage('seguimiento')">
       <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
       Seguimiento
     </button>
-    <button class="nav-item avanzado" onclick="showPage('comparativa')">
-      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="9" x2="9" y2="20"/></svg>
-      Cotización comparativa
-    </button>
     <button class="nav-item" onclick="showPage('perfil')">
       <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       Mi perfil
+    </button>
+    <div class="nav-section" style="margin-top:16px">Coordinación</div>
+    <button class="nav-item avanzado" onclick="showPage('inventory')">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 8V21H3V8M1 3H23V8H1V3Z"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+      Actualizar inventario
     </button>
     <button class="nav-item" id="btnUpdateApp" onclick="updateApp()">
       <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12a9 9 0 11-2.64-6.36"/><polyline points="21 3 21 9 15 9"/></svg>
@@ -545,28 +603,34 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
   <div id="page-inicio" class="page">
     <div class="page-header">
       <img id="inicioMapImg" class="inicio-map" alt="" aria-hidden="true">
-      <div class="breadcrumb">TORAM · Parque Temático y Residencial</div>
-      <h2>¿Qué quieres hacer hoy?</h2>
-      <p>Elige una opción y la calculadora te lleva paso a paso. Nada se borra ni se complica: todo sigue aquí.</p>
+      <div class="breadcrumb">TORAM · Mesa del asesor</div>
+      <h2>¿Qué busca tu cliente?</h2>
+      <p>Elige lo que busca tu cliente y la calculadora te lleva paso a paso.</p>
     </div>
-    <div class="card" style="display:flex;flex-direction:column;gap:12px">
-      <button class="btn btn-primary" onclick="showPage('unit')" style="padding:18px;text-align:left;font-size:17px">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="vertical-align:-4px;margin-right:8px"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>Cotizar un departamento
-        <span style="display:block;font-size:13px;font-weight:400;opacity:0.85;margin-top:4px">Elige la unidad, el plan y genera la propuesta</span>
-      </button>
-      <button class="btn btn-primary" onclick="showPage('propuesta'); pSetMode('part')" style="padding:18px;text-align:left;font-size:17px">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="vertical-align:-4px;margin-right:8px"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>Cotizar una participación
-        <span style="display:block;font-size:13px;font-weight:400;opacity:0.85;margin-top:4px">Participaciones del parque temático</span>
-      </button>
-      <button class="btn btn-primary" onclick="showPage('locales')" style="padding:18px;text-align:left;font-size:17px">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="vertical-align:-4px;margin-right:8px"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>Cotizar un local
-        <span style="display:block;font-size:13px;font-weight:400;opacity:0.85;margin-top:4px">Locales comerciales, Etapa 1</span>
-      </button>
-      <button class="btn btn-outline" onclick="showPage('seguimiento')" style="padding:14px;text-align:left;font-size:15px">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="vertical-align:-4px;margin-right:8px"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Ver mis seguimientos
-        <span style="display:block;font-size:12px;font-weight:400;opacity:0.8;margin-top:2px">Los clientes a los que les mandé propuesta y su llamada a los 3 días</span>
-      </button>
-      <div style="font-size:13px;color:var(--green-soft);text-align:center">¿Eres asesor? Configura tu nombre y teléfono en <a href="javascript:void(0)" onclick="showPage('perfil')" style="color:var(--navy);font-weight:700">Mi perfil</a> para que tus propuestas salgan con tus datos.</div>
+    <div class="card">
+      <div class="inicio-rows">
+        <button class="inicio-row" onclick="showPage('unit')">
+          <span class="inicio-num">01</span>
+          <span class="inicio-txt"><strong>Un departamento</strong><span class="inicio-sub">Torre 1 entrega en 24 meses · Torre 2 en 42</span></span>
+          <span class="inicio-arrow">→</span>
+        </button>
+        <button class="inicio-row" onclick="showPage('propuesta'); pSetMode('part')">
+          <span class="inicio-num">02</span>
+          <span class="inicio-txt"><strong>Una participación</strong><span class="inicio-sub">Con contado o meses sin intereses</span></span>
+          <span class="inicio-arrow">→</span>
+        </button>
+        <button class="inicio-row" onclick="showPage('locales')">
+          <span class="inicio-num">03</span>
+          <span class="inicio-txt"><strong>Un local</strong><span class="inicio-sub">21 locales · Etapa 1</span></span>
+          <span class="inicio-arrow">→</span>
+        </button>
+      </div>
+      <div id="inicioRetomar"></div>
+      <div id="inicioLlamadas"></div>
+      <div style="margin-top:16px">
+        <button class="btn btn-outline btn-full" onclick="showPage('seguimiento')">Ver mis seguimientos</button>
+      </div>
+      <div id="inicioFirstUse"></div>
     </div>
   </div>
 
@@ -574,7 +638,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
   <div id="page-unit" class="page active">
     <div class="page-header">
       <div class="breadcrumb">Configuración</div>
-      <h2>Datos de la Unidad</h2>
+      <h2>Unidad</h2>
       <p>Busca la unidad por número de departamento — el precio y torre se cargan automáticamente.</p>
     </div>
 
@@ -635,7 +699,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
       <!-- Down payment input row (dynamic) -->
       <div style="margin-top:16px;background:var(--surface);border-radius:var(--radius);padding:16px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;align-items:end" id="dpRow">
         <div class="field">
-          <span class="label" id="dpLabel">Enganche <span class="label-hint">(%, pago único)</span></span>
+          <span class="label" id="dpLabel">Enganche <span class="gloss" tabindex="0">?<span class="gloss-tip">Lo que pagas al inicio. Entre más das, menos financias.</span></span> <span class="label-hint">(%, pago único)</span></span>
           <input type="number" id="dpValue" value="15" min="0" step="0.5" oninput="syncDpDisplay()">
         </div>
         <div class="field">
@@ -651,9 +715,9 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
       <div class="alert alert-info" style="margin-top:16px;margin-bottom:16px">
         <strong>Torres:</strong> Torre 1 ofrece planes hasta 5 años (60 meses). Torre 2 incluye también planes de 6 y 7 años con tasas diferenciadas. El enganche mínimo para planes con intereses es 15%.
       </div>
-      <button class="btn btn-gold btn-full" onclick="calculatePlans()">
+      <button class="btn btn-primary btn-full" onclick="calculatePlans()">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
-        Calcular Planes de Financiamiento
+        <span id="calcPlansBtnLabel">Ver planes de financiamiento →</span>
       </button>
     </div>
   </div>
@@ -662,7 +726,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
   <div id="page-plans" class="page">
     <div class="page-header">
       <div class="breadcrumb">Calculadora</div>
-      <h2>Planes de Financiamiento</h2>
+      <h2>Planes de pago</h2>
       <p id="plansSubtitle">Configura la unidad primero para ver los planes disponibles.</p>
     </div>
     <div class="card">
@@ -670,14 +734,14 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
         <div class="card-title" style="margin-bottom:0">Opciones disponibles</div>
         <button class="btn btn-outline btn-sm" onclick="exportPlansPDF()">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Descargar PDF
+          Guardar PDF
         </button>
       </div>
       <div class="scroll-x">
         <table class="plans-table" id="plansTable">
           <thead>
             <tr>
-              <th>Plan</th>
+              <th>Plan <span class="gloss" tabindex="0">?<span class="gloss-tip">MSI: meses sin intereses. El saldo se divide en pagos iguales sin recargo.</span></span></th>
               <th class="num">Enganche</th>
               <th class="num">% Eng.</th>
               <th class="num">A Financiar</th>
@@ -689,11 +753,12 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
             </tr>
           </thead>
           <tbody id="plansBody">
-            <tr><td colspan="9" style="padding:24px;text-align:center;color:var(--text-muted)">Configura la unidad y toca «Calcular Planes».</td></tr>
+            <tr><td colspan="9" style="padding:24px;text-align:center;color:var(--text-muted)">Configura la unidad y toca «Ver planes».</td></tr>
           </tbody>
         </table>
       </div>
-      <div class="o-apartado-note"><strong>Apartado (a cuenta del total): $50,000</strong> por departamento. No es un costo adicional: al firmar el contrato se abona al valor total. Los planes se calculan sobre el precio completo, sin sumar el apartado.</div>
+      <div class="ledger" style="margin-top:16px"><div class="ledger-row"><span class="ledger-label">Apartado (a cuenta del total) <span class="gloss" tabindex="0">?<span class="gloss-tip">$50,000 para reservar. Se abona al precio, no es un costo extra.</span></span></span><span class="ledger-amount">$50,000</span></div></div>
+      <div style="font-size:12px;color:var(--text-muted);margin-top:6px">Por departamento. Se abona al valor total, no es un costo adicional. Los planes se calculan sobre el precio completo.</div>
     </div>
   </div>
 
@@ -701,50 +766,63 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
   <div id="page-roi" class="page">
     <div class="page-header">
       <div class="breadcrumb">Análisis de Inversión</div>
-      <h2>Análisis de ROI</h2>
+      <h2>Rentabilidad (ROI)</h2>
       <p>Proyección de retorno sobre la inversión con dos escenarios de flujo de caja.</p>
     </div>
 
     <!-- ROI Inputs -->
     <div class="card" id="roiInputsCard">
       <div class="card-title">Supuestos de Inversión</div>
-      <div class="grid-3" style="gap:16px;margin-bottom:16px">
-        <div class="field">
-          <span class="label">Plan a analizar</span>
-          <select id="roiPlanSelect"><option value="0">— Calcula planes primero —</option></select>
-        </div>
-        <div class="field">
-          <span class="label">Años de tenencia</span>
-          <input type="number" id="roiYears" value="5" min="1" max="20">
-        </div>
-        <div class="field">
-          <span class="label">Apreciación anual <span class="label-hint">(%)</span></span>
-          <input type="number" id="appreciationRate" value="5" min="0" max="25" step="0.5">
-        </div>
-        <div class="field">
-          <span class="label">Ingresos mensuales <span class="label-hint">($)</span></span>
-          <input type="number" id="monthlyIncome" value="45000" step="500">
-        </div>
-        <div class="field">
-          <span class="label">Gastos mensuales <span class="label-hint">($)</span></span>
-          <input type="number" id="monthlyExpenses" value="3000" step="100">
-        </div>
-        <div class="field">
-          <span class="label">Impuestos anuales <span class="label-hint">($)</span></span>
-          <input type="number" id="annualTaxes" value="3500" step="100">
-        </div>
-        <div class="field">
-          <span class="label">Gastos escrituración <span class="label-hint">(%)</span></span>
-          <input type="number" id="escrituraCost" value="6" min="0" max="15" step="0.5">
-        </div>
-        <div class="field">
-          <span class="label">Mes inicio operación</span>
-          <input type="number" id="operationStartMonth" value="42" min="1">
+      <div class="field" style="margin-bottom:16px">
+        <span class="label">Plan a analizar</span>
+        <select id="roiPlanSelect"><option value="0">— Calcula planes primero —</option></select>
+      </div>
+      <div class="roi-group">
+        <div class="roi-group-title">Tu inversión</div>
+        <div class="grid-2" style="gap:16px">
+          <div class="field">
+            <span class="label">Años de tenencia <span class="label-hint">(años)</span></span>
+            <input type="number" id="roiYears" value="5" min="1" max="20">
+          </div>
+          <div class="field">
+            <span class="label">Apreciación anual <span class="label-hint">(% anual)</span></span>
+            <input type="number" id="appreciationRate" value="5" min="0" max="25" step="0.5">
+          </div>
         </div>
       </div>
-      <button class="btn btn-gold btn-full" onclick="calculateROI()">
+      <div class="roi-group">
+        <div class="roi-group-title">Lo que genera</div>
+        <div class="grid-2" style="gap:16px">
+          <div class="field">
+            <span class="label">Ingresos mensuales <span class="label-hint">(MXN / mes)</span></span>
+            <input type="number" id="monthlyIncome" value="45000" step="500">
+          </div>
+          <div class="field">
+            <span class="label">Mes inicio operación <span class="label-hint">(mes)</span></span>
+            <input type="number" id="operationStartMonth" value="42" min="1">
+          </div>
+        </div>
+      </div>
+      <div class="roi-group">
+        <div class="roi-group-title">Lo que cuesta</div>
+        <div class="grid-3" style="gap:16px">
+          <div class="field">
+            <span class="label">Gastos mensuales <span class="label-hint">(MXN / mes)</span></span>
+            <input type="number" id="monthlyExpenses" value="3000" step="100">
+          </div>
+          <div class="field">
+            <span class="label">Impuestos anuales <span class="label-hint">(MXN / año)</span></span>
+            <input type="number" id="annualTaxes" value="3500" step="100">
+          </div>
+          <div class="field">
+            <span class="label">Gastos escrituración <span class="gloss" tabindex="0">?<span class="gloss-tip">Gastos de notaría y trámite al cerrar.</span></span> <span class="label-hint">(% del valor futuro)</span></span>
+            <input type="number" id="escrituraCost" value="6" min="0" max="15" step="0.5">
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-primary btn-full" onclick="calculateROI()">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-        Calcular ROI
+        Ver rentabilidad →
       </button>
     </div>
 
@@ -760,13 +838,13 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
       <!-- Scenario toggle -->
       <div style="margin-top:20px">
         <div class="scenario-tabs">
-          <button class="scenario-tab active" onclick="showScenario(1,this)">Escenario 1 — Sin abono</button>
-          <button class="scenario-tab" id="sc2tab" onclick="showScenario(2,this)">Escenario 2 — Con abono de ingresos</button>
+          <button class="scenario-tab active" onclick="showScenario(1,this)">Escenario 1 · Tú pagas la mensualidad</button>
+          <button class="scenario-tab" id="sc2tab" onclick="showScenario(2,this)">Escenario 2 · La renta adelanta capital</button>
         </div>
 
         <!-- Scenario 1 -->
         <div id="sc1" class="card">
-          <div class="card-title">Escenario 1 — Flujo estándar (sin abono)</div>
+          <div class="card-title">Escenario 1 · Tú pagas la mensualidad</div>
           <div class="card-subtitle">El inversionista paga la mensualidad con su propio capital. Los ingresos por renta se contabilizan a partir del mes de inicio de operación.</div>
           
           <div class="section-title">Métricas de Ingresos por Operación</div>
@@ -787,13 +865,13 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
         <!-- Scenario 2 -->
         <div id="sc2" class="card" style="display:none;border-top:3px solid var(--gold)">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
-            <div class="card-title" style="margin-bottom:0">Escenario 2 — Amortización acelerada con ingresos</div>
+            <div class="card-title" style="margin-bottom:0">Escenario 2 · La renta adelanta capital</div>
             <span class="badge badge-gold" id="sc2badge">—</span>
           </div>
-          <div class="card-subtitle">Los ingresos netos mensuales se aplican como pago adicional al capital desde el mes de inicio de operación. Sistema de amortización francés.</div>
+          <div class="card-subtitle">Los ingresos netos mensuales se abonan al capital desde el mes de inicio de operación: el financiamiento se liquida antes y se pagan menos intereses.</div>
 
           <div id="sc2-notavail" class="alert alert-warning" style="margin-bottom:16px;display:none">
-            <strong>No aplicable:</strong> Este escenario requiere que el plazo de financiamiento sea mayor al período de entrega. El plan seleccionado no cumple esta condición.
+            Con este plan el pago termina antes de que entreguen el departamento, así que aún no habría renta para adelantar capital. <a href="javascript:void(0)" onclick="showPage('plans')" style="color:var(--navy);font-weight:700">Ver planes con más plazo →</a>
           </div>
 
           <div id="sc2-content">
@@ -801,12 +879,12 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
             <div class="grid-4" id="sc2-compare-metrics" style="margin-bottom:20px"></div>
 
             <hr class="divider">
-            <div class="section-title">Alivio de Flujo (Escenario A)</div>
+            <div class="section-title">Alivio de flujo</div>
             <div class="card-subtitle" style="margin-bottom:12px;font-size:12px;color:var(--text-muted)">Los ingresos cubren la mensualidad. Se mide el ahorro en desembolso de bolsillo.</div>
             <div class="grid-4" id="sc2-flowrelief-metrics" style="margin-bottom:20px"></div>
 
             <hr class="divider">
-            <div class="section-title">Amortización Acelerada (Escenario B)</div>
+            <div class="section-title">Amortización acelerada</div>
             <div class="card-subtitle" style="margin-bottom:12px;font-size:12px;color:var(--text-muted)">Los ingresos se aplican como abono extra al capital, reduciendo el saldo y los intereses generados.</div>
             <div class="grid-4" id="sc2-accel-metrics" style="margin-bottom:20px"></div>
 
@@ -819,7 +897,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
             <hr class="divider">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
               <div class="section-title" style="margin-bottom:0">Tabla de Amortización Acelerada (primeros 60 meses)</div>
-              <button class="btn btn-outline btn-sm" onclick="showPage('amort')">Ver completa →</button>
+              <button class="btn btn-tertiary" onclick="showPage('amort')">Ver completa →</button>
             </div>
             <div class="scroll-x scroll-y-400">
               <table class="amort-table" id="sc2-amort-preview">
@@ -837,8 +915,8 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
   <div id="page-amort" class="page">
     <div class="page-header">
       <div class="breadcrumb">Detalle</div>
-      <h2>Tabla de Amortización</h2>
-      <p>Tabla completa mes a mes del plan seleccionado.</p>
+      <h2>Calendario de pagos</h2>
+      <p>Amortización: tabla completa mes a mes del plan seleccionado.</p>
     </div>
     <div class="card">
       <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;flex-wrap:wrap">
@@ -849,15 +927,16 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
         <div style="display:flex;gap:10px;align-items:center;flex-shrink:0">
           <label class="toggle-wrap" onclick="toggleAmortScenario()">
             <div class="toggle-track" id="amortToggle"><div class="toggle-thumb"></div></div>
-            <span class="toggle-label">Mostrar con abono de ingresos</span>
+            <span class="toggle-label">La renta adelanta capital</span>
           </label>
         </div>
         <button class="btn btn-outline btn-sm" onclick="exportAmortPDF()">
+        
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          PDF
-        </button>
+        Guardar PDF
+      </button>
       </div>
-      <div id="oAmortExpl" class="o-amort-expl">Con el interruptor <strong>“Mostrar con abono de ingresos”</strong> activado, la renta neta mensual (renta − gastos) se abona al capital a partir del mes de inicio de operación: el financiamiento se liquida antes y se pagan menos intereses. Los indicadores muestran cuántos meses ahorras. También puedes ver el <strong>Escenario 2</strong> en el Análisis de ROI.</div>
+      <div id="oAmortExpl" class="o-amort-expl">Con <strong>“La renta adelanta capital”</strong> activado, la renta neta mensual (renta − gastos) se abona al capital a partir del mes de inicio de operación: el financiamiento se liquida antes y se pagan menos intereses. Los indicadores muestran cuántos meses ahorras. También puedes ver el <strong>Escenario 2 · La renta adelanta capital</strong> en Rentabilidad (ROI).</div>
       <div class="grid-4" id="amortKPIs" style="margin-bottom:16px"></div>
       <div class="scroll-x" style="max-height:600px;overflow-y:auto">
         <table class="amort-table" id="fullAmortTable">
@@ -872,16 +951,17 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
   <div id="page-compare" class="page">
     <div class="page-header">
       <div class="breadcrumb">Comparativo</div>
-      <h2>Tabla Comparativa de Planes</h2>
+      <h2>Planes lado a lado</h2>
       <p>Resumen ROI de todos los planes bajo los supuestos configurados.</p>
     </div>
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
         <div class="card-title" style="margin-bottom:0">Todos los planes — <span id="compareYears">5</span> años de tenencia</div>
         <button class="btn btn-outline btn-sm" onclick="exportComparePDF()">
+        
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          PDF
-        </button>
+        Guardar PDF
+      </button>
       </div>
       <div id="oCompareBest" style="display:none"></div>
       <div class="scroll-x">
@@ -912,7 +992,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
   <div id="page-sensitivity" class="page">
     <div class="page-header">
       <div class="breadcrumb">Análisis</div>
-      <h2>Análisis de Sensibilidad</h2>
+      <h2>¿Y si cambian los supuestos?</h2>
       <p>Impacto de variables clave sobre el ROI anualizado del plan seleccionado.</p>
     </div>
     <div class="card">
@@ -938,7 +1018,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
   <div id="page-quote" class="page">
     <div class="page-header">
       <div class="breadcrumb">Entregables</div>
-      <h2>Generar Cotización</h2>
+      <h2>Cotización</h2>
       <p>Agrega unidades del inventario, configura datos del cliente y genera el PDF de cotización profesional.</p>
     </div>
 
@@ -948,7 +1028,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
       <div class="grid-3" style="gap:16px">
         <div class="field">
           <span class="label">Nombre del cliente</span>
-          <input type="text" id="qClientName" placeholder="Dr. Juan Pérez">
+          <input type="text" id="qClientName" placeholder="Dr. Juan Pérez" oninput="refreshActionLabels()">
         </div>
         <div class="field">
           <span class="label">Asesor / Vendedor</span>
@@ -979,10 +1059,11 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
           <span class="label">Enganche %</span>
           <input type="number" id="qDownPct" value="15" min="1" max="100" step="0.5">
         </div>
-        <button class="btn btn-gold" onclick="addQuoteUnit()" style="height:42px;margin-bottom:1px">
+        <button class="btn btn-outline" onclick="addQuoteUnit()" style="height:42px;margin-bottom:1px">
+        
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Agregar
-        </button>
+        + Agregar otro departamento
+      </button>
       </div>
 
       <!-- Quote cart -->
@@ -993,7 +1074,8 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
       <div id="quoteEmpty" style="padding:20px;text-align:center;color:var(--text-muted);font-size:13px;background:var(--surface);border-radius:var(--radius)">
         Agrega al menos una unidad para generar la cotización.
       </div>
-      <div class="o-apartado-note"><strong>Apartado (a cuenta del total): $50,000</strong> por departamento. No es un costo adicional: al firmar el contrato se abona al valor total. Los planes se calculan sobre el precio completo, sin sumar el apartado.</div>
+      <div class="ledger" style="margin-top:16px"><div class="ledger-row"><span class="ledger-label">Apartado (a cuenta del total) <span class="gloss" tabindex="0">?<span class="gloss-tip">$50,000 para reservar. Se abona al precio, no es un costo extra.</span></span></span><span class="ledger-amount">$50,000</span></div></div>
+      <div style="font-size:12px;color:var(--text-muted);margin-top:6px">Por departamento. Se abona al valor total, no es un costo adicional. Los planes se calculan sobre el precio completo.</div>
     </div>
 
     <!-- ROI supuestos para cotización -->
@@ -1027,7 +1109,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
           <input type="number" id="qTaxes" value="3500" step="100">
         </div>
         <div class="field">
-          <span class="label">Escrituración %</span>
+          <span class="label">Escrituración % <span class="gloss" tabindex="0">?<span class="gloss-tip">Gastos de notaría y trámite al cerrar.</span></span></span>
           <input type="number" id="qEscritura" value="6" step="0.5">
         </div>
       </div>
@@ -1036,16 +1118,22 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
     <!-- Preview + Generate -->
     <div style="display:flex;gap:12px;margin-top:20px;flex-wrap:wrap">
       <button class="btn btn-primary btn-action" onclick="previewQuote()" >
+        
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-        Vista previa
+        Ver cómo queda
       </button>
-      <button class="btn btn-gold btn-action" onclick="exportQuotePDF()" >
+      <div class="pdf-action-wrap">
+      <button class="btn btn-outline" onclick="exportQuotePDF()" >
+        
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Descargar PDF Cotización
+        Guardar PDF
       </button>
+        <div class="btn-file-hint" id="fnQuote">Toram_Cotizacion_CLIENTE.pdf</div>
+      </div>
       <button class="btn btn-outline btn-action" onclick="exportQuotePDF(true)" >
+        
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/><line x1="15.4" y1="6.5" x2="8.6" y2="10.5"/></svg>
-        Compartir por WhatsApp
+        <span id="shareQuoteLabel">Enviar por WhatsApp</span>
       </button>
     </div>
 
@@ -1060,7 +1148,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
   <div id="page-ficha" class="page">
     <div class="page-header">
       <div class="breadcrumb">Entregables</div>
-      <h2>Ficha de Departamento</h2>
+      <h2>Ficha de depto</h2>
       <p>Hoja técnica individual: planta arquitectónica, especificaciones, planes y ROI de una unidad.</p>
     </div>
 
@@ -1077,19 +1165,22 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
           <span class="label">Enganche %</span>
           <input type="number" id="fichaDownPct" value="15" min="1" max="100" step="0.5">
         </div>
-        <button class="btn btn-gold" onclick="generateFicha()" style="height:42px;margin-bottom:1px">
+        <button class="btn btn-primary" onclick="generateFicha()" style="height:42px;margin-bottom:1px">
+        
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-          Generar Ficha
-        </button>
+        Ver cómo queda
+      </button>
         <button class="btn btn-outline" onclick="exportFichaPDF()" style="height:42px;margin-bottom:1px">
+        
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          PDF
-        </button>
+        Guardar PDF
+      </button>
       </div>
       <div id="fichaSelected" style="display:none;padding:10px 14px;background:var(--surface);border-radius:var(--radius);font-size:13px;color:var(--text-secondary)">
         Ninguna unidad seleccionada
       </div>
-      <div class="o-apartado-note"><strong>Apartado (a cuenta del total): $50,000</strong> por departamento. No es un costo adicional: al firmar el contrato se abona al valor total.</div>
+      <div class="ledger" style="margin-top:16px"><div class="ledger-row"><span class="ledger-label">Apartado (a cuenta del total) <span class="gloss" tabindex="0">?<span class="gloss-tip">$50,000 para reservar. Se abona al precio, no es un costo extra.</span></span></span><span class="ledger-amount">$50,000</span></div></div>
+      <div style="font-size:12px;color:var(--text-muted);margin-top:6px">Por departamento. Se abona al valor total, no es un costo adicional.</div>
     </div>
 
     <!-- Ficha preview -->
@@ -1135,7 +1226,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
       <div class="grid-3" style="gap:16px">
         <div class="field">
           <span class="label">Nombre del cliente</span>
-          <input type="text" id="pClientName" placeholder="Dr. Juan Pérez">
+          <input type="text" id="pClientName" placeholder="Dr. Juan Pérez" oninput="refreshActionLabels()">
         </div>
         <div class="field">
           <span class="label">Asesor / Vendedor</span>
@@ -1224,7 +1315,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
             <input type="number" id="pTaxes" value="3500" step="100">
           </div>
           <div class="field">
-            <span class="label">Escrituración %</span>
+            <span class="label">Escrituración % <span class="gloss" tabindex="0">?<span class="gloss-tip">Gastos de notaría y trámite al cerrar.</span></span></span>
             <input type="number" id="pEscritura" value="6" step="0.5">
           </div>
         </div>
@@ -1279,16 +1370,22 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
     <!-- Acciones -->
     <div style="display:flex;gap:12px;margin-top:20px;flex-wrap:wrap">
       <button class="btn btn-primary btn-action" onclick="previewPropuesta()" >
+        
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-        Generar propuesta
+        Ver cómo queda
       </button>
-      <button class="btn btn-gold btn-action" onclick="exportPropuestaPDF()" >
+      <div class="pdf-action-wrap">
+      <button class="btn btn-outline" onclick="exportPropuestaPDF()" >
+        
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Descargar PDF
+        Guardar PDF
       </button>
+        <div class="btn-file-hint" id="fnPropuesta">Toram_Propuesta_CLIENTE.pdf</div>
+      </div>
       <button class="btn btn-outline btn-action" onclick="sharePropuestaPDF()" >
+        
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/><line x1="15.4" y1="6.5" x2="8.6" y2="10.5"/></svg>
-        Compartir por WhatsApp
+        <span id="sharePropuestaLabel">Enviar por WhatsApp</span>
       </button>
     </div>
 
@@ -1357,7 +1454,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
       <div class="grid-3" style="gap:16px">
         <div class="field">
           <span class="label">Nombre del cliente</span>
-          <input type="text" id="lClientName" placeholder="Dr. Juan Pérez">
+          <input type="text" id="lClientName" placeholder="Dr. Juan Pérez" oninput="refreshActionLabels()">
         </div>
         <div class="field">
           <span class="label">Asesor / Vendedor</span>
@@ -1404,8 +1501,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
       <div class="card-title">Plano de la plaza — ETAPA 1</div>
       <img id="lPlanoImg" class="l-planoimg" alt="Plano de la plaza comercial TORAM, ETAPA 1">
       <p class="l-note" style="margin-top:10px">
-        Los locales marcados en amarillo en el plano son los apartados. La leyenda del plano dice
-        &ldquo;vendidos&rdquo;; la tabla de precios es la fuente de disponibilidad.
+        Los locales en amarillo son los apartados. La disponibilidad se confirma en la tabla de precios.
       </p>
     </div>
 
@@ -1419,16 +1515,22 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
     <!-- Acciones -->
     <div style="display:flex;gap:12px;margin-top:20px;flex-wrap:wrap">
       <button class="btn btn-primary btn-action" onclick="previewLocales()" >
+        
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-        Generar cotización
+        Ver cómo queda
       </button>
-      <button class="btn btn-gold btn-action" onclick="exportLocalesPDF()" >
+      <div class="pdf-action-wrap">
+      <button class="btn btn-outline" onclick="exportLocalesPDF()" >
+        
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Descargar PDF
+        Guardar PDF
       </button>
+        <div class="btn-file-hint" id="fnLocales">Toram_Cotizacion_Local_CLIENTE.pdf</div>
+      </div>
       <button class="btn btn-outline btn-action" onclick="exportLocalesPDF(true)" >
+        
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/><line x1="15.4" y1="6.5" x2="8.6" y2="10.5"/></svg>
-        Compartir por WhatsApp
+        <span id="shareLocalesLabel">Enviar por WhatsApp</span>
       </button>
     </div>
 
@@ -1442,7 +1544,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
   <div id="page-inventory" class="page">
     <div class="page-header">
       <div class="breadcrumb">Administración</div>
-      <h2>Actualizar Inventario</h2>
+      <h2>Actualizar inventario</h2>
       <p>Pega el texto del PDF/listado de disponibilidad y precios de Toram. La IA lo interpreta, te muestra qué cambió, y tú confirmas antes de aplicar nada.</p>
     </div>
 
@@ -1453,7 +1555,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
       </p>
       <textarea id="invRawText" rows="10" style="width:100%;font-family:monospace;font-size:16px;padding:10px;border:1px solid var(--border-strong);border-radius:var(--radius);resize:vertical" placeholder="Pega aquí el texto completo del PDF de disponibilidad..."></textarea>
       <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;align-items:center">
-        <button class="btn btn-gold" onclick="parseInventoryUpdate()" id="invParseBtn">
+        <button class="btn btn-primary" onclick="parseInventoryUpdate()" id="invParseBtn">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4m0 12v4m10-10h-4M6 12H2m15.5-6.5l-2.8 2.8M9.3 14.7l-2.8 2.8m0-11l2.8 2.8m8.4 8.4l-2.8-2.8"/></svg>
           Analizar con IA
         </button>
@@ -1466,7 +1568,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
       <div id="invDiffSummary" style="font-size:13px;color:var(--text-secondary);margin-bottom:14px"></div>
       <div id="invDiffTable" style="max-height:420px;overflow-y:auto"></div>
       <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap">
-        <button class="btn btn-gold" onclick="applyInventoryUpdate()">
+        <button class="btn btn-primary" onclick="applyInventoryUpdate()">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
           Aplicar cambios y descargar HTML actualizado
         </button>
@@ -1477,7 +1579,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
     <div id="invDoneCard" class="card" style="display:none;margin-top:20px;border-color:#1a7a4a">
       <div class="card-title" style="color:#1a7a4a">✓ Cambios aplicados</div>
       <p style="font-size:13px;color:var(--text-secondary)">
-        Se descargó un nuevo archivo HTML con el inventario actualizado. <strong>Usa ese archivo a partir de ahora</strong> — esta pestaña del navegador sigue con los datos viejos en memoria.
+        Datos actualizados. Abre el archivo nuevo para verlos.
       </p>
     </div>
   </div>
@@ -1501,7 +1603,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
         <input type="checkbox" id="pfShowQR" checked onchange="savePerfil()" style="width:18px;height:18px;accent-color:var(--green-dark)">
         Incluir el QR al mapa interactivo en los PDFs
       </label>
-      <button class="btn btn-primary" onclick="savePerfil()" style="padding:12px 24px">Guardar mi perfil</button>
+      <button class="btn btn-primary" onclick="savePerfil()" style="padding:12px 24px">Guardar mis datos</button>
       <div style="font-size:12px;color:var(--green-soft);margin-top:12px">Cada quien guarda el suyo en su propio teléfono. Para instalar la app en otro teléfono (Android o iPhone), abre https://cristobalderrama.github.io/toram_roi/ en el navegador y agrégala a la pantalla de inicio.</div>
     </div>
   </div>
@@ -1530,7 +1632,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
       <div style="display:flex;gap:12px;flex-wrap:wrap">
         <div class="field" style="flex:1;min-width:200px">
           <span class="label">Nombre del cliente</span>
-          <input type="text" id="cClientName" placeholder="Nombre del cliente" style="width:100%;height:42px;border:1px solid var(--border-strong);border-radius:var(--radius);padding:0 10px;font-size:16px">
+          <input type="text" id="cClientName" placeholder="Nombre del cliente" oninput="refreshActionLabels()" style="width:100%;height:42px;border:1px solid var(--border-strong);border-radius:var(--radius);padding:0 10px;font-size:16px">
         </div>
         <div class="field" style="flex:1;min-width:200px">
           <span class="label">Asesor</span>
@@ -1562,7 +1664,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
           <span class="label">Renta mensual estimada ($)</span>
           <input type="number" id="cRentInput" value="45000" step="1000" min="0" style="width:100%;height:42px;border:1px solid var(--border-strong);border-radius:var(--radius);padding:0 10px;font-size:16px">
         </div>
-        <button class="btn btn-gold" onclick="cAddUnit()" style="padding:12px 18px">+ Agregar unidad</button>
+        <button class="btn btn-outline" onclick="cAddUnit()" style="padding:12px 18px">+ Agregar otro departamento</button>
       </div>
       <div id="cUnitsList" style="display:flex;gap:8px;flex-wrap:wrap"></div>
       <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-top:16px">
@@ -1583,16 +1685,22 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
     <!-- Acciones -->
     <div style="display:flex;gap:12px;margin-top:20px;flex-wrap:wrap">
       <button class="btn btn-primary btn-action" onclick="previewComparativa()" >
+        
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-        Generar vista previa
+        Ver cómo queda
       </button>
-      <button class="btn btn-gold btn-action" onclick="exportComparativaPDF()" >
+      <div class="pdf-action-wrap">
+      <button class="btn btn-outline" onclick="exportComparativaPDF()" >
+        
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Descargar PDF
+        Guardar PDF
       </button>
+        <div class="btn-file-hint" id="fnComparativa">Toram_Cotizacion_Comparativa_CLIENTE.pdf</div>
+      </div>
       <button class="btn btn-outline btn-action" onclick="shareComparativaPDF()" >
+        
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/><line x1="15.4" y1="6.5" x2="8.6" y2="10.5"/></svg>
-        Compartir por WhatsApp
+        <span id="shareComparativaLabel">Enviar por WhatsApp</span>
       </button>
     </div>
 
@@ -2214,6 +2322,7 @@ function applyModo(){
     var avanzadas = ['roi','amort','quote','ficha','compare','sensitivity','inventory','comparativa'];
     if (avanzadas.indexOf(pid) >= 0) showPage('inicio');
   }
+  renderInicio();
 }
 function updateModoLabels(){
   var m = getModo();
@@ -2241,7 +2350,7 @@ function showPage(id) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.querySelectorAll('.bnav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('page-' + id).classList.add('active');
-  const labels = {inicio:0,unit:1,plans:2,roi:3,amort:4,quote:5,ficha:6,propuesta:7,locales:8,compare:9,sensitivity:10,inventory:11,seguimiento:12,comparativa:13,perfil:14};
+  const labels = {inicio:0,unit:1,plans:2,roi:3,amort:4,quote:5,ficha:6,propuesta:7,locales:8,comparativa:9,compare:10,sensitivity:11,seguimiento:12,perfil:13,inventory:14};
   const items = document.querySelectorAll('.nav-item');
   if (labels[id] !== undefined) items[labels[id]].classList.add('active');
   const bnMap = {unit:'bn-unit',plans:'bn-plans',roi:'bn-roi',compare:'bn-compare',amort:'bn-amort',sensitivity:'bn-amort',quote:'bn-quote',ficha:'bn-quote',propuesta:'bn-propuesta',locales:'bn-propuesta'};
@@ -2264,7 +2373,95 @@ function showPage(id) {
     if (!isNaN(pIdx) && plans[pIdx]) populateSensitivity(pIdx);
   }
 
+  if (id === 'inicio') renderInicio();
+  refreshActionLabels();
+
   window.scrollTo(0,0);
+}
+
+// ── Ola 1 · 2.3: nombre de archivo visible + botón de WhatsApp con cliente ──
+function _clientFileTag(inputId){
+  var v = '';
+  try { v = (document.getElementById(inputId).value || '').trim(); } catch(e){}
+  return (v || 'Cliente').replace(/[^a-z0-9]/gi,'_').toUpperCase();
+}
+function refreshActionLabels(){
+  // El nombre de archivo que se guardará (el mismo que usa cada export).
+  var files = [
+    ['fnQuote', 'Toram_Cotizacion_' + _clientFileTag('qClientName') + '.pdf'],
+    ['fnPropuesta', 'Toram_Propuesta_' + _clientFileTag('pClientName') + '.pdf'],
+    ['fnLocales', 'Toram_Cotizacion_Local_' + _clientFileTag('lClientName') + '.pdf'],
+    ['fnComparativa', 'Toram_Cotizacion_Comparativa_' + _clientFileTag('cClientName') + '.pdf']
+  ];
+  files.forEach(function(pair){
+    var el = document.getElementById(pair[0]);
+    if (el) el.textContent = pair[1];
+  });
+  // El botón de WhatsApp lleva el nombre del cliente cuando hay uno.
+  var shares = [
+    ['shareQuoteLabel', 'qClientName'],
+    ['sharePropuestaLabel', 'pClientName'],
+    ['shareLocalesLabel', 'lClientName'],
+    ['shareComparativaLabel', 'cClientName']
+  ];
+  shares.forEach(function(pair){
+    var el = document.getElementById(pair[0]);
+    if (!el) return;
+    var name = '';
+    try { name = (document.getElementById(pair[1]).value || '').trim(); } catch(e){}
+    el.textContent = name ? ('Enviar por WhatsApp a ' + name) : 'Enviar por WhatsApp';
+  });
+}
+
+// ── Ola 1 · 3.3: Inicio por el cliente ────────────────────────────────────
+// Los bloques Retomar / Llamadas de hoy solo aparecen si hay algo que mostrar.
+function _relDia(iso){
+  try {
+    var hoy = todayISO();
+    if (iso === hoy) return 'hoy';
+    var d = new Date(hoy + 'T12:00:00');
+    d.setDate(d.getDate() - 1);
+    var ay = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+    if (iso === ay) return 'ayer';
+  } catch(e){}
+  return fmtFechaCorta(iso);
+}
+function renderInicio(){
+  var ret = document.getElementById('inicioRetomar');
+  var llam = document.getElementById('inicioLlamadas');
+  var fu = document.getElementById('inicioFirstUse');
+  if (!ret || !llam || !fu) return;
+  var list = [];
+  try { list = loadFollowUps(); } catch(e){ list = []; }
+  var pend = list.filter(function(f){ return f.status === 'pendiente'; });
+  var hoy = todayISO();
+  var typeLabel = {depto:'Departamento', part:'Participaciones', locales:'Local', comparativa:'Comparativa', cotizacion:'Cotización'};
+  // Retomar: la cotización/propuesta guardada más reciente.
+  if (pend.length){
+    var f = pend[0];
+    ret.innerHTML = '<div class="inicio-block"><div class="inicio-block-title">Retomar</div>'
+      + '<button class="inicio-card" onclick="showPage(\'seguimiento\')"><strong>' + (typeLabel[f.type] || 'Propuesta') + ' de ' + escHtml(f.client) + '</strong>'
+      + '<p>' + escHtml(f.unit || '') + ' · ' + _relDia(f.date) + ' →</p></button></div>';
+  } else { ret.innerHTML = ''; }
+  // Llamadas de hoy: vencidas + para hoy.
+  var paraHoy = pend.filter(function(f){ return f.due && f.due <= hoy; });
+  if (paraHoy.length){
+    var venc = paraHoy.filter(function(f){ return f.due < hoy; }).length;
+    var hoyN = paraHoy.length - venc;
+    var det = [];
+    if (venc) det.push(venc + (venc === 1 ? ' vencida' : ' vencidas'));
+    if (hoyN) det.push(hoyN + (hoyN === 1 ? ' para hoy' : ' para hoy'));
+    llam.innerHTML = '<div class="inicio-block"><div class="inicio-block-title">Llamadas de hoy</div>'
+      + '<button class="inicio-card" onclick="showPage(\'seguimiento\')"><strong>' + paraHoy.length + (paraHoy.length === 1 ? ' cliente para llamar' : ' clientes para llamar') + '</strong>'
+      + '<p>' + det.join(' · ') + ' →</p></button></div>';
+  } else { llam.innerHTML = ''; }
+  // Tarjeta de primer uso: solo en modo sencillo y sin perfil guardado.
+  // En modo completo (la forma de trabajar de Cristo) nunca se muestra.
+  var saved = false;
+  try { saved = !!localStorage.getItem('toram_perfil_v1'); } catch(e){}
+  if (!saved && getModo() === 'sencillo'){
+    fu.innerHTML = '<div class="inicio-firstuse"><strong>¿Eres asesor?</strong><p>Configura tu nombre y teléfono en <a href="javascript:void(0)" onclick="showPage(\'perfil\')">Mi perfil</a> para que tus propuestas salgan con tus datos.</p></div>';
+  } else { fu.innerHTML = ''; }
 }
 
 // ── Formatting ─────────────────────────────────────────────────────────────
@@ -2307,7 +2504,7 @@ function setDpMode(mode) {
   if (mode === 'pct') {
     pctBtn.style.background = 'var(--navy)'; pctBtn.style.color = 'white';
     mxnBtn.style.background = 'var(--white)'; mxnBtn.style.color = 'var(--text-muted)';
-    document.getElementById('dpLabel').innerHTML = 'Enganche <span class="label-hint">(%, pago único)</span>';
+    document.getElementById('dpLabel').innerHTML = 'Enganche <span class=\"gloss\" tabindex=\"0\">?<span class=\"gloss-tip\">Lo que pagas al inicio. Entre más das, menos financias.</span></span> <span class="label-hint">(%, pago único)</span>';
     document.getElementById('dpEquivLabel').textContent = 'Equivale en $';
     const cur = parseFloat(document.getElementById('dpValue').value) || 15;
     document.getElementById('dpValue').value = cur <= 100 ? cur : 15;
@@ -2315,7 +2512,7 @@ function setDpMode(mode) {
   } else {
     mxnBtn.style.background = 'var(--navy)'; mxnBtn.style.color = 'white';
     pctBtn.style.background = 'var(--white)'; pctBtn.style.color = 'var(--text-muted)';
-    document.getElementById('dpLabel').innerHTML = 'Enganche <span class="label-hint">($ MXN, pago único)</span>';
+    document.getElementById('dpLabel').innerHTML = 'Enganche <span class=\"gloss\" tabindex=\"0\">?<span class=\"gloss-tip\">Lo que pagas al inicio. Entre más das, menos financias.</span></span> <span class="label-hint">($ MXN, pago único)</span>';
     document.getElementById('dpEquivLabel').textContent = 'Equivale en %';
     const cur = parseFloat(document.getElementById('dpValue').value) || 15;
     document.getElementById('dpValue').value = price ? Math.round(price * cur / 100) : '';
@@ -2573,10 +2770,10 @@ function calculateROI() {
     {label:'Gastos escrituración',   val:fmtK(escrituraCostAmt), cls:'amber', sub:'Al cierre de venta'},
   ]);
   metricGrid('sc1-total-metrics', [
-    {label:'Plusvalía ganada',   val:fmtK(appreciationGain), cls:'green', sub:roiYears+' años × '+fmtPct(apprRate*100)+' anual'},
+    {label:'Plusvalía ganada <span class="gloss" tabindex="0">?<span class="gloss-tip">Cuánto sube de valor el departamento con el tiempo.</span></span>',   val:fmtK(appreciationGain), cls:'green', sub:roiYears+' años × '+fmtPct(apprRate*100)+' anual'},
     {label:'ROI total absoluto', val:fmtK(appreciationGain+totalNetIncome), cls:'green', sub:'Plusvalía + ingresos'},
     {label:'Tasa retorno total', val:fmtPct(roiTotalPct1), cls:'green', sub:'Total / inversión'},
-    {label:'ROI anualizado',     val:fmtPct(roiAnnual1,2), cls:roiAnnual1>=0?'purple':'red', sub:'Tasa anual promedio', accent:true},
+    {label:'ROI anualizado <span class="gloss" tabindex="0">?<span class="gloss-tip">Cuánto gana la inversión por año, comparado con lo que pusiste.</span></span>',     val:fmtPct(roiAnnual1,2), cls:roiAnnual1>=0?'purple':'red', sub:'Tasa anual promedio', accent:true},
   ]);
   metricGrid('sc1-breakdown', [
     {label:'Enganche',           val:fmtMXN(p.downPayment), cls:'blue'},
@@ -2591,18 +2788,18 @@ function calculateROI() {
     '<div class="metric-value">' + fmtK(netGain1) + '</div>' +
     '<div class="metric-sub">Ingresos + Plusvalía − Intereses − Escrituración</div></div>' +
     '<div class="metric ' + (roiAnnual1>=0?'green':'red') + '">' +
-    '<div class="metric-label">ROI Anualizado</div>' +
+    '<div class="metric-label">ROI Anualizado <span class="gloss" tabindex="0">?<span class="gloss-tip">Cuánto gana la inversión por año, comparado con lo que pusiste.</span></span></div>' +
     '<div class="metric-value">' + fmtPct(roiAnnual1,2) + '</div>' +
     '<div class="metric-sub">Sobre inversión total de ' + fmtK(totalInvestment) + '</div></div>';
 
   // Scenario 2
   const sc2tab = document.getElementById('sc2tab');
   if (!sc2 || !sc2.applicable) {
-    sc2tab.textContent = 'Escenario 2 — No aplica';
+    sc2tab.textContent = 'Escenario 2 · No aplica';
     document.getElementById('sc2-notavail').style.display = 'block';
     document.getElementById('sc2-content').style.display  = 'none';
   } else {
-    sc2tab.textContent = 'Escenario 2 — Con abono de ingresos';
+    sc2tab.textContent = 'Escenario 2 · La renta adelanta capital';
     document.getElementById('sc2-notavail').style.display = 'none';
     document.getElementById('sc2-content').style.display  = 'block';
 
@@ -2620,7 +2817,7 @@ function calculateROI() {
       {label:'Inversión ajustada', val:fmtK(sc2.adjustedInvestment), cls:'blue', sub:'vs '+fmtK(totalInvestment)+' Esc.1'},
       {label:'Intereses pagados',  val:fmtK(sc2.accelInterests), cls:'amber', sub:'Ahorro: '+fmtK(sc2.interestSaved)},
       {label:'Ganancia neta',      val:fmtK(sc2.netGainAccel), cls:sc2.netGainAccel>=0?'green':'red'},
-      {label:'ROI anualizado',     val:fmtPct(sc2.roiAnnualAccel,2), cls:sc2.roiAnnualAccel>=0?'purple':'red',
+      {label:'ROI anualizado <span class="gloss" tabindex="0">?<span class="gloss-tip">Cuánto gana la inversión por año, comparado con lo que pusiste.</span></span>',     val:fmtPct(sc2.roiAnnualAccel,2), cls:sc2.roiAnnualAccel>=0?'purple':'red',
        sub:(roiDiff>=0?'+':'')+fmtPct(roiDiff,2)+' vs Esc.1', accent:true},
     ]);
 
@@ -2741,7 +2938,7 @@ function renderAmortTable() {
     {label:'Intereses totales',  val:fmtMXN(totalInterests), cls:totalInterests>0?'red':'green'},
     {label:'Total abonado extra',val:fmtMXN(totalExtra),     cls:totalExtra>0?'green':'amber'},
     {label:'Total pagado',       val:fmtMXN(p.downPayment+totalPaid), cls:'blue'},
-    {label:payoffRow?'Liquida mes':'Plazo completo', val:payoffRow?payoffRow.month:p.months, cls:payoffRow?'green':'amber', sub:monthsSaved>0?('Ahorra '+monthsSaved+' meses vs. plazo'):(amortShowScenario2?'Sin ahorro de plazo':'Activa el abono de ingresos para ahorrar meses')},
+    {label:payoffRow?'Liquida mes':'Plazo completo', val:payoffRow?payoffRow.month:p.months, cls:payoffRow?'green':'amber', sub:monthsSaved>0?('Ahorra '+monthsSaved+' meses vs. plazo'):(amortShowScenario2?'Sin ahorro de plazo':'Activa “La renta adelanta capital” para ahorrar meses')},
   ]);
 
   const tbody = document.getElementById('fullAmortBody');
@@ -2752,7 +2949,7 @@ function renderAmortTable() {
     else if (r.incomeMonth && amortShowScenario2) tr.className = 'income-applied';
     const estado = r.balanceEnd<=0.01
       ? '<span class="badge badge-green">Liquidado</span>'
-      : (r.incomeMonth && amortShowScenario2 ? '<span class="badge badge-blue">Con abono</span>' : '');
+      : (r.incomeMonth && amortShowScenario2 ? '<span class="badge badge-blue">Con renta adelantada</span>' : '');
     tr.innerHTML = '<td>'+r.month+'</td><td>'+fmtMXN(r.balanceStart)+'</td><td>'+fmtMXN(r.interest)+
       '</td><td>'+fmtMXN(r.capital)+'</td><td>'+(r.extra>0?fmtMXN(r.extra):'—')+'</td><td>'+
       fmtMXN(r.totalPaid)+'</td><td>'+fmtMXN(r.balanceEnd)+'</td><td>'+estado+'</td>';
@@ -3188,6 +3385,8 @@ function selectUnit(torre, num) {
   document.getElementById('listPrice').value = d.precio;
   document.getElementById('tower').value     = torre === 'T1' ? '1' : '2';
   syncDpDisplay();
+  var calcBtn = document.getElementById('calcPlansBtnLabel');
+  if (calcBtn) calcBtn.textContent = 'Ver planes para ' + torre + '-' + num + ' →';
 }
 
 function showUnitChip(d) {
@@ -5524,6 +5723,7 @@ function savePerfil(){
   applyPerfilToInputs();
   applyModo();
   renderSeguimiento();
+  renderInicio();
   alert('Perfil guardado. Desde ahora tus propuestas, cotizaciones y comparativas salen con tu nombre y tu teléfono.');
 }
 function applyPerfilToInputs(){
@@ -6044,7 +6244,7 @@ function cBestIdx(rows){
   return best;
 }
 function cUnitsListHtml(){
-  if (!cUnits.length) return '<span style="font-size:13px;color:var(--green-soft)">Aún no hay unidades. Elige un modelo y una unidad, pon su renta mensual estimada y toca "+ Agregar unidad".</span>';
+  if (!cUnits.length) return '<span style="font-size:13px;color:var(--green-soft)">Aún no hay unidades. Elige un modelo y una unidad, pon su renta mensual estimada y toca "+ Agregar otro departamento".</span>';
   var h = '';
   cUnits.forEach(function(item, i){
     var u = item.inv;
@@ -7153,7 +7353,7 @@ function buildLocalesHTML() {
   '<div style="padding:20px 32px;border-top:1px solid #deeadc">' +
   '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-dark);margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Capítulo 03 · Plano de la plaza — ETAPA 1</div>' +
   '<img src="'+PLAZA_PLANO_IMG+'" style="width:100%;display:block;border-radius:4px;border:1px solid #deeadc" alt="Plano de la plaza comercial TORAM, ETAPA 1">' +
-  '<div style="font-size:11px;color:var(--green-soft);margin-top:8px">Los locales marcados en amarillo en el plano son los apartados. La leyenda del plano dice &ldquo;vendidos&rdquo;; la tabla de precios es la fuente de disponibilidad.</div>' +
+  '<div style="font-size:11px;color:var(--green-soft);margin-top:8px">Los locales en amarillo son los apartados. La disponibilidad se confirma en la tabla de precios.</div>' +
   '</div>' +
   '<div style="padding:20px 32px;border-top:1px solid #deeadc">' +
   '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-dark);margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Capítulo 04 · La plaza</div>' +
