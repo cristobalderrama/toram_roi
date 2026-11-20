@@ -1216,7 +1216,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
       <div class="p-hero-text">
         <div class="p-hero-kicker">Entregables · TORAM Residencial</div>
         <h2>Propuesta personalizada</h2>
-        <p>Departamento (con plano y planes) o participaciones (con proyección 2027–2030). Descarga el PDF con el nombre del cliente.</p>
+        <p>Departamento (con plano y planes) o participaciones (con proyección 2028–2031). Descarga el PDF con el nombre del cliente.</p>
       </div>
     </div>
 
@@ -4172,15 +4172,36 @@ const PARTI = {
   adminPerUnit: 30000,
   downPct: 30,
   msiOptions: [20, 24],
-  // Proyección oficial por participación (folleto; proyecciones, no garantía)
+  // Proyección oficial por participación (folleto; proyecciones, no garantía).
+  // Años 2028–2031 (no 2027–2030): el parque abre en oct 2027 y los cobros son
+  // trimestrales vencidos; el 1er trimestre (oct 2027–ene 2028) se recibe en feb
+  // 2028. Los montos del folleto no cambian, solo el año al que se atribuyen.
   roi: [
-    {year:2027, annual:170820, monthly:14235, pct:14.85},
-    {year:2028, annual:225482.40, monthly:18790.20, pct:19.61},
-    {year:2029, annual:297636.77, monthly:24803.06, pct:25.88},
-    {year:2030, annual:392810.55, monthly:32734.21, pct:34.16}
+    {year:2028, annual:170820, monthly:14235, pct:14.85},
+    {year:2029, annual:225482.40, monthly:18790.20, pct:19.61},
+    {year:2030, annual:297636.77, monthly:24803.06, pct:25.88},
+    {year:2031, annual:392810.55, monthly:32734.21, pct:34.16}
   ]
 };
 
+
+// ── Desglose del retorno de inversión (folleto oficial TORAM) ───────────────
+// Tabla "RETORNO DE INVERSIÓN" del folleto: de dónde sale el rendimiento.
+// Columnas 2028–2031 = columnas 2027–2030 del folleto (mismo corrimiento que
+// PARTI.roi: el parque abre en oct 2027; el 1er año de cobro es 2028).
+// El crecimiento entre columnas: +20% de visitantes por año y costo de entrada
+// subiendo con la inflación anual más 3% (nota del folleto).
+const RETORNO = {
+  years: [2028, 2029, 2030, 2031],
+  rows: [
+    {label:'Ingreso de personas por día', values:[1600, 1920, 2304, 2765], fmt:'num'},
+    {label:'Costo de entrada al parque / por persona', values:[1500, 1650, 1815, 1996], fmt:'mxn'},
+    {label:'Ingreso por día', values:[2400000, 3168000, 4181760, 5518940], fmt:'mxn'},
+    {label:'Ingreso anual / entradas', values:[876000000, 1156320000, 1526342400, 2014413100], fmt:'mxn'},
+    {label:'Ingresos adicionales: renta de locales, souvenirs, etc.', values:[262800000, 346896000, 457902720, 604323930], fmt:'mxn'},
+    {label:'Total de ingresos anuales', values:[1138800000, 1503216000, 1984245120, 2618737030], fmt:'mxn', total:true}
+  ]
+};
 
 // ── FASE 3 · Plaza comercial / Locales (ETAPA 1) ───────────────────────────
 // Datos de la tabla de precios de locales (ETAPA 1): 21 locales, $62,349.00/m2.
@@ -5916,6 +5937,16 @@ function buildPropuestaPartHTML() {
       '<td style="padding:8px 12px;text-align:right;border-bottom:1px solid #eef3ee">'+fmtMXN(r.monthly*c.qty)+'</td>' +
       '<td style="padding:8px 12px;text-align:right;font-weight:700;color:#1a6640;border-bottom:1px solid #eef3ee">'+fmtPct(r.pct,2)+'</td></tr>';
   }).join('');
+  var retHead = RETORNO.years.map(function(y){
+    return '<th style="padding:7px 8px;text-align:right;color:rgba(255,255,255,0.85);font-size:10px;font-weight:600">' + y + '</th>';
+  }).join('');
+  var retRows = RETORNO.rows.map(function(row){
+    var cells = row.values.map(function(v){
+      return '<td style="padding:8px 8px;text-align:right;border-bottom:1px solid #eef3ee;white-space:nowrap' + (row.total ? ';font-weight:700;color:#1a6640' : '') + '">' + (row.fmt === 'num' ? fmt(v) : fmtMXN(v, 0)) + '</td>';
+    }).join('');
+    return '<tr style="background:#fff">' +
+      '<td style="padding:8px 12px;font-weight:700;color:var(--green-text);border-bottom:1px solid #eef3ee">' + row.label + '</td>' + cells + '</tr>';
+  }).join('');
   var payRows = '';
   if (c.pay === 'fin') {
     payRows =
@@ -5928,7 +5959,7 @@ function buildPropuestaPartHTML() {
   }
   var noteHtml = cd.note ? '<div style="font-size:12px;color:var(--green-soft);margin-top:4px">'+cd.note+'</div>' : '';
   var partTotal = PARTI.roi.reduce(function(a,r){return a + r.annual * c.qty;}, 0);
-  var partTake = 'En 4 años (2027–2030), tus ' + c.qty + (c.qty === 1 ? ' participación' : ' participaciones') + ' te dejarían ' + fmtMXN(partTotal, 0) + ' en total.';
+  var partTake = 'En 4 años (2028–2031), tus ' + c.qty + (c.qty === 1 ? ' participación' : ' participaciones') + ' te dejarían ' + fmtMXN(partTotal, 0) + ' en total.';
   var partChartHtml = roiChartHtml('¿Cuánto ganas cada año?', PARTI.roi.map(function(r){return String(r.year);}), PARTI.roi.map(function(r){return r.annual * c.qty;}), null, '', '', partTake);
   var atrHtml = '';
   if (typeof PART_ATRACCIONES !== 'undefined' && PART_ATRACCIONES.length) {
@@ -5976,6 +6007,14 @@ function buildPropuestaPartHTML() {
   '</tr></thead><tbody>'+roiRows+'</tbody></table>' +
   partChartHtml +
   '<div style="font-size:10px;color:#7a9a82;margin-top:8px">Proyecciones basadas en el desempeño esperado del parque; no constituyen garantía. Cada participación equivale al 0.05% del ingreso neto del parque, con pagos trimestrales.</div>' +
+  '<div style="font-size:10px;color:#7a9a82;margin-top:4px"><b>Los cobros para el socio son trimestrales.</b> Ejemplo: el primer trimestre (octubre 2027–enero 2028) se recibe en febrero de 2028; el segundo trimestre (febrero–abril 2028) se recibe en junio de 2028, y así sucesivamente cada trimestre.</div>' +
+  '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-dark);margin:18px 0 12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Retorno de inversión — de dónde sale el rendimiento</div>' +
+  '<div style="overflow-x:auto">' +
+  '<table style="width:100%;min-width:560px;border-collapse:collapse;font-size:11px">' +
+  '<thead><tr style="background:#2d5a38">' +
+  '<th style="padding:7px 12px;text-align:left;color:rgba(255,255,255,0.85);font-size:10px;font-weight:600">Concepto</th>' + retHead +
+  '</tr></thead><tbody>' + retRows + '</tbody></table></div>' +
+  '<div style="font-size:10px;color:#7a9a82;margin-top:8px">El rendimiento crece cada año porque la proyección considera 20% más de personas entrando al parque por año y el costo de entrada subiendo con la inflación anual más 3%.</div>' +
   '</div>' +
   '<div style="padding:20px 32px;border-top:1px solid #deeadc">' +
   '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-dark);margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Capítulo 02 · Conoce el parque</div>' +
@@ -6934,7 +6973,7 @@ function exportPropuestaPartPDF(share) {
   doc.text('El apartado no es un costo adicional: al firmar el contrato se abona al valor total.', M, y);
   y += 8;
 
-  // ── PROYECCIÓN 2027–2030 ─────────────────────────────────────────────────
+  // ── PROYECCIÓN 2028–2031 ─────────────────────────────────────────────────
   doc.setDrawColor(216,206,188); doc.setLineWidth(0.5);
   doc.line(M, y, W - M, y);
   setStyle(7,[45,96,64],true);
@@ -6969,17 +7008,58 @@ function exportPropuestaPartPDF(share) {
   y += 4;
   doc.text('Cada participación equivale al 0.05% del ingreso neto del parque, con pagos trimestrales.', M, y);
   y += 4;
-  // Gráfica: ingresos anuales proyectados 2027-2030
+  // Gráfica: ingresos anuales proyectados 2028-2031
   var partTotal = PARTI.roi.reduce(function(a,r){return a + r.annual * c.qty;}, 0);
-  var partTake = 'En 4 años (2027–2030), tus ' + c.qty + (c.qty === 1 ? ' participación' : ' participaciones') + ' te dejarían ' + fmtMXN(partTotal, 0) + ' en total.';
+  var partTake = 'En 4 años (2028–2031), tus ' + c.qty + (c.qty === 1 ? ' participación' : ' participaciones') + ' te dejarían ' + fmtMXN(partTotal, 0) + ' en total.';
   y = drawROIChart(doc, M, y + 2, CW, '¿CUÁNTO GANAS CADA AÑO?', PARTI.roi.map(function(r){return String(r.year);}), PARTI.roi.map(function(r){return r.annual * c.qty;}), null, '', '', partTake);
   doc.text('Sujeto a disponibilidad.', M, y);
   y += 4;
+  var legLines = doc.splitTextToSize('Los cobros para el socio son trimestrales. Ejemplo: el primer trimestre (octubre 2027–enero 2028) se recibe en febrero de 2028; el segundo trimestre (febrero–abril 2028) se recibe en junio de 2028, y así sucesivamente cada trimestre.', CW);
+  doc.text(legLines, M, y);
+  y += legLines.length * 4;
   if (y > 270) { doc.addPage(); y = 20; }
   setStyle(7,[45,96,64],true);
   var vigLines = doc.splitTextToSize('Vigencia: 3 días a partir de la emisión (válida hasta el ' + vigenciaHastaTxt() + '). Después de esa fecha, precios y disponibilidad pueden cambiar.', CW);
   doc.text(vigLines, M, y);
   y += vigLines.length * 4;
+
+  // ── RETORNO DE INVERSIÓN (desglose del folleto oficial) ──────────────────
+  var retH = 100; // título + encabezado + 6 filas + explicación (estimación amplia; la tabla no se parte)
+  if (y + retH > 268) { doc.addPage(); y = 20; }
+  doc.setDrawColor(216,206,188); doc.setLineWidth(0.5);
+  doc.line(M, y, W - M, y);
+  setStyle(7,[45,96,64],true);
+  doc.text('RETORNO DE INVERSIÓN  —  DE DÓNDE SALE EL RENDIMIENTO', M, y - 1.5);
+  y += 5;
+  var cLab = 62, cYr = (CW - cLab) / 4;
+  doc.setFillColor(45,90,56);
+  doc.rect(M, y - 4, CW, 8, 'F');
+  setStyle(6.5,[210,230,210],true);
+  doc.text('CONCEPTO', M + 2, y);
+  RETORNO.years.forEach(function(yr, i){
+    doc.text(String(yr), M + cLab + cYr * (i + 1) - 2, y, {align:'right'});
+  });
+  y += 6;
+  RETORNO.rows.forEach(function(row, ri){
+    var labLines = doc.splitTextToSize(row.label, cLab - 4);
+    var rh = Math.max(9, labLines.length * 4 + 4);
+    if (ri % 2 === 0) { doc.setFillColor(247,242,234); } else { doc.setFillColor(239,232,220); }
+    doc.rect(M, y - 3, CW, rh, 'F');
+    setStyle(7.5,[26,51,32], !!row.total);
+    doc.text(labLines, M + 2, y + 1);
+    setStyle(8,[26,102,64], !!row.total, 'courier');
+    row.values.forEach(function(v, i){
+      doc.text(row.fmt === 'num' ? fmt(v) : fmtMXN(v, 0), M + cLab + cYr * (i + 1) - 2, y + 1, {align:'right'});
+    });
+    doc.setDrawColor(216,206,188); doc.setLineWidth(0.2);
+    doc.line(M, y + rh - 3.5, W - M, y + rh - 3.5);
+    y += rh;
+  });
+  y += 4;
+  setStyle(6.5,[140,165,140],false);
+  var expLines = doc.splitTextToSize('El rendimiento crece cada año porque la proyección considera 20% más de personas entrando al parque por año y el costo de entrada subiendo con la inflación anual más 3%.', CW);
+  doc.text(expLines, M, y);
+  y += expLines.length * 4;
 
   // ── Mapa del parque ──────────────────────────────────────────
   var mapW = 182, mapH = Math.round(mapW * 675 / 1200);
