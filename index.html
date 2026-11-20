@@ -66,7 +66,7 @@ h1,h2,h3,h4{font-family:'Playfair Display',serif;font-weight:600;line-height:1.2
 
 /* Layout */
 .app-shell{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
-.sidebar{background:var(--navy);color:#e8edf5;padding:0;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:hidden}
+.sidebar{background:var(--navy);color:#e8edf5;padding:0;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;height:100dvh;overflow-y:hidden}
 .sidebar-logo{padding:28px 24px 20px;border-bottom:1px solid rgba(255,255,255,0.08)}
 .sidebar-logo h1{font-size:22px;color:var(--gold-light);letter-spacing:0.02em}
 .sidebar-logo p{font-size:11px;text-transform:uppercase;letter-spacing:0.12em;color:rgba(200,215,240,0.6);margin-top:4px}
@@ -194,11 +194,32 @@ html.vista-movil .main{padding:16px 14px calc(80px + env(safe-area-inset-bottom)
   .scroll-y-400{max-height:300px}
 }
 
+/* ── TABLETA 769–1023 px: barra de iconos (sin barra inferior) ── */
+@media(min-width:769px) and (max-width:1023px){
+  .app-shell{grid-template-columns:72px 1fr}
+  .sidebar-logo{padding:16px 8px;text-align:center}
+  .sidebar-logo h1,.sidebar-logo p{display:none}
+  .sidebar-logo-img{width:48px;height:auto;max-height:48px;margin:0 auto}
+  .nav-section{display:none}
+  .nav-item{justify-content:center;padding:10px 0;font-size:0;gap:0}
+  .nav-item .icon{width:22px;height:22px}
+  .sidebar-footer{display:none}
+  .main{padding:24px}
+  .grid-3{grid-template-columns:1fr 1fr}
+  #qRoiFields,#pRoiFields{grid-template-columns:1fr 1fr}
+}
+/* ── TABLETA 1024–1279 px: sidebar angosta ── */
+@media(min-width:1024px) and (max-width:1279px){
+  .app-shell{grid-template-columns:220px 1fr}
+  .main{padding:28px}
+  .grid-3{grid-template-columns:1fr 1fr 1fr}
+}
+
 /* Form */
 .field{display:flex;flex-direction:column;gap:5px}
 .label{font-size:12px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.06em}
 .label-hint{font-size:11px;color:var(--text-muted);font-weight:400;text-transform:none;letter-spacing:0}
-input[type=number],input[type=text],select{border:1px solid var(--border-strong);border-radius:var(--radius);padding:9px 12px;font-size:14px;font-family:'Source Sans 3',sans-serif;color:var(--text-primary);background:var(--white);width:100%;transition:border-color 0.15s,box-shadow 0.15s;outline:none}
+input[type=number],input[type=text],select{border:1px solid var(--border-strong);border-radius:var(--radius);padding:9px 12px;font-size:16px;font-family:'Source Sans 3',sans-serif;color:var(--text-primary);background:var(--white);width:100%;transition:border-color 0.15s,box-shadow 0.15s;outline:none}
 input:focus,select:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(184,144,46,0.12)}
 select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23718096' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px}
 
@@ -211,7 +232,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 .btn-outline{background:transparent;border:1.5px solid var(--border-strong);color:var(--text-secondary)}
 .btn:focus-visible,.nav-item:focus-visible,.bnav-item:focus-visible,.more-menu-item:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 /* Clases utilitarias: el sistema de diseño vive en el CSS, no en estilos inline */
-.input-lg{width:100%;height:42px;border:1px solid var(--border-strong);border-radius:var(--radius);padding:0 10px;font-size:14px;background:white}
+.input-lg{width:100%;height:42px;border:1px solid var(--border-strong);border-radius:var(--radius);padding:0 10px;font-size:16px;background:white}
 .field-row{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap}
 .btn-action{flex:1;min-width:200px;padding:13px}
 .btn-outline:hover{border-color:var(--navy);color:var(--navy)}
@@ -1404,7 +1425,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
       <p style="font-size:13px;color:var(--text-secondary);margin-bottom:10px">
         Abre el PDF, selecciona todo el texto (Ctrl/Cmd+A), copia (Ctrl/Cmd+C) y pégalo aquí abajo. No necesita formato especial — la IA reconoce torre, número de unidad, estado (Disponible/Apartado/Vendido/Bloqueado) y precio aunque vengan en cualquier orden.
       </p>
-      <textarea id="invRawText" rows="10" style="width:100%;font-family:monospace;font-size:12px;padding:10px;border:1px solid var(--border-strong);border-radius:var(--radius);resize:vertical" placeholder="Pega aquí el texto completo del PDF de disponibilidad..."></textarea>
+      <textarea id="invRawText" rows="10" style="width:100%;font-family:monospace;font-size:16px;padding:10px;border:1px solid var(--border-strong);border-radius:var(--radius);resize:vertical" placeholder="Pega aquí el texto completo del PDF de disponibilidad..."></textarea>
       <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;align-items:center">
         <button class="btn btn-gold" onclick="parseInventoryUpdate()" id="invParseBtn">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4m0 12v4m10-10h-4M6 12H2m15.5-6.5l-2.8 2.8M9.3 14.7l-2.8 2.8m0-11l2.8 2.8m8.4 8.4l-2.8-2.8"/></svg>
@@ -1444,11 +1465,11 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
     <div class="card">
       <div class="field" style="margin-bottom:14px">
         <span class="label">Nombre (como asesor)</span>
-        <input type="text" id="pfName" value="Cristobal Rafael" style="width:100%;height:42px;border:1px solid var(--border-strong);border-radius:var(--radius);padding:0 10px;font-size:14px">
+        <input type="text" id="pfName" value="Cristobal Rafael" style="width:100%;height:42px;border:1px solid var(--border-strong);border-radius:var(--radius);padding:0 10px;font-size:16px">
       </div>
       <div class="field" style="margin-bottom:14px">
         <span class="label">Teléfono / WhatsApp</span>
-        <input type="text" id="pfPhone" value="669 139 3136" style="width:100%;height:42px;border:1px solid var(--border-strong);border-radius:var(--radius);padding:0 10px;font-size:14px">
+        <input type="text" id="pfPhone" value="669 139 3136" style="width:100%;height:42px;border:1px solid var(--border-strong);border-radius:var(--radius);padding:0 10px;font-size:16px">
       </div>
       <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--green-text);margin-bottom:16px;cursor:pointer">
         <input type="checkbox" id="pfShowQR" checked onchange="savePerfil()" style="width:18px;height:18px;accent-color:var(--green-dark)">
@@ -1483,15 +1504,15 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
       <div style="display:flex;gap:12px;flex-wrap:wrap">
         <div class="field" style="flex:1;min-width:200px">
           <span class="label">Nombre del cliente</span>
-          <input type="text" id="cClientName" placeholder="Nombre del cliente" style="width:100%;height:42px;border:1px solid var(--border-strong);border-radius:var(--radius);padding:0 10px;font-size:14px">
+          <input type="text" id="cClientName" placeholder="Nombre del cliente" style="width:100%;height:42px;border:1px solid var(--border-strong);border-radius:var(--radius);padding:0 10px;font-size:16px">
         </div>
         <div class="field" style="flex:1;min-width:200px">
           <span class="label">Asesor</span>
-          <input type="text" id="cAdvisor" value="Cristobal Rafael" style="width:100%;height:42px;border:1px solid var(--border-strong);border-radius:var(--radius);padding:0 10px;font-size:14px">
+          <input type="text" id="cAdvisor" value="Cristobal Rafael" style="width:100%;height:42px;border:1px solid var(--border-strong);border-radius:var(--radius);padding:0 10px;font-size:16px">
         </div>
         <div class="field" style="width:200px">
           <span class="label">Fecha</span>
-          <input type="text" id="cDate" style="width:100%;height:42px;border:1px solid var(--border-strong);border-radius:var(--radius);padding:0 10px;font-size:14px">
+          <input type="text" id="cDate" style="width:100%;height:42px;border:1px solid var(--border-strong);border-radius:var(--radius);padding:0 10px;font-size:16px">
         </div>
       </div>
     </div>
@@ -1513,7 +1534,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
         </div>
         <div class="field" style="width:180px">
           <span class="label">Renta mensual estimada ($)</span>
-          <input type="number" id="cRentInput" value="45000" step="1000" min="0" style="width:100%;height:42px;border:1px solid var(--border-strong);border-radius:var(--radius);padding:0 10px;font-size:14px">
+          <input type="number" id="cRentInput" value="45000" step="1000" min="0" style="width:100%;height:42px;border:1px solid var(--border-strong);border-radius:var(--radius);padding:0 10px;font-size:16px">
         </div>
         <button class="btn btn-gold" onclick="cAddUnit()" style="padding:12px 18px">+ Agregar unidad</button>
       </div>
