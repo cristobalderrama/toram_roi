@@ -635,7 +635,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
       <!-- Down payment input row (dynamic) -->
       <div style="margin-top:16px;background:var(--surface);border-radius:var(--radius);padding:16px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;align-items:end" id="dpRow">
         <div class="field">
-          <span class="label" id="dpLabel">Enganche <span class="label-hint">(%)</span></span>
+          <span class="label" id="dpLabel">Enganche <span class="label-hint">(%, pago único)</span></span>
           <input type="number" id="dpValue" value="15" min="0" step="0.5" oninput="syncDpDisplay()">
         </div>
         <div class="field">
@@ -1184,7 +1184,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
               <button id="pDpModePct" onclick="pSetDpMode('pct')" style="flex:1;padding:7px 4px;font-size:11px;font-weight:600;border:none;cursor:pointer;background:var(--navy);color:white;font-family:inherit">Porcentaje %</button>
               <button id="pDpModeMxn" onclick="pSetDpMode('mxn')" style="flex:1;padding:7px 4px;font-size:11px;font-weight:600;border:none;cursor:pointer;background:var(--white);color:var(--text-muted);font-family:inherit">Pesos $</button>
             </div>
-            <span class="label" id="pDpLabel">Enganche <span class="label-hint">(%)</span></span>
+            <span class="label" id="pDpLabel">Enganche <span class="label-hint">(%, pago único)</span></span>
             <input type="number" id="pDpValue" value="15" min="1" max="100" step="0.5" onchange="pSyncDpDisplay(); if(pSelectedUnit) pOnUnitChange()">
             <div style="font-size:10px;color:var(--text-muted);margin-top:3px"><span id="pDpEquivLabel">Equivale en $</span>: <span id="pDpEquiv">—</span></div>
           </div>
@@ -2272,6 +2272,9 @@ const fmt = (n, dec=0) => n == null ? '—' : n.toLocaleString('es-MX', {minimum
 const fmtK = (n) => Math.abs(n) >= 1000000 ? '$' + (n/1000000).toFixed(2) + 'M' : '$' + Math.round(n/1000) + 'K';
 const fmtPct = (n, dec=1) => n.toFixed(dec) + '%';
 const fmtMXN = (n, dec=2) => '$' + fmt(n, dec);
+// fmtMXNLead: símbolo $ más chico y dorado que la cifra (§2.3: el símbolo
+// pesa menos que el valor). Solo para cifras de veredicto en la vista previa.
+const fmtMXNLead = (n, dec=2) => '<span style="font-size:.55em;font-weight:400;color:var(--gold-dark)">$</span>' + fmt(n, dec);
 
 // ── FASE 2 · Exactitud a centavos ──────────────────────────────────────────
 // Los montos de los planes se guardan ya redondeados a centavos, para que
@@ -2304,7 +2307,7 @@ function setDpMode(mode) {
   if (mode === 'pct') {
     pctBtn.style.background = 'var(--navy)'; pctBtn.style.color = 'white';
     mxnBtn.style.background = 'var(--white)'; mxnBtn.style.color = 'var(--text-muted)';
-    document.getElementById('dpLabel').innerHTML = 'Enganche <span class="label-hint">(%)</span>';
+    document.getElementById('dpLabel').innerHTML = 'Enganche <span class="label-hint">(%, pago único)</span>';
     document.getElementById('dpEquivLabel').textContent = 'Equivale en $';
     const cur = parseFloat(document.getElementById('dpValue').value) || 15;
     document.getElementById('dpValue').value = cur <= 100 ? cur : 15;
@@ -2312,7 +2315,7 @@ function setDpMode(mode) {
   } else {
     mxnBtn.style.background = 'var(--navy)'; mxnBtn.style.color = 'white';
     pctBtn.style.background = 'var(--white)'; pctBtn.style.color = 'var(--text-muted)';
-    document.getElementById('dpLabel').innerHTML = 'Enganche <span class="label-hint">($)</span>';
+    document.getElementById('dpLabel').innerHTML = 'Enganche <span class="label-hint">($ MXN, pago único)</span>';
     document.getElementById('dpEquivLabel').textContent = 'Equivale en %';
     const cur = parseFloat(document.getElementById('dpValue').value) || 15;
     document.getElementById('dpValue').value = price ? Math.round(price * cur / 100) : '';
@@ -2909,6 +2912,38 @@ function pdfGoldRule(doc, x1, x2, y, w) {
 function pdfNewPage(doc, W, H) {
   var _ap = doc.addPage.bind(doc);
   doc.addPage = function(){ _ap.apply(doc, arguments); pdfPaper(doc, W, H); };
+}
+// pdfVerdict: bloque de veredicto estilo maqueta (§4.1: la página 1 es el
+// veredicto). Regla dorada, kicker de capítulo, cifra grande en serif con
+// el $ más chico y dorado (§2.3), y la aritmética en mono debajo.
+// Devuelve la y donde continúa el contenido (~20mm después de y).
+function pdfVerdict(doc, M, W, y, kicker, figureVal, arith) {
+  pdfGoldRule(doc, M, W - M, y, 1.2);
+  doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(138,109,31);
+  doc.text(kicker, M, y + 5);
+  var yFig = y + 13;
+  doc.setFont('times','bold'); doc.setFontSize(11); doc.setTextColor(138,109,31);
+  var dW = doc.getTextWidth('$');
+  doc.text('$', M, yFig);
+  doc.setFontSize(20); doc.setTextColor(26,51,32);
+  doc.text(fmt(figureVal, 2), M + dW + 1, yFig);
+  doc.setFont('courier','normal'); doc.setFontSize(8); doc.setTextColor(90,122,90);
+  doc.text(arith, M, y + 18);
+  return y + 25;
+}
+// pdfChapter: encabezado de capítulo estilo revista (Dirección 2) para
+// hojas dedicadas con aire. Kicker dorado, título serif grande, una línea
+// de intro en palabras simples y hairline. Devuelve la y del contenido.
+function pdfChapter(doc, M, W, y, num, title, intro) {
+  doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(138,109,31);
+  doc.text('CAPITULO ' + num, M, y);
+  doc.setFont('times','bold'); doc.setFontSize(14); doc.setTextColor(26,51,32);
+  doc.text(title, M, y + 8);
+  doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(90,122,90);
+  doc.text(intro, M, y + 13);
+  doc.setDrawColor(216,206,188); doc.setLineWidth(0.5);
+  doc.line(M, y + 15, W - M, y + 15);
+  return y + 19;
 }
 
 function exportPlansPDF() {
@@ -5093,14 +5128,14 @@ function pSetDpMode(mode) {
   if (mode === 'pct') {
     pctBtn.style.background = 'var(--navy)'; pctBtn.style.color = 'white';
     mxnBtn.style.background = 'var(--white)'; mxnBtn.style.color = 'var(--text-muted)';
-    document.getElementById('pDpLabel').innerHTML = 'Enganche <span class="label-hint">(%)</span>';
+    document.getElementById('pDpLabel').innerHTML = 'Enganche <span class="label-hint">(%, pago único)</span>';
     document.getElementById('pDpEquivLabel').textContent = 'Equivale en $';
     valEl.value = price ? Math.round(cur / price * 1000) / 10 : (cur <= 100 ? cur : 15);
     valEl.step = '0.5'; valEl.min = '1'; valEl.max = '100';
   } else {
     mxnBtn.style.background = 'var(--navy)'; mxnBtn.style.color = 'white';
     pctBtn.style.background = 'var(--white)'; pctBtn.style.color = 'var(--text-muted)';
-    document.getElementById('pDpLabel').innerHTML = 'Enganche <span class="label-hint">($)</span>';
+    document.getElementById('pDpLabel').innerHTML = 'Enganche <span class="label-hint">($ MXN, pago único)</span>';
     document.getElementById('pDpEquivLabel').textContent = 'Equivale en %';
     valEl.value = price ? Math.round(price * cur / 100) : '';
     valEl.step = '1000'; valEl.min = '0'; valEl.max = '';
@@ -5256,7 +5291,7 @@ function pUpdatePartSummary() {
   el.innerHTML =
     '<div class="p-summary">' +
     '<div><div class="p-kicker">Inversión total ('+c.qty+(c.qty===1?' participación':' participaciones')+')</div>' +
-    '<div class="p-price">'+fmtMXN(c.total)+'</div>' +
+    '<div class="p-price">'+fmtMXNLead(c.total)+'</div>' +
     '<div style="font-family:var(--font-mono);font-size:12px;color:var(--text-muted);margin-top:6px;font-variant-numeric:tabular-nums">'+fmtMXN(c.unitPrice)+' × '+c.qty+' = '+fmtMXN(c.total)+'</div>' +
     '<div class="p-note">'+fmtMXN(c.unitPrice)+' por participación · Apartado '+fmtMXN(c.admin)+' ('+fmtMXN(PARTI.adminPerUnit)+' c/u) — a cuenta del total, no es un costo adicional</div></div>' +
     payHtml +
@@ -5597,7 +5632,7 @@ function buildPropuestaDeptoHTML() {
   if (mi.plano || mi.acabados) {
     planoAcabadosHtml =
       '<div style="padding:20px 32px;border-top:1px solid #deeadc">' +
-      '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-dark);margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Plano y acabados — ' + m.nombre + '</div>' +
+      '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-dark);margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Capítulo 02 · Plano y acabados — ' + m.nombre + '</div>' +
       '<div style="display:flex;gap:16px;align-items:flex-start">' +
       (mi.plano ? '<div style="flex:1;text-align:center"><img src="' + mi.plano + '" style="max-width:100%;max-height:340px;object-fit:contain;display:block;margin:0 auto;border:1px solid #deeadc;border-radius:4px" alt="Plano del modelo"><div style="font-size:11px;color:var(--green-soft);margin-top:8px">Plano — ' + m.nombre + ' (' + m.m2 + ' m²)</div></div>' : '') +
       (mi.acabados ? '<div style="flex:1;text-align:center"><img src="' + mi.acabados + '" style="max-width:100%;max-height:340px;object-fit:contain;display:block;margin:0 auto;border:1px solid #deeadc;border-radius:4px" alt="Acabados del modelo"><div style="font-size:11px;color:var(--green-soft);margin-top:8px">Acabados — renders ilustrativos del modelo</div></div>' : '') +
@@ -5621,9 +5656,9 @@ function buildPropuestaDeptoHTML() {
   '<div style="font-size:12px;color:rgba(255,255,255,0.75);margin-top:2px">Asesor: '+cd.advisor+' · '+cd.dateStr+'</div>' + noteHtml +
   '</div></div>' +
   '<div style="padding:20px 32px;border-bottom:1px solid #deeadc">' +
-  '<div style="font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold-dark)">Precio con descuento del 20%</div>' +
-  '<div style="font-family:var(--font-display);font-size:44px;font-weight:600;line-height:1.05;color:var(--navy);border-top:2px solid var(--gold);padding-top:10px;margin-top:8px">'+fmtMXN(plans[0].finalPrice)+'</div>' +
-  '<div style="font-family:var(--font-mono);font-size:12px;color:var(--text-muted);margin-top:6px;font-variant-numeric:tabular-nums">'+fmtMXN(inv.precio)+' − 20% = '+fmtMXN(plans[0].finalPrice)+'</div>' +
+  '<div style="font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold-dark)">Capítulo 01 · El departamento</div>' +
+  '<div style="font-family:var(--font-display);font-size:44px;font-weight:600;line-height:1.05;color:var(--navy);border-top:2px solid var(--gold);padding-top:10px;margin-top:8px">'+fmtMXNLead(plans[0].finalPrice)+'</div>' +
+  '<div style="font-family:var(--font-mono);font-size:12px;color:var(--text-muted);margin-top:6px;font-variant-numeric:tabular-nums">'+fmtMXN(inv.precio)+' − 20% = '+fmtMXN(plans[0].finalPrice)+' · Precio con descuento del 20%</div>' +
   '</div>' +
   '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0">' +
   '<div style="border-right:1px solid #deeadc">' +
@@ -5652,13 +5687,13 @@ function buildPropuestaDeptoHTML() {
   '</tr></thead><tbody>'+planRowsHtml+'</tbody></table></div></div>' +
   planoAcabadosHtml +
   '<div style="padding:20px 32px;border-top:1px solid #deeadc">' +
-  '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-dark);margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Amenidades — Planta de conjunto alberca Torre 1 y 2</div>' +
+  '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-dark);margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Capítulo 03 · Amenidades — Planta de conjunto alberca Torre 1 y 2</div>' +
   '<img src="'+AMENITIES_IMG+'" style="width:100%;display:block;border-radius:4px;border:1px solid #deeadc" alt="Planta de amenidades">' +
   '<div style="font-size:11px;color:var(--green-soft);margin-top:8px">Alberca, cancha de pádel, restaurante, gym, parque infantil, baños y asadores.</div>' +
   '</div>' +
   roiHtml + roiChartHtmlStr +
   '<div style="padding:20px 32px;border-top:1px solid #deeadc">' +
-  '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-dark);margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Conoce el parque</div>' +
+  '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-dark);margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Capítulo 04 · Conoce el parque</div>' +
   '<img src="'+PARK_MAP_IMG+'" style="width:100%;display:block;border-radius:4px;border:1px solid #deeadc" alt="Mapa del parque TORAM">' +
   '<div style="font-size:11px;color:var(--green-soft);margin-top:8px">TORAM Parque Temático · Mazatlán — el desarrollo completo: parque, plaza y residencial.</div>' +
   (perfilShowQR() ? '<div style="display:flex;align-items:center;gap:12px;margin-top:12px"><img src="'+MAPA_QR_IMG+'" style="width:64px;height:64px" alt="QR mapa interactivo"><div><div style="font-size:12px;font-weight:700;color:var(--green-dark)">Escanea el código con tu celular</div><div style="font-size:11px;color:var(--green-soft)">para recorrer el parque en el mapa interactivo.</div></div></div>' : '') +
@@ -5698,7 +5733,7 @@ function buildPropuestaPartHTML() {
   var atrHtml = '';
   if (typeof PART_ATRACCIONES !== 'undefined' && PART_ATRACCIONES.length) {
     atrHtml = '<div style="padding:20px 32px;border-top:1px solid #deeadc">' +
-      '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-dark);margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Atracciones del parque</div>' +
+      '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-dark);margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Capítulo 03 · Atracciones del parque</div>' +
       PART_ATRACCIONES.map(function(at){
         return '<div style="text-align:center;margin-bottom:16px"><img src="' + at.src + '" style="width:100%;max-width:420px;display:block;margin:0 auto;border-radius:4px;border:1px solid #deeadc" alt="' + at.label + '"><div style="font-size:11px;color:var(--green-soft);margin-top:6px">' + at.label + '</div></div>';
       }).join('') +
@@ -5717,6 +5752,11 @@ function buildPropuestaPartHTML() {
   '<div style="font-family:\'Cormorant Garamond\',Georgia,serif;font-size:20px;font-weight:700;color:white">Propuesta para '+cd.client+'</div>' +
   '<div style="font-size:12px;color:rgba(255,255,255,0.75);margin-top:2px">Asesor: '+cd.advisor+' · '+cd.dateStr+'</div>' + noteHtml +
   '</div></div>' +
+  '<div style="padding:20px 32px;border-bottom:1px solid #deeadc">' +
+  '<div style="font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold-dark)">Capítulo 01 · Tu inversión</div>' +
+  '<div style="font-family:var(--font-display);font-size:44px;font-weight:600;line-height:1.05;color:var(--navy);border-top:2px solid var(--gold);padding-top:10px;margin-top:8px">'+fmtMXNLead(c.total)+'</div>' +
+  '<div style="font-family:var(--font-mono);font-size:12px;color:var(--text-muted);margin-top:6px;font-variant-numeric:tabular-nums">'+fmtMXN(c.unitPrice)+' × '+c.qty+' = '+fmtMXN(c.total)+' · Inversión total</div>' +
+  '</div>' +
   '<div style="padding:20px 32px">' +
   '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-dark);margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Tu inversión</div>' +
   '<table style="width:100%;border-collapse:collapse;font-size:13px">' +
@@ -5738,7 +5778,7 @@ function buildPropuestaPartHTML() {
   '<div style="font-size:10px;color:#7a9a82;margin-top:8px">Proyecciones basadas en el desempeño esperado del parque; no constituyen garantía. Cada participación equivale al 0.05% del ingreso neto del parque, con pagos trimestrales.</div>' +
   '</div>' +
   '<div style="padding:20px 32px;border-top:1px solid #deeadc">' +
-  '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-dark);margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Conoce el parque</div>' +
+  '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-dark);margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Capítulo 02 · Conoce el parque</div>' +
   '<img src="'+PARK_MAP_IMG+'" style="width:100%;display:block;border-radius:4px;border:1px solid #deeadc" alt="Mapa del parque TORAM">' +
   '<div style="font-size:11px;color:var(--green-soft);margin-top:8px">El parque es la inversión: atracciones, cenote, playa y experiencias en Mazatlán.</div>' +
   (perfilShowQR() ? '<div style="display:flex;align-items:center;gap:12px;margin-top:12px"><img src="'+MAPA_QR_IMG+'" style="width:64px;height:64px" alt="QR mapa interactivo"><div><div style="font-size:12px;font-weight:700;color:var(--green-dark)">Escanea el código con tu celular</div><div style="font-size:11px;color:var(--green-soft)">para recorrer el parque en el mapa interactivo.</div></div></div>' : '') +
@@ -6266,7 +6306,7 @@ function exportPropuestaDeptoPDF(share) {
       setStyle(7,[140,175,140],false);
       doc.text('TORAM Residencial', M, 292);
       setStyle(7,[100,140,100],false);
-      doc.text('Vigencia 3 días · ' + cd.dateStr, W/2, 292, {align:'center'});
+      doc.text('Vigencia 3 días · ' + cd.dateStr + ' · Pág. ' + pg + ' de ' + pages, W/2, 292, {align:'center'});
       setStyle(8,[212,168,75],true);
       doc.text(perfilPhone(), W - M, 292, {align:'right'});
     }
@@ -6304,6 +6344,10 @@ function exportPropuestaDeptoPDF(share) {
     doc.text(pNoteLines, M, 51);
     y = 51 + pNoteLines.length*4 + 4;
   }
+
+  // ── VEREDICTO (maqueta: la página 1 es el veredicto) ────────────────────
+  y = pdfVerdict(doc, M, W, y, 'CAPITULO 01 · EL DEPARTAMENTO', ps[0].finalPrice,
+    fmtMXN(inv.precio) + ' - 20% = ' + fmtMXN(ps[0].finalPrice) + '  ·  Precio con descuento del 20%');
 
   // ── IMAGE (left) + SPECS (right) ─────────────────────────────────────────
   var imgW = 90, imgH = 70;
@@ -6505,12 +6549,7 @@ function exportPropuestaDeptoPDF(share) {
     var rowH = Math.max(planoH, acabH);
     // Hoja dedicada al plano y los renders, contenido centrado verticalmente
     doc.addPage();
-    y = 68;
-    doc.setDrawColor(216,206,188); doc.setLineWidth(0.5);
-    doc.line(M, y, W - M, y);
-    setStyle(7,[45,96,64],true);
-    doc.text('PLANO Y ACABADOS  -  ' + m.nombre.toUpperCase(), M, y - 1.5);
-    y += 4;
+    y = pdfChapter(doc, M, W, 56, '02', 'PLANO Y ACABADOS · ' + m.nombre.toUpperCase(), 'Cómo se ve tu departamento por dentro.');
     var imgY = y;
     if (mi.plano) {
       try { doc.addImage(mi.plano, 'JPEG', M + (colW - planoW)/2, imgY + (rowH - planoH)/2, planoW, planoH); } catch(e) {}
@@ -6534,7 +6573,7 @@ function exportPropuestaDeptoPDF(share) {
   doc.setDrawColor(216,206,188); doc.setLineWidth(0.5);
   doc.line(M, y, W - M, y);
   setStyle(7,[45,96,64],true);
-  doc.text('AMENIDADES  -  PLANTA DE CONJUNTO ALBERCA TORRE 1 Y 2', M, y - 1.5);
+  doc.text('AMENIDADES · CAPITULO 03  -  PLANTA DE CONJUNTO ALBERCA TORRE 1 Y 2', M, y - 1.5);
   y += 4;
   try { doc.addImage(AMENITIES_IMG, 'JPEG', M + (CW - amW)/2, y, amW, amH); }
   catch(e) {}
@@ -6566,7 +6605,7 @@ function exportPropuestaDeptoPDF(share) {
   doc.setDrawColor(216,206,188); doc.setLineWidth(0.5);
   doc.line(M, y, W - M, y);
   setStyle(7,[45,96,64],true);
-  doc.text('CONOCE EL PARQUE  -  TORAM PARQUE TEMÁTICO', M, y - 1.5);
+  doc.text('CONOCE EL PARQUE · CAPITULO 04  -  TORAM PARQUE TEMÁTICO', M, y - 1.5);
   y += 4;
   try { doc.addImage(PARK_MAP_IMG, 'JPEG', M + (CW - mapW)/2, y, mapW, mapH); }
   catch(e) {}
@@ -6649,6 +6688,10 @@ function exportPropuestaPartPDF(share) {
     doc.text(pNoteLines, M, 51);
     y = 51 + pNoteLines.length*4 + 4;
   }
+
+  // ── VEREDICTO (maqueta: la página 1 es el veredicto) ────────────────────
+  y = pdfVerdict(doc, M, W, y, 'CAPITULO 01 · TU INVERSION', c.total,
+    fmtMXN(c.unitPrice) + ' x ' + c.qty + ' = ' + fmtMXN(c.total) + '  ·  ' + c.qty + (c.qty===1?' participacion':' participaciones'));
 
   // ── TU INVERSIÓN ─────────────────────────────────────────────────────────
   setStyle(7,[45,96,64],true);
@@ -6745,7 +6788,7 @@ function exportPropuestaPartPDF(share) {
   doc.setDrawColor(216,206,188); doc.setLineWidth(0.5);
   doc.line(M, y, W - M, y);
   setStyle(7,[45,96,64],true);
-  doc.text('CONOCE EL PARQUE  -  TORAM PARQUE TEMÁTICO', M, y - 1.5);
+  doc.text('CONOCE EL PARQUE · CAPITULO 02  -  TORAM PARQUE TEMÁTICO', M, y - 1.5);
   y += 4;
   try { doc.addImage(PARK_MAP_IMG, 'JPEG', M + (CW - mapW)/2, y, mapW, mapH); }
   catch(e) {}
@@ -6788,7 +6831,7 @@ function exportPropuestaPartPDF(share) {
     doc.setDrawColor(216,206,188); doc.setLineWidth(0.5);
     doc.line(M, y, W - M, y);
     setStyle(7,[45,96,64],true);
-    doc.text('ATRACCIONES DEL PARQUE', M, y - 1.5);
+    doc.text('ATRACCIONES DEL PARQUE · CAPITULO 03', M, y - 1.5);
     y += 4;
     var atW = 72, atH = 48; // mismo tamaño para todas (3:2)
     PART_ATRACCIONES.forEach(function(at) {
@@ -6810,7 +6853,7 @@ function exportPropuestaPartPDF(share) {
     setStyle(7,[140,175,140],false);
     doc.text('TORAM Parque Temático', M, 292);
     setStyle(7,[100,140,100],false);
-    doc.text('Vigencia 3 días · ' + cd.dateStr, W/2, 292, {align:'center'});
+    doc.text('Vigencia 3 días · ' + cd.dateStr + ' · Pág. ' + pg + ' de ' + pages, W/2, 292, {align:'center'});
     setStyle(8,[212,168,75],true);
     doc.text(perfilPhone(), W - M, 292, {align:'right'});
   }
@@ -6961,7 +7004,7 @@ function lRenderPlansTable(plans) {
       ? fmtMXN(p.mensualidad)+' <span style="font-size:10px;color:#9ab0a0">(pago único)</span>'
       : fmtMXN(p.mensualidad);
     var plazoText = p.meses === 0 ? 'Pago único' : p.meses + ' meses';
-    var mark = i === lSelectedPlanIdx ? ' ★' : '';
+    var mark = i === lSelectedPlanIdx ? ' (seleccionado)' : '';
     return '<tr style="background:'+bg+';cursor:pointer" onclick="lSelectPlanRow('+i+')">' +
       '<td style="padding:8px 12px;font-weight:600;color:var(--green-text);border-bottom:1px solid #deeadc;font-size:12px">'+p.nombre+mark+'</td>' +
       '<td style="padding:8px 12px;text-align:right;border-bottom:1px solid #deeadc;font-size:12px;font-weight:700;color:var(--green-text)">'+fmtMXN(p.precioConDesc)+'</td>' +
@@ -7068,6 +7111,11 @@ function buildLocalesHTML() {
   '<div style="font-family:\'Cormorant Garamond\',Georgia,serif;font-size:20px;font-weight:700;color:white">Cotización para '+cd.client+'</div>' +
   '<div style="font-size:12px;color:rgba(255,255,255,0.75);margin-top:2px">Asesor: '+cd.advisor+' · '+cd.dateStr+'</div>' + noteHtml +
   '</div></div>' +
+  '<div style="padding:20px 32px;border-bottom:1px solid #deeadc">' +
+  '<div style="font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold-dark)">Capítulo 01 · El local</div>' +
+  '<div style="font-family:var(--font-display);font-size:44px;font-weight:600;line-height:1.05;color:var(--navy);border-top:2px solid var(--gold);padding-top:10px;margin-top:8px">'+fmtMXNLead(plan.precioConDesc)+'</div>' +
+  '<div style="font-family:var(--font-mono);font-size:12px;color:var(--text-muted);margin-top:6px;font-variant-numeric:tabular-nums">'+fmtMXN(loc.precio_lista)+' − '+plan.descuento_pct+'% = '+fmtMXN(plan.precioConDesc)+' · '+plan.nombre+'</div>' +
+  '</div>' +
   '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0">' +
   '<div style="border-right:1px solid #deeadc;padding:20px 24px">' +
   '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-dark);margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Datos del local</div>' +
@@ -7082,7 +7130,7 @@ function buildLocalesHTML() {
   '<tr><td style="padding:6px 0;color:var(--green-soft)">Resto (85%)</td><td style="padding:6px 0;text-align:right;font-weight:600;color:var(--green-text)">'+fmtMXN(plan.resto)+'</td></tr>' +
   '</table></div>' +
   '<div style="padding:20px 24px">' +
-  '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-dark);margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Planes de pago · Sin intereses</div>' +
+  '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-dark);margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Capítulo 02 · Planes de pago · Sin intereses</div>' +
   '<table style="width:100%;border-collapse:collapse;font-size:12px">' +
   '<thead><tr style="background:#2d5a38">' +
   '<th style="padding:7px 12px;text-align:left;color:rgba(255,255,255,0.85);font-size:10px;font-weight:600">Plan</th>' +
@@ -7103,17 +7151,17 @@ function buildLocalesHTML() {
   '<div style="font-size:11px;color:var(--green-soft);margin-top:8px">Enganche '+fmtMXN(plan.enganche)+' + suma de mensualidades '+fmtMXN(plan.resto)+' = precio con descuento '+fmtMXN(plan.precioConDesc)+'.</div>' +
   '</div>' +
   '<div style="padding:20px 32px;border-top:1px solid #deeadc">' +
-  '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-dark);margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Plano de la plaza — ETAPA 1</div>' +
+  '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-dark);margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Capítulo 03 · Plano de la plaza — ETAPA 1</div>' +
   '<img src="'+PLAZA_PLANO_IMG+'" style="width:100%;display:block;border-radius:4px;border:1px solid #deeadc" alt="Plano de la plaza comercial TORAM, ETAPA 1">' +
-  '<div style="padding:20px 32px;border-top:1px solid #deeadc">' +
-  '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-dark);margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Renders de la plaza</div>' +
-  PLAZA_RENDERS.map(function(rd){ return '<div style="margin-bottom:14px"><img src="'+rd.src+'" style="width:100%;max-width:520px;display:block;margin:0 auto;border-radius:4px;border:1px solid #deeadc" alt="'+rd.label+' de la plaza comercial TORAM"><div style="font-size:11px;color:var(--green-soft);margin-top:4px;text-align:center">'+rd.label+'</div></div>'; }).join('') +
-  '</div>' +
   '<div style="font-size:11px;color:var(--green-soft);margin-top:8px">Los locales marcados en amarillo en el plano son los apartados. La leyenda del plano dice &ldquo;vendidos&rdquo;; la tabla de precios es la fuente de disponibilidad.</div>' +
   '</div>' +
   '<div style="padding:20px 32px;border-top:1px solid #deeadc">' +
-  '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-dark);margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">La plaza</div>' +
+  '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-dark);margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Capítulo 04 · La plaza</div>' +
   '<div style="font-size:12px;line-height:1.6;color:var(--green-soft)">Plaza comercial dentro del parque, con acceso y operación independiente. 21 locales en ETAPA 1, el corazón comercial de la experiencia TORAM, con flujo mixto de turismo, residentes y experiencias del parque. Visitantes diarios estimados: 2026: 1,600 · 2027: 1,920 · 2028: 2,304 · 2029: 2,765. Más de 1,000 departamentos en el desarrollo y más de 4 millones de turistas al año en Mazatlán.</div>' +
+  '</div>' +
+  '<div style="padding:20px 32px;border-top:1px solid #deeadc">' +
+  '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-dark);margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Capítulo 05 · Renders de la plaza</div>' +
+  PLAZA_RENDERS.map(function(rd){ return '<div style="margin-bottom:14px"><img src="'+rd.src+'" style="width:100%;max-width:520px;display:block;margin:0 auto;border-radius:4px;border:1px solid #deeadc" alt="'+rd.label+' de la plaza comercial TORAM"><div style="font-size:11px;color:var(--green-soft);margin-top:4px;text-align:center">'+rd.label+'</div></div>'; }).join('') +
   '<div style="font-size:10px;color:#7a9a82;margin-top:10px">Vigencia 3 días · Sujeto a disponibilidad · Precios sin intereses · Descuentos sobre precio de lista · 669 139 3136</div>' +
   '</div>' +
   '</div>';
@@ -7156,7 +7204,7 @@ function exportLocalesPDF(share) {
       setStyle(7,[140,175,140],false);
       doc.text('TORAM Plaza Comercial', M, 292);
       setStyle(7,[100,140,100],false);
-      doc.text('Vigencia 3 días · ' + cd.dateStr, W/2, 292, {align:'center'});
+      doc.text('Vigencia 3 días · ' + cd.dateStr + ' · Pág. ' + pg + ' de ' + pages, W/2, 292, {align:'center'});
       setStyle(8,[212,168,75],true);
       doc.text(perfilPhone(), W - M, 292, {align:'right'});
     }
@@ -7200,6 +7248,10 @@ function exportLocalesPDF(share) {
     y += 5;
   }
 
+  // ── VEREDICTO (maqueta: la página 1 es el veredicto) ────────────────────
+  y = pdfVerdict(doc, M, W, y, 'CAPITULO 01 · EL LOCAL', plan.precioConDesc,
+    fmtMXN(loc.precio_lista) + ' - ' + plan.descuento_pct + '% = ' + fmtMXN(plan.precioConDesc) + '  ·  ' + plan.nombre);
+
   // ── DATOS DEL LOCAL ──────────────────────────────────────────────────────
   doc.setDrawColor(216,206,188); doc.setLineWidth(0.5);
   doc.line(M, y, W - M, y);
@@ -7238,7 +7290,7 @@ function exportLocalesPDF(share) {
   doc.setDrawColor(216,206,188); doc.setLineWidth(0.5);
   doc.line(M, y, W - M, y);
   setStyle(7,[45,96,64],true);
-  doc.text('PLANES DE PAGO  -  DESCUENTOS SOBRE PRECIO DE LISTA  -  SIN INTERESES', M, y - 1.5);
+  doc.text('CAPITULO 02 · PLANES DE PAGO  -  DESCUENTOS SOBRE PRECIO DE LISTA  -  SIN INTERESES', M, y - 1.5);
   y += 5;
   var cPlan = 52, cPrecio = 34, cEng = 28, cResto = 28, cMens = 28, cPlazo = CW - cPlan - cPrecio - cEng - cResto - cMens;
   doc.setFillColor(45,90,56);
@@ -7258,7 +7310,7 @@ function exportLocalesPDF(share) {
     else { doc.setFillColor(239,232,220); }
     doc.rect(M, y - 3, CW, 9, 'F');
     setStyle(8,[26,51,32],true);
-    doc.text(p.nombre + (pi === lSelectedPlanIdx ? ' ★' : ''), M + 2, y + 1);
+    doc.text(p.nombre + (pi === lSelectedPlanIdx ? ' (seleccionado)' : ''), M + 2, y + 1);
     setStyle(8,[26,51,32],true,'courier');
     doc.text(fmtMXN(p.precioConDesc), M + cPlan + cPrecio, y + 1, {align:'right'});
     setStyle(7.5,[74,110,82],false,'courier');
@@ -7320,7 +7372,7 @@ function exportLocalesPDF(share) {
   doc.setDrawColor(216,206,188); doc.setLineWidth(0.5);
   doc.line(M, y, W - M, y);
   setStyle(7,[45,96,64],true);
-  doc.text('PLANO DE LA PLAZA  -  ETAPA 1', M, y - 1.5);
+  doc.text('CAPITULO 03 · PLANO DE LA PLAZA  -  ETAPA 1', M, y - 1.5);
   y += 4;
   try { doc.addImage(PLAZA_PLANO_IMG, 'JPEG', M + (CW - plW)/2, y, plW, plH); }
   catch(e) {}
@@ -7335,7 +7387,7 @@ function exportLocalesPDF(share) {
   doc.setDrawColor(216,206,188); doc.setLineWidth(0.5);
   doc.line(M, y, W - M, y);
   setStyle(7,[45,96,64],true);
-  doc.text('LA PLAZA', M, y - 1.5);
+  doc.text('CAPITULO 04 · LA PLAZA', M, y - 1.5);
   y += 5;
   setStyle(8,[90,122,90],false);
   var plazaLines = (typeof doc.splitTextToSize === 'function')
@@ -7352,7 +7404,7 @@ function exportLocalesPDF(share) {
   doc.setDrawColor(216,206,188); doc.setLineWidth(0.5);
   doc.line(M, y, W - M, y);
   setStyle(7,[45,96,64],true);
-  doc.text('RENDERS DE LA PLAZA', M, y - 1.5);
+  doc.text('CAPITULO 05 · RENDERS DE LA PLAZA', M, y - 1.5);
   y += 6;
   PLAZA_RENDERS.forEach(function(rd, ri){
     var rW = 130, rH = Math.round(rW * PLAZA_RENDERS_H[ri] / 640);
