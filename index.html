@@ -365,6 +365,10 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
       <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="9" x2="9" y2="20"/></svg>
       Cotización comparativa
     </button>
+    <button class="nav-item" onclick="showPage('perfil')">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Mi perfil
+    </button>
     <button class="nav-item" id="btnUpdateApp" onclick="updateApp()">
       <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12a9 9 0 11-2.64-6.36"/><polyline points="21 3 21 9 15 9"/></svg>
       Actualizar app
@@ -1290,6 +1294,30 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
     </div>
   </div>
 
+  <div id="page-perfil" class="page">
+    <div class="page-header">
+      <div class="breadcrumb">Administración</div>
+      <h2>Mi perfil</h2>
+      <p>Tu nombre y tu teléfono salen en todas las propuestas, cotizaciones y comparativas que descargues o compartas. Se guarda solo en tu teléfono. Si no cambias nada, todo sigue como siempre con los datos de Cristobal Rafael.</p>
+    </div>
+    <div class="card">
+      <div class="field" style="margin-bottom:14px">
+        <span class="label">Nombre (como asesor)</span>
+        <input type="text" id="pfName" value="Cristobal Rafael" style="width:100%;height:42px;border:1px solid var(--border-strong);border-radius:var(--radius);padding:0 10px;font-size:14px">
+      </div>
+      <div class="field" style="margin-bottom:14px">
+        <span class="label">Teléfono / WhatsApp</span>
+        <input type="text" id="pfPhone" value="669 139 3136" style="width:100%;height:42px;border:1px solid var(--border-strong);border-radius:var(--radius);padding:0 10px;font-size:14px">
+      </div>
+      <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:#1a3320;margin-bottom:16px;cursor:pointer">
+        <input type="checkbox" id="pfShowQR" checked onchange="savePerfil()" style="width:18px;height:18px;accent-color:#2d6040">
+        Incluir el QR al mapa interactivo en los PDFs
+      </label>
+      <button class="btn btn-primary" onclick="savePerfil()" style="padding:12px 24px">Guardar mi perfil</button>
+      <div style="font-size:12px;color:#5a7a62;margin-top:12px">Cada quien guarda el suyo en su propio teléfono. Para instalar la app en otro teléfono (Android o iPhone), abre https://cristobalderrama.github.io/toram_roi/ en el navegador y agrégala a la pantalla de inicio.</div>
+    </div>
+  </div>
+
   <div id="page-seguimiento" class="page">
     <div class="page-header">
       <div class="breadcrumb">Administración</div>
@@ -1934,7 +1962,7 @@ function showPage(id) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.querySelectorAll('.bnav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('page-' + id).classList.add('active');
-  const labels = {unit:0,plans:1,roi:2,amort:3,quote:4,ficha:5,propuesta:6,locales:7,compare:8,sensitivity:9,inventory:10,seguimiento:11,comparativa:12};
+  const labels = {unit:0,plans:1,roi:2,amort:3,quote:4,ficha:5,propuesta:6,locales:7,compare:8,sensitivity:9,inventory:10,seguimiento:11,comparativa:12,perfil:13};
   const items = document.querySelectorAll('.nav-item');
   if (labels[id] !== undefined) items[labels[id]].classList.add('active');
   const bnMap = {unit:'bn-unit',plans:'bn-plans',roi:'bn-roi',compare:'bn-compare',amort:'bn-amort',sensitivity:'bn-amort',quote:'bn-quote',ficha:'bn-quote',propuesta:'bn-propuesta',locales:'bn-propuesta'};
@@ -1948,6 +1976,7 @@ function showPage(id) {
   }
   if (id === 'seguimiento') renderSeguimiento();
   if (id === 'comparativa') { cPopulateModels(); cPopulatePlans(); renderComparativa(); }
+  if (id === 'perfil') applyPerfilToInputs();
 
   if (id === 'sensitivity' && typeof plans !== 'undefined' && plans.length > 0) {
     var roiSel = document.getElementById('roiPlanSelect');
@@ -3024,7 +3053,7 @@ function previewQuote() {
 
 function buildQuoteHTML() {
   var client  = document.getElementById('qClientName').value || 'Cliente';
-  var advisor = document.getElementById('qAdvisor').value    || '';
+  var advisor = document.getElementById('qAdvisor').value    || perfilName();
   var date    = document.getElementById('qDate').value       || new Date().toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'});
   var note    = document.getElementById('qNote').value       || 'Cotización de unidades residenciales.';
   var roiOn   = document.getElementById('qRoiToggle').classList.contains('on');
@@ -3182,7 +3211,7 @@ function buildQuoteHTML() {
     '<div style="background:#1a3a22;padding:14px 40px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">' +
     '<div style="font-size:10px;color:rgba(255,255,255,0.4)">TORAM</div>' +
     '<div style="font-size:10px;color:rgba(255,255,255,0.35)">Vigencia 3 días · Sujeto a disponibilidad</div>' +
-    '<div style="font-size:12px;font-weight:700;color:#b8d890">669 139 3136</div></div></div>';
+    '<div style="font-size:12px;font-weight:700;color:#b8d890">'+perfilPhone()+'</div></div></div>';
 }
 
 // Vigencia de propuestas/cotizaciones: 3 días a partir de la emisión (día en que se genera el PDF).
@@ -3196,7 +3225,7 @@ function exportQuotePDF(share) {
   var jsPDF = getJsPDF(); if (!jsPDF) return;
 
   var clientName = document.getElementById('qClientName').value || 'Cliente';
-  var advisor    = document.getElementById('qAdvisor').value    || '';
+  var advisor    = document.getElementById('qAdvisor').value    || perfilName();
   var date       = document.getElementById('qDate').value       || new Date().toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'});
   var note       = document.getElementById('qNote').value       || '';
   var roiOn      = document.getElementById('qRoiToggle').classList.contains('on');
@@ -3383,20 +3412,23 @@ function exportQuotePDF(share) {
   }
 
   // QR al mapa del parque (al final, antes del pie)
-  if (y > 235){ doc.addPage(); y = 20; }
-  y += 6;
-  doc.setDrawColor(184,212,184); doc.setLineWidth(0.6); doc.line(M,y,W-M,y);
-  hdr(7,[45,96,64],true); doc.text('CONOCE EL PARQUE', M, y-1.5);
-  y += 6;
-  try { doc.addImage(MAPA_QR_IMG, 'PNG', M, y, 20, 20); } catch(e){}
-  hdr(7,[45,96,64],true);
-  doc.text('Escanea el código con tu celular', M + 24, y + 8);
-  hdr(7,[90,122,90],false);
-  doc.text('para recorrer el parque en el mapa interactivo.', M + 24, y + 13);
-  var qMapaTxt = 'https://cristobalderrama.github.io/Toram/mapa/';
-  hdr(7,[45,96,64],true);
-  doc.text(qMapaTxt, M + 24, y + 18);
-  doc.link(M + 24, y + 14, doc.getTextWidth(qMapaTxt), 6, {url: 'https://cristobalderrama.github.io/Toram/mapa/'});
+  // Solo si el perfil lo incluye (Mi perfil).
+  if (perfilShowQR()) {
+    if (y > 235){ doc.addPage(); y = 20; }
+    y += 6;
+    doc.setDrawColor(184,212,184); doc.setLineWidth(0.6); doc.line(M,y,W-M,y);
+    hdr(7,[45,96,64],true); doc.text('CONOCE EL PARQUE', M, y-1.5);
+    y += 6;
+    try { doc.addImage(MAPA_QR_IMG, 'PNG', M, y, 20, 20); } catch(e){}
+    hdr(7,[45,96,64],true);
+    doc.text('Escanea el código con tu celular', M + 24, y + 8);
+    hdr(7,[90,122,90],false);
+    doc.text('para recorrer el parque en el mapa interactivo.', M + 24, y + 13);
+    var qMapaTxt = 'https://cristobalderrama.github.io/Toram/mapa/';
+    hdr(7,[45,96,64],true);
+    doc.text(qMapaTxt, M + 24, y + 18);
+    doc.link(M + 24, y + 14, doc.getTextWidth(qMapaTxt), 6, {url: 'https://cristobalderrama.github.io/Toram/mapa/'});
+  }
 
   // Footer
   var pages = doc.getNumberOfPages();
@@ -3406,13 +3438,13 @@ function exportQuotePDF(share) {
     hdr(7,[140,175,140],false);
     doc.text('TORAM', M, 292);
     doc.text('Vigencia 3 días · Sujeto a disponibilidad', W/2, 292, {align:'center'});
-    hdr(8,[184,216,144],true); doc.text('669 139 3136', W-M, 292, {align:'right'});
+    hdr(8,[184,216,144],true); doc.text(perfilPhone(), W-M, 292, {align:'right'});
     if (pages>1){ hdr(6.5,[120,155,120],false); doc.text(pg+' / '+pages, W/2, 284, {align:'center'}); }
   }
   var qFname = 'Toram_Cotizacion_'+clientName.replace(/[^a-z0-9]/gi,'_').toUpperCase()+'.pdf';
   var qUnitLabel = quoteUnits.map(function(u){ return u.inv.torre+'-'+u.inv.num; }).join(', ');
   saveFollowUp('cotizacion', qUnitLabel);
-  if (share) { sharePDFBlob(doc, qFname, 'Te comparto la cotización de TORAM Residencial con ' + quoteUnits.length + (quoteUnits.length===1 ? ' departamento' : ' departamentos') + ' para que compares. Cualquier duda, escríbeme. — Cristobal Rafael, Asesor Comercial de TORAM'); }
+  if (share) { sharePDFBlob(doc, qFname, 'Te comparto la cotización de TORAM Residencial con ' + quoteUnits.length + (quoteUnits.length===1 ? ' departamento' : ' departamentos') + ' para que compares. Cualquier duda, escríbeme. — ' + perfilName() + ', Asesor Comercial de TORAM'); }
   else { doc.save(qFname); }
 }
 
@@ -4347,7 +4379,7 @@ function buildFichaHTML(inv, dpPct) {
   '<div style="background:#1a3a22;padding:12px 32px;display:flex;justify-content:space-between;align-items:center">' +
   '<div style="font-size:10px;color:rgba(255,255,255,0.4)">TORAM Residencial</div>' +
   '<div style="font-size:10px;color:rgba(255,255,255,0.35)">Precios sujetos a disponibilidad · Vigencia 3 días · '+new Date().toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'})+'</div>' +
-  '<div style="font-size:11px;font-weight:700;color:#b8d890">669 139 3136</div>' +
+  '<div style="font-size:11px;font-weight:700;color:#b8d890">'+perfilPhone()+'</div>' +
   '</div></div>';
 }
 
@@ -4579,7 +4611,7 @@ function exportFichaPDF() {
     setStyle(7,[100,140,100],false);
     doc.text('Vigencia 3 días · ' + new Date().toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'}), W/2, 292, {align:'center'});
     setStyle(8,[184,216,144],true);
-    doc.text('669 139 3136', W - M, 292, {align:'right'});
+    doc.text(perfilPhone(), W - M, 292, {align:'right'});
   }
 
   doc.save('Toram_Ficha_' + inv.torre + '_' + inv.num.replace(/[^a-z0-9]/gi,'_') + '.pdf');
@@ -5094,10 +5126,53 @@ function pRoiOpts() {
   };
 }
 
+// ── Mi perfil ─────────────────────────────────────────────────────────────
+// Cada asesor guarda SU nombre, su teléfono y si quiere el QR al mapa, en SU
+// teléfono (localStorage). Si no hay nada guardado, todo funciona como
+// siempre con los datos de Cristobal Rafael: NO se pide nada, no hay login
+// ni pantalla de registro. El perfil es solo para quien quiera cambiarlo.
+var PERFIL_DEFAULT = {name:'Cristobal Rafael', phone:'669 139 3136', showQR:true};
+function getPerfil(){
+  try {
+    var raw = localStorage.getItem('toram_perfil_v1');
+    if (!raw) return {name:PERFIL_DEFAULT.name, phone:PERFIL_DEFAULT.phone, showQR:PERFIL_DEFAULT.showQR};
+    var p = JSON.parse(raw);
+    return {
+      name: (p.name || '').trim() || PERFIL_DEFAULT.name,
+      phone: (p.phone || '').trim() || PERFIL_DEFAULT.phone,
+      showQR: p.showQR !== false
+    };
+  } catch(e){ return {name:PERFIL_DEFAULT.name, phone:PERFIL_DEFAULT.phone, showQR:PERFIL_DEFAULT.showQR}; }
+}
+function perfilName(){ return getPerfil().name; }
+function perfilPhone(){ return getPerfil().phone; }
+function perfilShowQR(){ return getPerfil().showQR; }
+function savePerfil(){
+  var p = {
+    name: (document.getElementById('pfName').value || '').trim(),
+    phone: (document.getElementById('pfPhone').value || '').trim(),
+    showQR: document.getElementById('pfShowQR').checked
+  };
+  try { localStorage.setItem('toram_perfil_v1', JSON.stringify(p)); } catch(e){}
+  applyPerfilToInputs();
+  alert('Perfil guardado. Desde ahora tus propuestas, cotizaciones y comparativas salen con tu nombre y tu teléfono.');
+}
+function applyPerfilToInputs(){
+  var p = getPerfil();
+  ['pAdvisor','lAdvisor','cAdvisor','qAdvisor'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (el) el.value = p.name;
+  });
+  var n = document.getElementById('pfName'), t = document.getElementById('pfPhone'), q = document.getElementById('pfShowQR');
+  if (n) n.value = p.name;
+  if (t) t.value = p.phone;
+  if (q) q.checked = p.showQR;
+}
+
 function pClientData() {
   return {
     client: document.getElementById('pClientName').value || 'Cliente',
-    advisor: document.getElementById('pAdvisor').value || 'Cristobal Rafael',
+    advisor: document.getElementById('pAdvisor').value || perfilName(),
     dateStr: document.getElementById('pDate').value || new Date().toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'}),
     note: document.getElementById('pNote').value || ''
   };
@@ -5250,12 +5325,12 @@ function buildPropuestaDeptoHTML() {
   '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#2d6040;margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Conoce el parque</div>' +
   '<img src="'+PARK_MAP_IMG+'" style="width:100%;display:block;border-radius:4px;border:1px solid #deeadc" alt="Mapa del parque TORAM">' +
   '<div style="font-size:11px;color:#5a7a62;margin-top:8px">TORAM Parque Temático · Mazatlán — el desarrollo completo: parque, plaza y residencial.</div>' +
-  '<div style="display:flex;align-items:center;gap:12px;margin-top:12px"><img src="'+MAPA_QR_IMG+'" style="width:64px;height:64px" alt="QR mapa interactivo"><div><div style="font-size:12px;font-weight:700;color:#2d6040">Escanea el código con tu celular</div><div style="font-size:11px;color:#5a7a62">para recorrer el parque en el mapa interactivo.</div></div></div>' +
+  (perfilShowQR() ? '<div style="display:flex;align-items:center;gap:12px;margin-top:12px"><img src="'+MAPA_QR_IMG+'" style="width:64px;height:64px" alt="QR mapa interactivo"><div><div style="font-size:12px;font-weight:700;color:#2d6040">Escanea el código con tu celular</div><div style="font-size:11px;color:#5a7a62">para recorrer el parque en el mapa interactivo.</div></div></div>' : '') +
   '</div>' +
   '<div style="background:#1a3a22;padding:12px 32px;display:flex;justify-content:space-between;align-items:center">' +
   '<div style="font-size:10px;color:rgba(255,255,255,0.4)">TORAM Residencial · Proyecciones basadas en el desempeño esperado; no constituyen garantía.</div>' +
   '<div style="font-size:10px;color:rgba(255,255,255,0.35)">Vigencia 3 días · Precios sujetos a disponibilidad · '+cd.dateStr+'</div>' +
-  '<div style="font-size:11px;font-weight:700;color:#d4a84b">669 139 3136</div>' +
+  '<div style="font-size:11px;font-weight:700;color:#d4a84b">'+perfilPhone()+'</div>' +
   '</div></div>';
 }
 
@@ -5330,13 +5405,13 @@ function buildPropuestaPartHTML() {
   '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#2d6040;margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Conoce el parque</div>' +
   '<img src="'+PARK_MAP_IMG+'" style="width:100%;display:block;border-radius:4px;border:1px solid #deeadc" alt="Mapa del parque TORAM">' +
   '<div style="font-size:11px;color:#5a7a62;margin-top:8px">El parque es la inversión: atracciones, cenote, playa y experiencias en Mazatlán.</div>' +
-  '<div style="display:flex;align-items:center;gap:12px;margin-top:12px"><img src="'+MAPA_QR_IMG+'" style="width:64px;height:64px" alt="QR mapa interactivo"><div><div style="font-size:12px;font-weight:700;color:#2d6040">Escanea el código con tu celular</div><div style="font-size:11px;color:#5a7a62">para recorrer el parque en el mapa interactivo.</div></div></div>' +
+  (perfilShowQR() ? '<div style="display:flex;align-items:center;gap:12px;margin-top:12px"><img src="'+MAPA_QR_IMG+'" style="width:64px;height:64px" alt="QR mapa interactivo"><div><div style="font-size:12px;font-weight:700;color:#2d6040">Escanea el código con tu celular</div><div style="font-size:11px;color:#5a7a62">para recorrer el parque en el mapa interactivo.</div></div></div>' : '') +
   '</div>' +
   atrHtml +
   '<div style="background:#1a3a22;padding:12px 32px;display:flex;justify-content:space-between;align-items:center">' +
   '<div style="font-size:10px;color:rgba(255,255,255,0.4)">TORAM Parque Temático · Proyecciones basadas en el desempeño esperado; no constituyen garantía.</div>' +
   '<div style="font-size:10px;color:rgba(255,255,255,0.35)">Vigencia 3 días · Sujeto a disponibilidad · '+cd.dateStr+'</div>' +
-  '<div style="font-size:11px;font-weight:700;color:#d4a84b">669 139 3136</div>' +
+  '<div style="font-size:11px;font-weight:700;color:#d4a84b">'+perfilPhone()+'</div>' +
   '</div></div>';
 }
 
@@ -5479,7 +5554,7 @@ var cCurrentUnits = [];
 function cClientData(){
   return {
     client: document.getElementById('cClientName').value || 'Cliente',
-    advisor: document.getElementById('cAdvisor').value || 'Cristobal Rafael',
+    advisor: document.getElementById('cAdvisor').value || perfilName(),
     dateStr: document.getElementById('cDate').value || new Date().toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'})
   };
 }
@@ -5793,11 +5868,11 @@ function exportComparativaPDF(share){
   doc.text(mapaTxt, M, y);
   doc.link(M, y - 4, doc.getTextWidth(mapaTxt), 6, {url: 'https://cristobalderrama.github.io/Toram/mapa/'});
   st(8, [100,140,100], false);
-  doc.text('Cristobal Rafael, Asesor Comercial de TORAM  ·  WhatsApp 669 139 3136', W - M, y, {align:'right'});
+  doc.text(perfilName() + ', Asesor Comercial de TORAM  ·  WhatsApp ' + perfilPhone(), W - M, y, {align:'right'});
   var fname = 'Toram_Cotizacion_Comparativa_' + cClientFileName() + '.pdf';
   var unitLabel = cUnits.map(function(x){ return x.inv.torre + '-' + x.inv.num; }).join(', ');
   saveFollowUp('comparativa', unitLabel);
-  if (share) { sharePDFBlob(doc, fname, 'Te comparto una cotización comparativa de TORAM Residencial con ' + cUnits.length + ' opciones para que las veas lado a lado. Cualquier duda, escríbeme. — Cristobal Rafael, Asesor Comercial de TORAM'); }
+  if (share) { sharePDFBlob(doc, fname, 'Te comparto una cotización comparativa de TORAM Residencial con ' + cUnits.length + ' opciones para que las veas lado a lado. Cualquier duda, escríbeme. — ' + perfilName() + ', Asesor Comercial de TORAM'); }
   else { doc.save(fname); }
 }
 
@@ -5843,7 +5918,7 @@ function exportPropuestaDeptoPDF(share) {
       setStyle(7,[100,140,100],false);
       doc.text('Vigencia 3 días · ' + cd.dateStr, W/2, 292, {align:'center'});
       setStyle(8,[212,168,75],true);
-      doc.text('669 139 3136', W - M, 292, {align:'right'});
+      doc.text(perfilPhone(), W - M, 292, {align:'right'});
     }
   }
 
@@ -6145,28 +6220,36 @@ function exportPropuestaDeptoPDF(share) {
   doc.text('Atracciones, cenote, playa y experiencias: el parque es el corazón del desarrollo.', M, y);
   y += 4;
   // Mapa interactivo del parque (enlace clicable)
-  var mapaTxt = 'Recorre el parque en el mapa interactivo: cristobalderrama.github.io/Toram/mapa/';
-  setStyle(7,[45,96,64],true);
-  doc.text(mapaTxt, M, y);
-  doc.link(M, y - 5, doc.getTextWidth(mapaTxt), 7, {url: 'https://cristobalderrama.github.io/Toram/mapa/'});
-  y += 8;
+  // Solo si el perfil lo incluye: es el mismo destino que el QR (la página
+  // personal de Cristo), así que se quita junto con él en Mi perfil.
+  if (perfilShowQR()) {
+    var mapaTxt = 'Recorre el parque en el mapa interactivo: cristobalderrama.github.io/Toram/mapa/';
+    setStyle(7,[45,96,64],true);
+    doc.text(mapaTxt, M, y);
+    doc.link(M, y - 5, doc.getTextWidth(mapaTxt), 7, {url: 'https://cristobalderrama.github.io/Toram/mapa/'});
+    y += 8;
+  }
   setStyle(8,[90,122,90],false);
   var parkLines = doc.splitTextToSize('El parque temático TORAM es el desarrollo de entretenimiento más ambicioso del noroeste de México: cenote, río subterráneo, playa artificial, tirolesa, museo interactivo y más de 10 atracciones en un solo lugar, a minutos del malecón de Mazatlán.', CW);
   parkLines.forEach(function(ln){ doc.text(ln, M, y); y += 4.5; });
   // QR al mapa interactivo (para impresos: se escanea desde el papel)
-  if (y + 24 > 268) { doc.addPage(); y = 20; }
-  y += 2;
-  try { doc.addImage(MAPA_QR_IMG, 'PNG', M, y, 20, 20); } catch(e) {}
-  setStyle(7,[45,96,64],true);
-  doc.text('Escanea el código con tu celular', M + 24, y + 8);
-  setStyle(7,[90,122,90],false);
-  doc.text('para recorrer el parque en el mapa interactivo.', M + 24, y + 13);
-  y += 20;
+  // Solo si el perfil lo incluye (los compañeros que solo entregan
+  // cotizaciones pueden quitarlo en Mi perfil).
+  if (perfilShowQR()) {
+    if (y + 24 > 268) { doc.addPage(); y = 20; }
+    y += 2;
+    try { doc.addImage(MAPA_QR_IMG, 'PNG', M, y, 20, 20); } catch(e) {}
+    setStyle(7,[45,96,64],true);
+    doc.text('Escanea el código con tu celular', M + 24, y + 8);
+    setStyle(7,[90,122,90],false);
+    doc.text('para recorrer el parque en el mapa interactivo.', M + 24, y + 13);
+    y += 20;
+  }
 
   pFooter();
   var fname = 'Toram_Propuesta_' + pClientFileName() + '.pdf';
   saveFollowUp('depto', inv.torre + '-' + inv.num);
-  if (share) { sharePDFBlob(doc, fname, 'Te comparto la propuesta del departamento ' + inv.torre + '-' + inv.num + ' de TORAM Residencial. Cualquier duda, escríbeme. — Cristobal Rafael, Asesor Comercial de TORAM'); }
+  if (share) { sharePDFBlob(doc, fname, 'Te comparto la propuesta del departamento ' + inv.torre + '-' + inv.num + ' de TORAM Residencial. Cualquier duda, escríbeme. — ' + perfilName() + ', Asesor Comercial de TORAM'); }
   else { doc.save(fname); }
 }
 
@@ -6309,23 +6392,31 @@ function exportPropuestaPartPDF(share) {
   doc.text('Atracciones, cenote, playa y experiencias: el parque es el corazón del desarrollo.', M, y);
   y += 4;
   // Mapa interactivo del parque (enlace clicable)
-  var mapaTxt = 'Recorre el parque en el mapa interactivo: cristobalderrama.github.io/Toram/mapa/';
-  setStyle(7,[45,96,64],true);
-  doc.text(mapaTxt, M, y);
-  doc.link(M, y - 5, doc.getTextWidth(mapaTxt), 7, {url: 'https://cristobalderrama.github.io/Toram/mapa/'});
-  y += 8;
+  // Solo si el perfil lo incluye: es el mismo destino que el QR (la página
+  // personal de Cristo), así que se quita junto con él en Mi perfil.
+  if (perfilShowQR()) {
+    var mapaTxt = 'Recorre el parque en el mapa interactivo: cristobalderrama.github.io/Toram/mapa/';
+    setStyle(7,[45,96,64],true);
+    doc.text(mapaTxt, M, y);
+    doc.link(M, y - 5, doc.getTextWidth(mapaTxt), 7, {url: 'https://cristobalderrama.github.io/Toram/mapa/'});
+    y += 8;
+  }
   setStyle(8,[90,122,90],false);
   var parkLines = doc.splitTextToSize('El parque temático TORAM es el desarrollo de entretenimiento más ambicioso del noroeste de México: cenote, río subterráneo, playa artificial, tirolesa, museo interactivo y más de 10 atracciones en un solo lugar, a minutos del malecón de Mazatlán.', CW);
   parkLines.forEach(function(ln){ doc.text(ln, M, y); y += 4.5; });
   // QR al mapa interactivo (para impresos: se escanea desde el papel)
-  if (y + 24 > 268) { doc.addPage(); y = 20; }
-  y += 2;
-  try { doc.addImage(MAPA_QR_IMG, 'PNG', M, y, 20, 20); } catch(e) {}
-  setStyle(7,[45,96,64],true);
-  doc.text('Escanea el código con tu celular', M + 24, y + 8);
-  setStyle(7,[90,122,90],false);
-  doc.text('para recorrer el parque en el mapa interactivo.', M + 24, y + 13);
-  y += 20;
+  // Solo si el perfil lo incluye (los compañeros que solo entregan
+  // cotizaciones pueden quitarlo en Mi perfil).
+  if (perfilShowQR()) {
+    if (y + 24 > 268) { doc.addPage(); y = 20; }
+    y += 2;
+    try { doc.addImage(MAPA_QR_IMG, 'PNG', M, y, 20, 20); } catch(e) {}
+    setStyle(7,[45,96,64],true);
+    doc.text('Escanea el código con tu celular', M + 24, y + 8);
+    setStyle(7,[90,122,90],false);
+    doc.text('para recorrer el parque en el mapa interactivo.', M + 24, y + 13);
+    y += 20;
+  }
 
   // ── Atracciones del parque (franja vertical, hoja dedicada) ──
   if (typeof PART_ATRACCIONES !== 'undefined' && PART_ATRACCIONES.length) {
@@ -6359,12 +6450,12 @@ function exportPropuestaPartPDF(share) {
     setStyle(7,[100,140,100],false);
     doc.text('Vigencia 3 días · ' + cd.dateStr, W/2, 292, {align:'center'});
     setStyle(8,[212,168,75],true);
-    doc.text('669 139 3136', W - M, 292, {align:'right'});
+    doc.text(perfilPhone(), W - M, 292, {align:'right'});
   }
 
   var fname = 'Toram_Propuesta_' + pClientFileName() + '.pdf';
   saveFollowUp('part', c.qty + (c.qty === 1 ? ' participación' : ' participaciones'));
-  if (share) { sharePDFBlob(doc, fname, 'Te comparto la propuesta de ' + c.qty + (c.qty === 1 ? ' participación' : ' participaciones') + ' de TORAM Parque Temático. Cualquier duda, escríbeme. — Cristobal Rafael, Asesor Comercial de TORAM'); }
+  if (share) { sharePDFBlob(doc, fname, 'Te comparto la propuesta de ' + c.qty + (c.qty === 1 ? ' participación' : ' participaciones') + ' de TORAM Parque Temático. Cualquier duda, escríbeme. — ' + perfilName() + ', Asesor Comercial de TORAM'); }
   else { doc.save(fname); }
 }
 
@@ -6548,7 +6639,7 @@ function lOnPlanChange() {
 function lClientData() {
   return {
     client: document.getElementById('lClientName').value || 'Cliente',
-    advisor: document.getElementById('lAdvisor').value || 'Cristobal Rafael',
+    advisor: document.getElementById('lAdvisor').value || perfilName(),
     dateStr: document.getElementById('lDate').value || new Date().toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'}),
     note: document.getElementById('lNote').value || ''
   };
@@ -6704,7 +6795,7 @@ function exportLocalesPDF(share) {
       setStyle(7,[100,140,100],false);
       doc.text('Vigencia 3 días · ' + cd.dateStr, W/2, 292, {align:'center'});
       setStyle(8,[212,168,75],true);
-      doc.text('669 139 3136', W - M, 292, {align:'right'});
+      doc.text(perfilPhone(), W - M, 292, {align:'right'});
     }
   }
 
@@ -6907,7 +6998,7 @@ function exportLocalesPDF(share) {
   setStyle(6.5,[140,165,140],false);
   doc.text('* Precios sujetos a disponibilidad. Descuentos sobre precio de lista, sin intereses.', M, y);
   y += 4;
-  doc.text('Sujeto a disponibilidad · TORAM Plaza Comercial · 669 139 3136', M, y);
+  doc.text('Sujeto a disponibilidad · TORAM Plaza Comercial · ' + perfilPhone(), M, y);
   y += 4;
   if (y > 270) { doc.addPage(); y = 20; }
   setStyle(7,[45,96,64],true);
@@ -6918,7 +7009,7 @@ function exportLocalesPDF(share) {
   lFooter();
   var fname = 'Toram_Cotizacion_Local_' + lClientFileName() + '.pdf';
   saveFollowUp('locales', 'Local ' + loc.id);
-  if (share) { sharePDFBlob(doc, fname, 'Te comparto la cotización del Local ' + loc.id + ' de la Plaza TORAM. Cualquier duda, escríbeme. — Cristobal Rafael, Asesor Comercial de TORAM'); }
+  if (share) { sharePDFBlob(doc, fname, 'Te comparto la cotización del Local ' + loc.id + ' de la Plaza TORAM. Cualquier duda, escríbeme. — ' + perfilName() + ', Asesor Comercial de TORAM'); }
   else { doc.save(fname); }
 }
 
@@ -7169,6 +7260,7 @@ function downloadUpdatedCalculatorHTML() {
 
 
 window.addEventListener('DOMContentLoaded', function() {
+  applyPerfilToInputs();
   showPage('unit');
   syncDpDisplay();
   // Logo oficial en la banda de la Propuesta
