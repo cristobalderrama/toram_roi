@@ -3,6 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>
+// Vista Web / Móvil: cada quien elige cómo ver la calculadora según el
+// dispositivo que usa. Se aplica antes de pintar la página para que no
+// parpadee el diseño. Guardado por teléfono (localStorage).
+try {
+  var _v = localStorage.getItem('toram_vista_v1');
+  if (_v === 'web') document.documentElement.classList.add('vista-web');
+  else if (_v === 'movil') document.documentElement.classList.add('vista-movil');
+} catch(e){}
+</script>
 <title>Toram — Calculadora de Inversión v2</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0e1a12">
@@ -78,6 +88,18 @@ h1,h2,h3,h4{font-family:'Playfair Display',serif;font-weight:600;line-height:1.2
 .more-menu-item:active{background:#f2f6f2}
 .more-menu-sep{height:1px;background:#dfe8df;margin:12px 0 4px}
 .more-menu-close{display:block;width:100%;margin-top:14px;padding:12px;border:none;border-radius:10px;background:#1a3a22;color:#fff;font-size:15px;font-weight:700;cursor:pointer}
+/* Vista Web forzada: muestra la barra lateral (con todas las opciones) y
+   oculta la barra inferior, aunque la pantalla sea de teléfono. En un
+   teléfono estrecho la página se puede desplazar a lo ancho. */
+html.vista-web .app-shell{grid-template-columns:260px 1fr !important;overflow-x:auto}
+html.vista-web .sidebar{display:flex !important}
+html.vista-web .bottom-nav{display:none !important}
+/* Vista Móvil forzada: oculta la barra lateral y muestra la barra inferior
+   con el botón Más, aunque la pantalla sea ancha. */
+html.vista-movil .app-shell{grid-template-columns:1fr !important}
+html.vista-movil .sidebar{display:none !important}
+html.vista-movil .bottom-nav{display:block !important}
+html.vista-movil .main{padding:16px 14px calc(80px + env(safe-area-inset-bottom)) !important}
 
 .main{padding:32px 40px;overflow-y:auto}
 .page{display:none}
@@ -330,6 +352,9 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
     <button class="more-menu-item" onclick="showPage('comparativa')">Cotización comparativa</button>
     <button class="more-menu-item" onclick="showPage('perfil')">Mi perfil</button>
     <button class="more-menu-item" onclick="closeMoreMenu(); updateApp()">Actualizar app</button>
+    <div class="more-menu-sep"></div>
+    <div class="more-menu-title">Vista</div>
+    <button class="more-menu-item" id="vistaToggleMas" onclick="toggleVista()">Ver como web</button>
     <button class="more-menu-close" onclick="closeMoreMenu()">Cerrar</button>
   </div>
 </div>
@@ -408,7 +433,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
     <div id="updateAppStatus" style="font-size:11px;color:#8fb996;padding:2px 12px 0 12px;min-height:14px"></div>
   </nav>
   <div class="sidebar-footer">
-    Disponibilidad actualizada:<br><strong>T1:</strong> 12-Nov-2026 · <strong>T2:</strong> 07-Oct-2026<br><span style="opacity:0.6">Exportar PDF desde cada sección.</span>
+    Disponibilidad actualizada:<br><strong>T1:</strong> 12-Nov-2026 · <strong>T2:</strong> 19-Nov-2026<br><button onclick="toggleVista()" id="vistaToggleSide" style="margin-top:10px;background:none;border:1px solid rgba(255,255,255,0.35);color:#e8edf5;border-radius:8px;padding:7px 12px;font-size:12px;cursor:pointer">Vista: automática</button><br><span style="opacity:0.6">Exportar PDF desde cada sección.</span>
   </div>
 </aside>
 
@@ -1989,6 +2014,41 @@ let qSearchSelected = null;
 const deliveryMonths = () => document.getElementById('tower').value === '1' ? 24 : 42;
 
 // ── Navigation ─────────────────────────────────────────────────────────────
+// Vista Web / Móvil: cada quien elige cómo ver la calculadora según el
+// dispositivo que usa. 'web' fuerza la barra lateral (todas las opciones),
+// 'movil' fuerza la barra inferior con el botón Más, 'auto' sigue el
+// tamaño de la pantalla. Guardado por teléfono (localStorage).
+function getVista(){
+  try { return localStorage.getItem('toram_vista_v1') || 'auto'; } catch(e){ return 'auto'; }
+}
+function setVista(mode){
+  try { localStorage.setItem('toram_vista_v1', mode); } catch(e){}
+  var h = document.documentElement;
+  h.classList.remove('vista-web','vista-movil');
+  if (mode === 'web') h.classList.add('vista-web');
+  else if (mode === 'movil') h.classList.add('vista-movil');
+  updateVistaLabels();
+}
+function toggleVista(){
+  // En teléfono, alterna entre la vista que le toca (auto/móvil) y la web.
+  // En escritorio, alterna entre la web y la móvil.
+  var cur = getVista();
+  var esMovil = window.innerWidth <= 768;
+  if (cur === 'web') setVista(esMovil ? 'movil' : 'auto');
+  else setVista('web');
+}
+function updateVistaLabels(){
+  var cur = getVista();
+  var esMovil = window.innerWidth <= 768;
+  var enWeb = cur === 'web' || (cur === 'auto' && !esMovil);
+  var txtSide = enWeb ? 'Vista: web' : 'Vista: móvil';
+  var txtMas = enWeb ? 'Ver como móvil' : 'Ver como web';
+  var s = document.getElementById('vistaToggleSide');
+  if (s) s.textContent = txtSide;
+  var m = document.getElementById('vistaToggleMas');
+  if (m) m.textContent = txtMas;
+}
+
 // Menú "Más" (móvil): abre/cierra la hoja con las páginas que no caben
 // en la barra inferior (Locales, Ficha, Sensibilidad y Administración).
 function toggleMoreMenu(){
@@ -7305,6 +7365,7 @@ function downloadUpdatedCalculatorHTML() {
 
 window.addEventListener('DOMContentLoaded', function() {
   applyPerfilToInputs();
+  updateVistaLabels();
   showPage('unit');
   syncDpDisplay();
   // Logo oficial en la banda de la Propuesta
