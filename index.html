@@ -13,6 +13,7 @@ try {
   else if (_v === 'movil') document.documentElement.classList.add('vista-movil');
   var _m = localStorage.getItem('toram_modo_v1');
   if (_m === 'sencillo') document.documentElement.classList.add('modo-sencillo');
+  if (/Android/i.test(navigator.userAgent)) document.documentElement.classList.add('android');
 } catch(e){}
 </script>
 <title>Toram — Calculadora de Inversión v2</title>
@@ -108,6 +109,26 @@ html.modo-sencillo .nav-item.avanzado{display:none}
 html.modo-sencillo .nav-section-avanzado{display:none}
 html.modo-sencillo .bnav-item.avanzado{display:none}
 html.modo-sencillo .more-menu-item.avanzado{display:none}
+/* Android: texto más grande y más aire en la navegación (iPhone no cambia).
+   Solo en pantallas de teléfono; en laptop/web no se toca nada. */
+@media(max-width:768px){
+  html.android body{font-size:16px;line-height:1.7}
+  html.android .page-header h2{font-size:23px}
+  html.android .page-header p{font-size:15.5px;line-height:1.65}
+  html.android .card{padding:20px 18px}
+  html.android .card-title{font-size:16.5px}
+  html.android .label{font-size:13px}
+  html.android .label-hint{font-size:12px}
+  html.android input[type=number],html.android input[type=text],html.android select{font-size:16px;padding:12px 14px}
+  html.android .btn{padding:13px 22px;font-size:15.5px}
+  html.android .btn-sm{padding:10px 16px;font-size:14px}
+  html.android .bnav-item svg{width:22px;height:22px}
+  html.android .metric-value{font-size:22px}
+  html.android .metric-label{font-size:11px}
+  html.android .plans-table{font-size:13px}
+  html.android .comp-table{font-size:12px}
+  html.android .main{padding:20px 16px calc(84px + env(safe-area-inset-bottom))}
+}
 html.vista-movil .main{padding:16px 14px calc(80px + env(safe-area-inset-bottom)) !important}
 
 .main{padding:32px 40px;overflow-y:auto}
