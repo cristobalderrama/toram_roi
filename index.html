@@ -19,7 +19,7 @@ try {
 <title>Toram — Calculadora de Inversión v2</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0e1a12">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -35,7 +35,13 @@ try {
   --green-dark:#2d6040;
   --green-text:#1a3320;
   --green-soft:#5a7a62;
-  --surface:#f4f6fb;
+  --surface:#EFE7D3;
+  --paper:#F7F2EA;
+  --paper-card:#FDFBF6;
+  --hairline:rgba(14,26,18,0.14);
+  --font-display:'Cormorant Garamond',Georgia,serif;
+  --font-sans:'IBM Plex Sans',sans-serif;
+  --font-mono:'IBM Plex Mono',ui-monospace,monospace;
   --cream:#f7f5ef;
   --white:#ffffff;
   --text-primary:#1a2540;
@@ -61,8 +67,8 @@ try {
   --radius-lg:10px;
   --radius-xl:14px;
 }
-body{font-family:'Source Sans 3',sans-serif;background:#f4f3ee;color:var(--text-primary);font-size:15px;line-height:1.6;min-height:100vh}
-h1,h2,h3,h4{font-family:'Playfair Display',serif;font-weight:600;line-height:1.25}
+body{font-family:'IBM Plex Sans',sans-serif;background:var(--paper);color:var(--text-primary);font-size:15px;line-height:1.6;min-height:100vh}
+h1,h2,h3,h4{font-family:'Cormorant Garamond',serif;font-weight:600;line-height:1.25}
 
 /* Layout */
 .app-shell{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
@@ -84,7 +90,7 @@ h1,h2,h3,h4{font-family:'Playfair Display',serif;font-weight:600;line-height:1.2
 /* Bottom nav — mobile only */
 .bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--navy);z-index:100;border-top:1px solid rgba(255,255,255,0.1);padding:0;safe-area-inset-bottom:env(safe-area-inset-bottom)}
 .bottom-nav-inner{display:flex;justify-content:space-around;padding:6px 0 calc(6px + env(safe-area-inset-bottom))}
-.bnav-item{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;cursor:pointer;border:none;background:none;color:rgba(200,215,240,0.70);font-family:'Source Sans 3',sans-serif;font-size:10px;font-weight:600;letter-spacing:0.04em;transition:color 0.15s;white-space:nowrap;overflow:hidden}
+.bnav-item{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;cursor:pointer;border:none;background:none;color:rgba(200,215,240,0.70);font-family:'IBM Plex Sans',sans-serif;font-size:10px;font-weight:600;letter-spacing:0.04em;transition:color 0.15s;white-space:nowrap;overflow:hidden}
 .bnav-item.active{color:var(--gold-light)}
 .bnav-item svg{width:20px;height:20px}
 .bnav-dot{width:4px;height:4px;border-radius:50%;background:var(--gold-light);margin-top:1px;opacity:0;transition:opacity 0.15s}
@@ -147,10 +153,17 @@ html.vista-movil .main{padding:16px 14px calc(80px + env(safe-area-inset-bottom)
 .page-header h2{font-size:30px;font-weight:700;color:var(--navy)}
 .page-header p{font-size:14px;color:var(--text-muted);margin-top:4px}
 .breadcrumb{font-size:12px;color:var(--text-muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.08em}
+/* Inicio: hero de libro mayor (Dirección 1) + motivo del plano (Dirección 5) */
+#page-inicio .page-header{position:relative;overflow:hidden;background:var(--navy);border-radius:var(--radius);padding:22px 24px;margin-bottom:16px;border-bottom:4px solid var(--gold)}
+#page-inicio .page-header::after{content:'';position:absolute;inset:5px;border:1px solid rgba(212,175,90,0.45);border-radius:4px;pointer-events:none}
+#page-inicio .page-header h2{color:#fff;position:relative;z-index:1}
+#page-inicio .page-header p{color:rgba(255,255,255,.78);position:relative;z-index:1}
+#page-inicio .breadcrumb{color:var(--gold-light);position:relative;z-index:1}
+.inicio-map{position:absolute;top:0;right:0;height:100%;width:auto;opacity:0.08;pointer-events:none}
 
 /* Cards */
-.card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:26px;box-shadow:var(--shadow-sm)}
-.card-title{font-size:19px;font-weight:700;color:var(--navy);margin-bottom:6px;padding-bottom:10px;border-bottom:3px solid var(--gold);font-family:'Playfair Display',serif}
+.card{background:var(--paper-card);border:1px solid var(--hairline);border-radius:var(--radius-lg);padding:26px;box-shadow:none}
+.card-title{font-size:19px;font-weight:700;color:var(--navy);margin-bottom:6px;padding-bottom:10px;border-bottom:3px solid var(--gold);font-family:'Cormorant Garamond',serif}
 .card-subtitle{font-size:12px;color:var(--text-muted);margin-bottom:16px}
 .card + .card{margin-top:20px}
 
@@ -219,12 +232,12 @@ html.vista-movil .main{padding:16px 14px calc(80px + env(safe-area-inset-bottom)
 .field{display:flex;flex-direction:column;gap:5px}
 .label{font-size:12px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.06em}
 .label-hint{font-size:11px;color:var(--text-muted);font-weight:400;text-transform:none;letter-spacing:0}
-input[type=number],input[type=text],select{border:1px solid var(--border-strong);border-radius:var(--radius);padding:9px 12px;font-size:16px;font-family:'Source Sans 3',sans-serif;color:var(--text-primary);background:var(--white);width:100%;transition:border-color 0.15s,box-shadow 0.15s;outline:none}
+input[type=number],input[type=text],select{border:1px solid var(--border-strong);border-radius:var(--radius);padding:9px 12px;font-size:16px;font-family:'IBM Plex Sans',sans-serif;color:var(--text-primary);background:var(--white);width:100%;transition:border-color 0.15s,box-shadow 0.15s;outline:none}
 input:focus,select:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(184,144,46,0.12)}
 select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23718096' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px}
 
 /* Buttons */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 20px;border-radius:var(--radius);font-family:'Source Sans 3',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.15s;border:none;outline:none}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 20px;border-radius:var(--radius);font-family:'IBM Plex Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.15s;border:none;outline:none}
 .btn-primary{background:var(--navy);color:var(--white)}
 .btn-primary:hover{background:var(--navy-light)}
 .btn-gold{background:var(--gold);color:var(--navy)}
@@ -241,9 +254,9 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 .btn-icon{width:18px;height:18px}
 
 /* Metric cards */
-.metric{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px}
+.metric{background:var(--paper-card);border:1px solid var(--hairline);border-radius:var(--radius-lg);padding:16px 18px}
 .metric-label{font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted);margin-bottom:6px}
-.metric-value{font-size:26px;font-weight:600;font-family:'Playfair Display',serif;line-height:1.1}
+.metric-value{font-size:24px;font-weight:500;font-family:var(--font-mono);font-variant-numeric:tabular-nums;line-height:1.15}
 .metric-sub{font-size:11px;color:var(--text-muted);margin-top:4px}
 .metric.green .metric-value{color:var(--green)}
 .metric.red .metric-value{color:var(--red)}
@@ -251,6 +264,15 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 .metric.purple .metric-value{color:var(--purple)}
 .metric.amber .metric-value{color:var(--amber)}
 .metric.accent{border-left:3px solid var(--gold)}
+/* Libro mayor (Dirección 1): renglones etiqueta-izquierda / monto-derecha */
+.ledger{border-top:1px solid var(--hairline)}
+.ledger-row{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 2px;border-bottom:1px solid var(--hairline)}
+.ledger-row .ledger-label{color:var(--text-muted);font-size:13px}
+.ledger-row .ledger-amount{font-family:var(--font-mono);font-weight:500;text-align:right;font-variant-numeric:tabular-nums;color:var(--green-text);white-space:nowrap}
+.ledger-row.ledger-total{border-bottom:none;border-top:2px solid var(--gold);padding-top:12px}
+.ledger-row.ledger-total .ledger-label{color:var(--green-text);font-weight:600}
+.ledger-row.ledger-total .ledger-amount{font-weight:600;color:var(--navy)}
+#pPreviewContent td,#cPreviewContent td{font-variant-numeric:tabular-nums}
 
 /* Plans table */
 .plans-table{width:100%;border-collapse:collapse;font-size:13.5px}
@@ -258,7 +280,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 .plans-table td{padding:11px 14px;border-bottom:1px solid var(--border);color:var(--text-primary)}
 .plans-table tr:last-child td{border-bottom:none}
 .plans-table tr:hover td{background:var(--surface)}
-.plans-table .num{text-align:right;font-variant-numeric:tabular-nums}
+.plans-table .num{text-align:right;font-family:var(--font-mono);font-variant-numeric:tabular-nums}
 .plans-table .badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600}
 .badge-green{background:var(--green-bg);color:var(--green)}
 .badge-gold{background:var(--gold-pale);color:var(--navy)}
@@ -267,14 +289,14 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 /* Toggle */
 .toggle-wrap{display:flex;align-items:center;gap:10px;cursor:pointer}
 .toggle-track{width:40px;height:22px;border-radius:999px;background:var(--border-strong);position:relative;transition:background 0.2s;flex-shrink:0}
-.toggle-track.on{background:var(--gold)}
+.toggle-track.on{background:var(--green-dark)}
 .toggle-thumb{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:white;transition:left 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2)}
 .toggle-track.on .toggle-thumb{left:21px}
 .toggle-label{font-size:13.5px;color:var(--text-secondary)}
 
 /* Scenario toggle */
 .scenario-tabs{display:flex;gap:0;border:1.5px solid var(--border-strong);border-radius:var(--radius);overflow:hidden;margin-bottom:20px;width:fit-content}
-.scenario-tab{padding:8px 20px;font-size:13px;font-weight:600;cursor:pointer;background:var(--white);color:var(--text-muted);border:none;transition:all 0.15s;font-family:'Source Sans 3',sans-serif}
+.scenario-tab{padding:8px 20px;font-size:13px;font-weight:600;cursor:pointer;background:var(--white);color:var(--text-muted);border:none;transition:all 0.15s;font-family:'IBM Plex Sans',sans-serif}
 .scenario-tab.active{background:var(--navy);color:var(--white)}
 
 /* Section divider */
@@ -349,7 +371,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 
 /* ── FASE 2 · Optimización ─────────────────────────────────────────────── */
 .o-apartado-note{background:#fdf8e7;border:1px solid #e8d9a0;border-left:4px solid var(--gold);border-radius:6px;padding:10px 14px;font-size:12.5px;color:#5a4a1a;line-height:1.5}
-.o-best-banner{background:linear-gradient(135deg,#fdf8e7,#fbf3d5);border:1px solid #e8d9a0;border-left:4px solid var(--gold);border-radius:8px;padding:12px 16px;font-size:13.5px;color:#4a3a10;line-height:1.55;margin-bottom:14px}
+.o-best-banner{background:#fdf8e7;border:1px solid #e8d9a0;border-left:4px solid var(--gold);border-radius:8px;padding:12px 16px;font-size:13.5px;color:#4a3a10;line-height:1.55;margin-bottom:14px}
 .comp-table tr.highlight-row td{border-top:2px solid var(--gold);border-bottom:2px solid var(--gold)}
 .comp-table tr.highlight-row td:first-child{border-left:3px solid var(--gold)}
 .comp-table tr.highlight-row td:last-child{border-right:3px solid var(--gold)}
@@ -522,6 +544,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
   <!-- PAGE: Inicio -->
   <div id="page-inicio" class="page">
     <div class="page-header">
+      <img id="inicioMapImg" class="inicio-map" alt="" aria-hidden="true">
       <div class="breadcrumb">TORAM · Parque Temático y Residencial</div>
       <h2>¿Qué quieres hacer hoy?</h2>
       <p>Elige una opción y la calculadora te lleva paso a paso. Nada se borra ni se complica: todo sigue aquí.</p>
@@ -1079,20 +1102,22 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
     <style>
       /* Propuesta: pulido tipográfico y de color, SOLO esta página (selectores con #page-propuesta; no toca el CSS global). */
       #page-propuesta .page-header h2{letter-spacing:.01em}
-      #page-propuesta .p-tab{font-family:'Playfair Display',Georgia,serif;font-size:16px;font-weight:600;letter-spacing:.02em}
+      #page-propuesta .p-tab{font-family:'Cormorant Garamond',Georgia,serif;font-size:16px;font-weight:600;letter-spacing:.02em}
       #page-propuesta .p-tab.active{background:var(--navy);color:#fff;border-color:var(--navy)}
       #page-propuesta .p-tab:not(.active){background:var(--white);color:var(--navy);border:1px solid var(--border-strong)}
-      #page-propuesta .p-price{font-family:'Playfair Display',Georgia,serif;font-size:32px;font-weight:700;line-height:1.1;color:var(--navy)}
-      #page-propuesta .p-figure{font-family:'Playfair Display',Georgia,serif;font-size:22px;font-weight:700;line-height:1.15;color:var(--navy)}
+      #page-propuesta .p-price{font-family:'Cormorant Garamond',Georgia,serif;font-size:44px;font-weight:600;line-height:1.05;color:var(--navy)}
+      #page-propuesta .p-figure{font-family:var(--font-mono);font-size:20px;font-weight:500;line-height:1.2;color:var(--navy);font-variant-numeric:tabular-nums}
       #page-propuesta .p-kicker{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-dark)}
       #page-propuesta .p-note{font-size:12px;color:var(--text-muted);line-height:1.5}
-      #page-propuesta .p-summary{background:var(--gold-pale);border:1px solid var(--gold-border);border-radius:var(--radius);padding:16px 18px}
+      #page-propuesta .p-summary{background:var(--paper-card);border:1px solid var(--hairline);border-radius:var(--radius);padding:20px 22px}
+      #page-propuesta .p-summary .p-price{border-top:2px solid var(--gold);padding-top:12px;margin-top:6px}
       #page-propuesta .p-summary .p-price{color:var(--navy)}
       #page-propuesta .p-modelimg{width:100%;max-height:300px;object-fit:cover;display:block;border-radius:var(--radius);border:1px solid var(--border)}
-      #page-propuesta .p-hero{background:var(--navy);border-radius:var(--radius);padding:22px 24px;display:flex;gap:22px;align-items:center;margin-bottom:16px;border-bottom:4px solid var(--gold)}
+      #page-propuesta .p-hero{background:var(--navy);border-radius:var(--radius);padding:22px 24px;display:flex;gap:22px;align-items:center;margin-bottom:16px;border-bottom:4px solid var(--gold);position:relative}
+      #page-propuesta .p-hero::after{content:'';position:absolute;inset:5px;border:1px solid rgba(212,175,90,0.45);border-radius:4px;pointer-events:none}
       #page-propuesta .p-hero-logo{height:56px;width:auto;flex-shrink:0}
       #page-propuesta .p-hero-kicker{font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-light)}
-      #page-propuesta .p-hero h2{font-family:'Playfair Display',Georgia,serif;font-size:30px;font-weight:700;line-height:1.15;color:#fff;margin:4px 0 6px}
+      #page-propuesta .p-hero h2{font-family:'Cormorant Garamond',Georgia,serif;font-size:30px;font-weight:700;line-height:1.15;color:#fff;margin:4px 0 6px}
       #page-propuesta .p-hero p{font-size:13px;line-height:1.5;color:rgba(255,255,255,.78);margin:0}
     </style>
     <div class="p-hero">
@@ -1277,18 +1302,19 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
   <div id="page-locales" class="page">
     <style>
       /* Locales: pulido tipográfico y de color, SOLO esta página (selectores con #page-locales; no toca el CSS global). */
-      #page-locales .l-hero{background:var(--navy);border-radius:var(--radius);padding:22px 24px;display:flex;gap:22px;align-items:center;margin-bottom:16px;border-bottom:4px solid var(--gold)}
+      #page-locales .l-hero{background:var(--navy);border-radius:var(--radius);padding:22px 24px;display:flex;gap:22px;align-items:center;margin-bottom:16px;border-bottom:4px solid var(--gold);position:relative}
+      #page-locales .l-hero::after{content:'';position:absolute;inset:5px;border:1px solid rgba(212,175,90,0.45);border-radius:4px;pointer-events:none}
       #page-locales .l-hero-logo{height:56px;width:auto;flex-shrink:0}
       #page-locales .l-hero-kicker{font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-light)}
-      #page-locales .l-hero h2{font-family:'Playfair Display',Georgia,serif;font-size:30px;font-weight:700;line-height:1.15;color:#fff;margin:4px 0 6px}
+      #page-locales .l-hero h2{font-family:'Cormorant Garamond',Georgia,serif;font-size:30px;font-weight:700;line-height:1.15;color:#fff;margin:4px 0 6px}
       #page-locales .l-hero p{font-size:13px;line-height:1.5;color:rgba(255,255,255,.78);margin:0}
-      #page-locales .l-price{font-family:'Playfair Display',Georgia,serif;font-size:32px;font-weight:700;line-height:1.1;color:var(--navy)}
-      #page-locales .l-figure{font-family:'Playfair Display',Georgia,serif;font-size:22px;font-weight:700;line-height:1.15;color:var(--navy)}
+      #page-locales .l-price{font-family:'Cormorant Garamond',Georgia,serif;font-size:32px;font-weight:700;line-height:1.1;color:var(--navy)}
+      #page-locales .l-figure{font-family:'Cormorant Garamond',Georgia,serif;font-size:22px;font-weight:700;line-height:1.15;color:var(--navy)}
       #page-locales .l-kicker{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-dark)}
       #page-locales .l-note{font-size:12px;color:var(--text-muted);line-height:1.5}
       #page-locales .l-planoimg{width:100%;display:block;border-radius:var(--radius);border:1px solid var(--border)}
       #page-locales .l-stat{background:var(--gold-pale);border:1px solid var(--gold-border);border-radius:var(--radius);padding:14px 16px;text-align:center}
-      #page-locales .l-stat-num{font-family:'Playfair Display',Georgia,serif;font-size:26px;font-weight:700;line-height:1.1;color:var(--navy)}
+      #page-locales .l-stat-num{font-family:'Cormorant Garamond',Georgia,serif;font-size:26px;font-weight:700;line-height:1.1;color:var(--navy)}
       #page-locales .l-stat-lbl{font-size:11px;color:var(--text-secondary);margin-top:4px;line-height:1.4}
       #page-locales .l-badge{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px}
       #page-locales .l-badge-ok{background:#e6f4ea;color:#1a6640}
@@ -2855,6 +2881,36 @@ function renderSensitivity() {
 }
 
 // ── PDF Exports ─────────────────────────────────────────────────────────────
+// ── Sistema visual "El estado de cuenta" para PDFs (Dirección 1 + motivo Dirección 5) ──
+// Papel marfil, tinta verde oscuro, dorado SOLO como regla/acento (encabezado,
+// marco y regla sobre el total). Cifras tabulares en courier; cifras de
+// veredicto y títulos grandes en serif times. Solo diseño visual: no toca
+// montos, cálculos ni número de páginas. (jsPDF solo trae helvetica/times/
+// courier como fuentes built-in; no se incrustan TTF por el límite de push.)
+var PDF_IVORY = [247,242,234];      // papel marfil #F7F2EA
+var PDF_IVORY_ALT = [239,232,220];  // panel alterno #EFE8DC
+var PDF_GOLD = [184,146,42];        // dorado #b8922a
+var PDF_HAIR = [216,206,188];       // hairline cálida
+function pdfPaper(doc, W, H) {
+  doc.setFillColor(PDF_IVORY[0], PDF_IVORY[1], PDF_IVORY[2]);
+  doc.rect(0, 0, W, H, 'F');
+}
+function pdfFrame(doc, W, H) {
+  doc.setFillColor(PDF_IVORY[0], PDF_IVORY[1], PDF_IVORY[2]);
+  doc.setDrawColor(PDF_GOLD[0], PDF_GOLD[1], PDF_GOLD[2]);
+  doc.setLineWidth(0.5);
+  doc.rect(4, 4, W - 8, H - 8, 'D');
+}
+function pdfGoldRule(doc, x1, x2, y, w) {
+  doc.setDrawColor(PDF_GOLD[0], PDF_GOLD[1], PDF_GOLD[2]);
+  doc.setLineWidth(w || 0.8);
+  doc.line(x1, y, x2, y);
+}
+function pdfNewPage(doc, W, H) {
+  var _ap = doc.addPage.bind(doc);
+  doc.addPage = function(){ _ap.apply(doc, arguments); pdfPaper(doc, W, H); };
+}
+
 function exportPlansPDF() {
   if (plans.length === 0) { alert('Calcula primero los planes.'); return; }
   const jsPDF = getJsPDF(); if (!jsPDF) return;
@@ -2862,24 +2918,28 @@ function exportPlansPDF() {
   const unit = document.getElementById('unitName').value;
   const price= parseFloat(document.getElementById('listPrice').value);
   const W = doc.internal.pageSize.getWidth(), M = 16;
+  const H = doc.internal.pageSize.getHeight();
+  pdfPaper(doc, W, H); pdfNewPage(doc, W, H);
 
   doc.setFillColor(26,58,34); doc.rect(0,0,W,28,'F');
-  doc.setFont('helvetica','bold'); doc.setFontSize(18); doc.setTextColor(212,168,75);
+  doc.setFont('times','bold'); doc.setFontSize(18); doc.setTextColor(212,168,75);
   doc.text('TORAM — Planes de Financiamiento', M, 13);
   doc.setFontSize(9); doc.setTextColor(180,210,160); doc.setFont('helvetica','normal');
   doc.text('Unidad: '+unit+'   |   Precio de lista: $'+fmt(price)+'   |   Torre '+document.getElementById('tower').value, M, 21);
+  pdfGoldRule(doc, 0, W, 28, 0.8);
+  pdfFrame(doc, W, H);
 
   let y = 36;
   const cols   = ['Plan','Enganche','% Eng.','A Financiar','Mensualidad','Plazo','Tasa','Precio Final','Total Pagado'];
   const widths = [58, 28, 14, 28, 28, 18, 16, 30, 32];
   let x = M;
-  doc.setFillColor(240,242,248); doc.rect(M,y-4,W-M*2,8,'F');
-  doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(80,90,120);
+  doc.setFillColor(239,232,220); doc.rect(M,y-4,W-M*2,8,'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(74,66,52);
   cols.forEach(function(c,i){ doc.text(c, x+1, y); x += widths[i]; });
   y += 6;
 
   plans.forEach(function(p, idx) {
-    if (idx%2===0){ doc.setFillColor(252,252,255); doc.rect(M,y-3,W-M*2,8,'F'); }
+    if (idx%2===0){ doc.setFillColor(247,242,234); doc.rect(M,y-3,W-M*2,8,'F'); }
     const totalPaid  = p.downPayment + p.monthlyPayment * p.months;
     const interests  = totalPaid - p.finalPrice;
     const row = [
@@ -2889,18 +2949,21 @@ function exportPlansPDF() {
       fmtMXN(p.finalPrice), fmtMXN(totalPaid)
     ];
     x = M;
-    doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(30,40,60);
-    row.forEach(function(v,i){ doc.text(v, x+1, y); x += widths[i]; });
+    doc.setFontSize(7.5); doc.setTextColor(30,40,60);
+    row.forEach(function(v,i){
+      doc.setFont([1,3,4,7,8].indexOf(i)>=0 ? 'courier' : 'helvetica', 'normal');
+      doc.text(v, x+1, y); x += widths[i];
+    });
     if (interests > 0) {
       x = M + widths.slice(0,8).reduce(function(a,b){return a+b;},0);
       doc.setTextColor(180,40,40); doc.setFontSize(6);
       doc.text('+'+fmtMXN(interests), x+1, y+2.5);
     }
-    doc.setDrawColor(220,226,236); doc.line(M,y+3,W-M,y+3);
+    doc.setDrawColor(216,206,188); doc.line(M,y+3,W-M,y+3);
     y += 9;
   });
   y += 4;
-  doc.setFontSize(7); doc.setTextColor(140,150,170);
+  doc.setFontSize(7); doc.setTextColor(120,110,95);
   doc.text('Precios sujetos a disponibilidad. Generado: '+new Date().toLocaleDateString('es-MX'), M, y);
   doc.save('Toram_'+unit+'_Planes.pdf');
 }
@@ -2914,19 +2977,23 @@ function exportAmortPDF() {
   const opStart = parseInt(document.getElementById('operationStartMonth').value) || 42;
   const rows    = buildAmortSchedule(planIdx, amortShowScenario2, 0, opStart);
   const W = doc.internal.pageSize.getWidth(), M = 14;
+  const H = doc.internal.pageSize.getHeight();
+  pdfPaper(doc, W, H); pdfNewPage(doc, W, H);
 
   doc.setFillColor(26,58,34); doc.rect(0,0,W,26,'F');
-  doc.setFont('helvetica','bold'); doc.setFontSize(15); doc.setTextColor(212,168,75);
+  doc.setFont('times','bold'); doc.setFontSize(15); doc.setTextColor(212,168,75);
   doc.text('TORAM — Amortización: '+p.name, M, 12);
   doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(180,210,160);
   doc.text((amortShowScenario2?'Escenario 2 (con abono)':'Estándar')+'   |   Plazo: '+p.months+'m   |   Tasa: '+(p.interestRate||0)+'%', M, 20);
+  pdfGoldRule(doc, 0, W, 26, 0.8);
+  pdfFrame(doc, W, H);
 
   const headers = ['Mes','Saldo Inicial','Interés','Capital','Abono Extra','Cuota','Saldo Final'];
   const cw      = [14, 32, 28, 28, 28, 28, 32];
   let y = 34;
   let x = M;
-  doc.setFillColor(240,242,248); doc.rect(M,y-4,W-M*2,8,'F');
-  doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(80,90,120);
+  doc.setFillColor(239,232,220); doc.rect(M,y-4,W-M*2,8,'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(74,66,52);
   headers.forEach(function(h,i){ doc.text(h, x+1, y); x+=cw[i]; });
 
   rows.forEach(function(r, i) {
@@ -2934,14 +3001,14 @@ function exportAmortPDF() {
     if (y > doc.internal.pageSize.getHeight()-20){ doc.addPage(); y = 20; }
     const isPayoff = r.balanceEnd<=0.01 && r.balanceStart>0.01;
     if (isPayoff){ doc.setFillColor(237,247,242); doc.rect(M,y-4,W-M*2,7,'F'); }
-    else if (i%2===0){ doc.setFillColor(252,252,255); doc.rect(M,y-4,W-M*2,7,'F'); }
-    doc.setFont('helvetica','normal'); doc.setFontSize(7.5);
+    else if (i%2===0){ doc.setFillColor(247,242,234); doc.rect(M,y-4,W-M*2,7,'F'); }
+    doc.setFontSize(7.5);
     doc.setTextColor(isPayoff?21:50, isPayoff?120:60, isPayoff?74:90);
     x = M;
     [r.month, fmtMXN(r.balanceStart), fmtMXN(r.interest), fmtMXN(r.capital),
      r.extra>0?fmtMXN(r.extra):'—', fmtMXN(r.totalPaid), fmtMXN(r.balanceEnd)
-    ].forEach(function(v,j){ doc.text(String(v), x+1, y); x+=cw[j]; });
-    doc.setDrawColor(225,230,240); doc.line(M,y+2.5,W-M,y+2.5);
+    ].forEach(function(v,j){ doc.setFont(j===0?'helvetica':'courier','normal'); doc.text(String(v), x+1, y); x+=cw[j]; });
+    doc.setDrawColor(216,206,188); doc.line(M,y+2.5,W-M,y+2.5);
   });
   doc.save('Toram_Amortizacion_'+p.name.replace(/[^a-z0-9]/gi,'_')+'.pdf');
 }
@@ -2951,20 +3018,24 @@ function exportComparePDF() {
   const jsPDF = getJsPDF(); if (!jsPDF) return;
   const doc      = new jsPDF({ orientation: 'landscape' });
   const W = doc.internal.pageSize.getWidth(), M = 12;
+  const H = doc.internal.pageSize.getHeight();
+  pdfPaper(doc, W, H); pdfNewPage(doc, W, H);
   const roiYears = parseInt(document.getElementById('roiYears').value);
 
   doc.setFillColor(26,58,34); doc.rect(0,0,W,26,'F');
-  doc.setFont('helvetica','bold'); doc.setFontSize(15); doc.setTextColor(212,168,75);
+  doc.setFont('times','bold'); doc.setFontSize(15); doc.setTextColor(212,168,75);
   doc.text('TORAM — Tabla Comparativa de ROI', M, 12);
   doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(180,210,160);
   doc.text('Horizonte: '+roiYears+' años   |   '+document.getElementById('unitName').value, M, 20);
+  pdfGoldRule(doc, 0, W, 26, 0.8);
+  pdfFrame(doc, W, H);
 
   const headers = ['Plan','Enganche','Mensualidad','Intereses','Plusvalía','Ingr.Netos','Gan.Neta','ROI Anual','Sc2 ROI'];
   const cw      = [60, 28, 28, 24, 24, 24, 26, 22, 22];
   let y = 34;
   let x = M;
-  doc.setFillColor(240,242,248); doc.rect(M,y-4,W-M*2,8,'F');
-  doc.setFont('helvetica','bold'); doc.setFontSize(6.5); doc.setTextColor(80,90,120);
+  doc.setFillColor(239,232,220); doc.rect(M,y-4,W-M*2,8,'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(6.5); doc.setTextColor(74,66,52);
   headers.forEach(function(h,i){ doc.text(h, x+1, y); x+=cw[i]; });
 
   const apprRate     = parseFloat(document.getElementById('appreciationRate').value)/100;
@@ -2989,7 +3060,7 @@ function exportComparePDF() {
     const roiA     = roiYears>0?(netGain/totalInv*100)/roiYears:0;
     const sc2      = calcScenario2(i);
     const roiA2    = sc2&&sc2.applicable?sc2.roiAnnualAccel:null;
-    if (i%2===0){ doc.setFillColor(252,252,255); doc.rect(M,y-4,W-M*2,8,'F'); }
+    if (i%2===0){ doc.setFillColor(247,242,234); doc.rect(M,y-4,W-M*2,8,'F'); }
     x = M;
     const vals = [p.name, fmtMXN(p.downPayment), fmtMXN(p.monthlyPayment),
       fmtMXN(totalInt), fmtMXN(appGain), fmtMXN(netInc), fmtMXN(netGain),
@@ -3006,10 +3077,10 @@ function exportComparePDF() {
         const isPositive = !isVal || n >= 0;
         doc.setTextColor(isVal?(isPositive?21:160):50, isVal?(isPositive?120:40):60, isVal?(isPositive?74:40):90);
       }
-      doc.setFont('helvetica',j===0?'bold':'normal'); doc.setFontSize(7);
+      doc.setFont(j===0?'helvetica':'courier',j===0?'bold':'normal'); doc.setFontSize(7);
       doc.text(String(v), x+1, y); x+=cw[j];
     });
-    doc.setDrawColor(225,230,240); doc.line(M,y+2.5,W-M,y+2.5);
+    doc.setDrawColor(216,206,188); doc.line(M,y+2.5,W-M,y+2.5);
   });
   doc.save('Toram_Comparativa_ROI.pdf');
 }
@@ -3432,7 +3503,7 @@ function buildQuoteHTML() {
   var advisorHtml = advisor ? '<div style="font-size:11px;color:rgba(255,255,255,0.55);margin-top:3px">Asesor: '+advisor+'</div>' : '';
 
   return '<div style="font-family:Arial,sans-serif;background:white;max-width:960px;margin:0 auto;color:var(--green-text)">' +
-    '<div style="background:linear-gradient(135deg,#1a3a22 0%,#2d5a38 55%,#3a6e45 100%);padding:30px 40px 24px;position:relative;overflow:hidden">' +
+    '<div style="background:#1a3a22;padding:30px 40px 24px;position:relative;overflow:hidden">' +
     '<div style="display:flex;justify-content:space-between;align-items:flex-start;position:relative;flex-wrap:wrap;gap:12px">' +
     '<div><div style="font-size:40px;font-weight:900;letter-spacing:0.05em;color:white;line-height:1">TORAM</div>' +
     '<div style="font-size:13px;letter-spacing:0.3em;color:#b8d890;text-transform:uppercase;margin-top:3px;font-weight:300">COTIZACIÓN</div></div>' +
@@ -3490,14 +3561,15 @@ function exportQuotePDF(share) {
 
   var doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
   var W = 210, M = 13, CW = W - M*2;
+  pdfPaper(doc, W, 297); pdfNewPage(doc, W, 297);
 
-  function hdr(size, color, bold) {
-    doc.setFont('helvetica', bold?'bold':'normal');
+  function hdr(size, color, bold, font) {
+    doc.setFont(font || 'helvetica', bold?'bold':'normal');
     doc.setFontSize(size);
     doc.setTextColor(color[0], color[1], color[2]);
   }
   function sectionBar(title, sub, y) {
-    doc.setDrawColor(184,212,184); doc.setLineWidth(0.6); doc.line(M,y,W-M,y);
+    doc.setDrawColor(216,206,188); doc.setLineWidth(0.6); doc.line(M,y,W-M,y);
     hdr(7,[45,96,64],true);
     var tw = doc.getTextWidth(title.toUpperCase()); // medir con la fuente del título
     doc.text(title.toUpperCase(), M, y-1.5);
@@ -3520,22 +3592,24 @@ function exportQuotePDF(share) {
     return y+5;
   }
   function rowBg(i, y, h) {
-    if (i%2===1){ doc.setFillColor(247,252,247); doc.rect(M,y-3.5,CW,h,'F'); }
-    doc.setDrawColor(220,234,220); doc.setLineWidth(0.25); doc.line(M,y+h-4,W-M,y+h-4);
+    if (i%2===1){ doc.setFillColor(239,232,220); doc.rect(M,y-3.5,CW,h,'F'); }
+    doc.setDrawColor(216,206,188); doc.setLineWidth(0.25); doc.line(M,y+h-4,W-M,y+h-4);
   }
 
   // Header
   doc.setFillColor(26,58,34);  doc.rect(0,0,W,30,'F');
   doc.setFillColor(45,90,56);  doc.rect(0,22,W,8,'F');
-  hdr(20,[255,255,255],true);  doc.text('TORAM', M, 14);
+  hdr(20,[255,255,255],true,'times');  doc.text('TORAM', M, 14);
   hdr(7.5,[184,216,144],false);doc.text('COTIZACIÓN', M, 20);
   hdr(7,[180,210,160],false);  // event tag removed — asesor/date shown instead
   hdr(7.5,[200,225,190],false);doc.text(date, W-M, 16, {align:'right'});
   if (advisor){ hdr(7,[170,200,170],false); doc.text('Asesor: '+advisor, W-M, 22, {align:'right'}); }
 
   // Client strip
-  doc.setFillColor(238,247,238); doc.rect(0,30,W,13,'F');
-  doc.setDrawColor(200,220,200); doc.setLineWidth(0.4); doc.line(0,43,W,43);
+  doc.setFillColor(239,232,220); doc.rect(0,30,W,13,'F');
+  doc.setDrawColor(216,206,188); doc.setLineWidth(0.4); doc.line(0,43,W,43);
+  pdfGoldRule(doc, 0, W, 30, 0.8);
+  pdfFrame(doc, W, 297);
   hdr(6,[74,122,82],true);  doc.text('CLIENTE', M, 36);
   hdr(11,[26,51,32],true);  doc.text(clientName, M, 42);
 
@@ -3566,9 +3640,9 @@ function exportQuotePDF(share) {
     var p0 = u.plans[0];
     hdr(8,[26,51,32],true);   doc.text(u.inv.torre+'-'+u.inv.num, M+1, y);
     hdr(7,[58,90,66],false);  doc.text((u.inv.tipo.replace('DEPTO ','')+' '+u.inv.m2+'m² · '+u.inv.vista).substring(0,32), M+t1x[1]+1, y);
-    hdr(7.5,[74,106,82],false); doc.text(fmtMXN(u.inv.precio),    M+t1x[2], y, {align:'right'});
-    hdr(7.5,[26,51,32],true);   doc.text(fmtMXN(p0.finalPrice),   M+t1x[3], y, {align:'right'});
-    hdr(7.5,[26,102,64],true);  doc.text(fmtMXN(p0.downPayment),  M+t1x[4], y, {align:'right'});
+    hdr(7.5,[74,106,82],false,'courier'); doc.text(fmtMXN(u.inv.precio),    M+t1x[2], y, {align:'right'});
+    hdr(7.5,[26,51,32],true,'courier');   doc.text(fmtMXN(p0.finalPrice),   M+t1x[3], y, {align:'right'});
+    hdr(7.5,[26,102,64],true,'courier');  doc.text(fmtMXN(p0.downPayment),  M+t1x[4], y, {align:'right'});
     hdr(7,[100,140,106],false);  doc.text(fmtPct(p0.dpPctEff,1),  M+t1x[5], y, {align:'right'});
     y += 8;
   });
@@ -3591,13 +3665,13 @@ function exportQuotePDF(share) {
     if (y > 265){ doc.addPage(); y = 20; }
 
     if (pi === 0) {
-      doc.setFillColor(232,242,232); doc.rect(M,y-3,CW,6,'F');
+      doc.setFillColor(239,232,220); doc.rect(M,y-3,CW,6,'F');
       hdr(6.5,[45,96,64],true);
       doc.text('GRUPO A — 20% DTO · Contado y Financiamientos con interés (mismo precio final)', M+1, y+0.5);
       y += 7;
     }
     if (pi === grpAEndPDF) {
-      doc.setFillColor(238,245,240); doc.rect(M,y-3,CW,6,'F');
+      doc.setFillColor(239,232,220); doc.rect(M,y-3,CW,6,'F');
       hdr(6.5,[45,96,64],true);
       doc.text('GRUPO B — Descuento escalonado · Meses sin intereses (precio final y enganche distintos)', M+1, y+0.5);
       y += 7;
@@ -3609,7 +3683,7 @@ function exportQuotePDF(share) {
     var rLabel = refP.rate>0 ? refP.disc+'% dto · '+refP.rate+'% int · '+refP.months+'m'+t2tag : refP.disc+'% dto · Sin int · '+refP.months+'p';
     hdr(6,[90,130,96],false); doc.text(rLabel, M+1, y+3.5);
     hdr(7,[74,110,82],false); doc.text(fmtPct(refP.dpPctEff,0), M+planLabelW+dpColW, y, {align:'right'});
-    hdr(6,[100,140,100],false); doc.text(fmtMXN(refP.downPayment), M+planLabelW+dpColW, y+3.5, {align:'right'});
+    hdr(6,[100,140,100],false,'courier'); doc.text(fmtMXN(refP.downPayment), M+planLabelW+dpColW, y+3.5, {align:'right'});
 
     quoteUnits.forEach(function(u, ui) {
       var p      = u.plans[pi];
@@ -3620,8 +3694,8 @@ function exportQuotePDF(share) {
       } else if (p.financed<=0.01){
         hdr(7.5,[26,102,64],true); doc.text('Cubierto', xRight, y, {align:'right'});
       } else {
-        hdr(8,[26,51,32],true);    doc.text(fmtMXN(p.monthlyPayment), xRight, y, {align:'right'});
-        hdr(6,[100,140,100],false); doc.text('Eng: '+fmtMXN(p.downPayment), xRight, y+3.5, {align:'right'});
+        hdr(8,[26,51,32],true,'courier');    doc.text(fmtMXN(p.monthlyPayment), xRight, y, {align:'right'});
+        hdr(6,[100,140,100],false,'courier'); doc.text('Eng: '+fmtMXN(p.downPayment), xRight, y+3.5, {align:'right'});
       }
     });
     y += 10;
@@ -3643,7 +3717,7 @@ function exportQuotePDF(share) {
       rowBg(ri, y, 9);
       hdr(7.5,[26,51,32],true);  doc.text(refP.name, M+1, y);
       hdr(6.5,[90,130,96],false);doc.text(refP.rate+'% · '+refP.months+'m', M+1, y+3.5);
-      hdr(7.5,[74,110,82],false);doc.text(fmtMXN(refP.downPayment), M+planLabelW+dpColW, y, {align:'right'});
+      hdr(7.5,[74,110,82],false,'courier');doc.text(fmtMXN(refP.downPayment), M+planLabelW+dpColW, y, {align:'right'});
       quoteUnits.forEach(function(u, ui) {
         var p      = u.plans[pi];
         var xRight = M+planLabelW+dpColW+unitColW*(ui+1);
@@ -3655,7 +3729,7 @@ function exportQuotePDF(share) {
           var r = roi[pi];
           var c = r.roiAnn>=8?[26,102,64]:r.roiAnn>=4?[74,122,48]:[176,88,32];
           hdr(8.5,c,true);          doc.text(fmtPct(r.roiAnn,1)+'/año', xRight, y, {align:'right'});
-          hdr(6,[120,155,120],false);doc.text(fmtMXN(r.netGain, 0),       xRight, y+3.5, {align:'right'});
+          hdr(6,[120,155,120],false,'courier');doc.text(fmtMXN(r.netGain, 0),       xRight, y+3.5, {align:'right'});
         }
       });
       y += 10;
@@ -3670,7 +3744,7 @@ function exportQuotePDF(share) {
   if (perfilShowQR()) {
     if (y > 235){ doc.addPage(); y = 20; }
     y += 6;
-    doc.setDrawColor(184,212,184); doc.setLineWidth(0.6); doc.line(M,y,W-M,y);
+    doc.setDrawColor(216,206,188); doc.setLineWidth(0.6); doc.line(M,y,W-M,y);
     hdr(7,[45,96,64],true); doc.text('CONOCE EL PARQUE', M, y-1.5);
     y += 6;
     try { doc.addImage(MAPA_QR_IMG, 'PNG', M, y, 20, 20); } catch(e){}
@@ -4589,7 +4663,7 @@ function buildFichaHTML(inv, dpPct) {
   return '<div style="font-family:Arial,sans-serif;background:white;color:var(--green-text);max-width:800px;margin:0 auto">' +
 
   // Header
-  '<div style="background:linear-gradient(135deg,#1a3a22 0%,#2d5a38 55%,#3a6e45 100%);padding:24px 32px;display:flex;justify-content:space-between;align-items:flex-end">' +
+  '<div style="background:#1a3a22;padding:24px 32px;display:flex;justify-content:space-between;align-items:flex-end">' +
   '<div><div style="font-size:28px;font-weight:900;color:white;line-height:1;letter-spacing:0.05em">TORAM</div>' +
   '<div style="font-size:10px;letter-spacing:0.3em;color:#b8d890;text-transform:uppercase;margin-top:2px">FICHA TÉCNICA</div></div>' +
   '<div style="text-align:right">' +
@@ -4660,10 +4734,11 @@ function exportFichaPDF() {
 
   var doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
   var W = 210, M = 14, CW = W - M * 2;
+  pdfPaper(doc, W, 297); pdfNewPage(doc, W, 297);
 
   // ── helpers ──────────────────────────────────────────────────────────────
-  function setStyle(size, rgb, bold) {
-    doc.setFont('helvetica', bold ? 'bold' : 'normal');
+  function setStyle(size, rgb, bold, font) {
+    doc.setFont(font || 'helvetica', bold ? 'bold' : 'normal');
     doc.setFontSize(size);
     doc.setTextColor(rgb[0], rgb[1], rgb[2]);
   }
@@ -4678,13 +4753,13 @@ function exportFichaPDF() {
   doc.setFillColor(37,78,48);  doc.rect(0, 22, W, 10, 'F');
 
   // Left: TORAM + FICHA TÉCNICA
-  setStyle(22,[255,255,255],true);
+  setStyle(22,[255,255,255],true,'times');
   doc.text('TORAM', M, 15);
   setStyle(7,[184,216,144],false);
   doc.text('FICHA TECNICA', M, 22);
 
   // Right: unit number + tipo + status pill
-  setStyle(17,[255,255,255],true);
+  setStyle(17,[255,255,255],true,'times');
   doc.text(inv.torre+'-'+inv.num, W-M, 14, {align:'right'});
   setStyle(8,[184,216,144],false);
   doc.text(inv.tipo, W-M, 21, {align:'right'});
@@ -4698,6 +4773,8 @@ function exportFichaPDF() {
   doc.roundedRect(W-M-stW, 24, stW, 6, 1, 1, 'F');
   setStyle(7,[255,255,255],true);
   doc.text(statusText, W-M-stW/2, 28.2, {align:'center'});
+  pdfGoldRule(doc, 0, W, 32, 0.8);
+  pdfFrame(doc, W, 297);
 
   var y = 38;
 
@@ -4707,7 +4784,7 @@ function exportFichaPDF() {
     try { doc.addImage(imgSrc, 'JPEG', M, y, imgW, imgH); }
     catch(e) {}
   } else {
-    doc.setFillColor(240,246,240);
+    doc.setFillColor(239,232,220);
     doc.rect(M, y, imgW, imgH, 'F');
     setStyle(8,[160,180,160],false);
     doc.text('Planta no disponible', M + imgW/2, y + imgH/2, {align:'center'});
@@ -4719,7 +4796,7 @@ function exportFichaPDF() {
 
   setStyle(7,[45,96,64],true);
   doc.text('ESPECIFICACIONES', sx, y + 2);
-  doc.setDrawColor(184,212,184); doc.setLineWidth(0.5);
+  doc.setDrawColor(216,206,188); doc.setLineWidth(0.5);
   doc.line(sx, y + 3.5, W - M, y + 3.5);
 
   var recCount = inv.tipo.replace('DEPTO ','').replace(' REC.','').trim();
@@ -4739,16 +4816,16 @@ function exportFichaPDF() {
   specs.forEach(function(sp, si) {
     var ry = y + 6 + si * rowH;
     // alternating row bg
-    if (si % 2 === 0) { doc.setFillColor(248,252,248); } else { doc.setFillColor(255,255,255); }
+    if (si % 2 === 0) { doc.setFillColor(247,242,234); } else { doc.setFillColor(239,232,220); }
     doc.rect(sx, ry - 3, sw, rowH, 'F');
     // label
     setStyle(7.5,[90,122,90],false);
     doc.text(sp[0], sx + 2, ry + 1);
     // value (right-aligned, bold)
-    setStyle(7.5,[26,51,32],true);
+    setStyle(7.5,[26,51,32],true,'courier');
     doc.text(sp[1], W - M - 1, ry + 1, {align:'right'});
     // divider
-    doc.setDrawColor(220,236,220); doc.setLineWidth(0.2);
+    doc.setDrawColor(216,206,188); doc.setLineWidth(0.2);
     doc.line(sx, ry + rowH - 3, W - M, ry + rowH - 3);
   });
 
@@ -4759,7 +4836,7 @@ function exportFichaPDF() {
 
   // ── PLANS TABLE ───────────────────────────────────────────────────────────
   // Section title
-  doc.setDrawColor(184,212,184); doc.setLineWidth(0.5);
+  doc.setDrawColor(216,206,188); doc.setLineWidth(0.5);
   doc.line(M, y, W - M, y);
   setStyle(7,[45,96,64],true);
   doc.text('PLANES DE FINANCIAMIENTO  -  ENGANCHE ' + dpPct + '%', M, y - 1.5);
@@ -4790,16 +4867,16 @@ function exportFichaPDF() {
 
     // Group separator before first plan in each group
     if (pi === 0) {
-      doc.setFillColor(232,242,232);
+      doc.setFillColor(239,232,220);
       doc.rect(M, y - 2, CW, 6, 'F');
       setStyle(6,[45,96,64],true);
       doc.text('Contado y financiamientos directos - 20% descuento', M + 2, y + 2);
-      doc.setDrawColor(200,226,200); doc.setLineWidth(0.3);
+      doc.setDrawColor(216,206,188); doc.setLineWidth(0.3);
       doc.line(M, y + 4, W-M, y + 4);
       y += 7;
     }
     if (pi === grpAEnd) {
-      doc.setFillColor(238,246,240);
+      doc.setFillColor(239,232,220);
       doc.rect(M, y - 2, CW, 6, 'F');
       setStyle(6,[45,96,64],true);
       // Build the discount range string safely (no special characters)
@@ -4807,13 +4884,13 @@ function exportFichaPDF() {
       var lastPlan     = ps[ps.length-1];
       var lastDisc     = lastPlan && !lastPlan.t2only ? lastPlan.disc : 5;
       doc.text('Meses sin intereses - descuento escalonado (' + firstMsiDisc + '% al ' + lastDisc + '%)', M + 2, y + 2);
-      doc.setDrawColor(200,226,200); doc.setLineWidth(0.3);
+      doc.setDrawColor(216,206,188); doc.setLineWidth(0.3);
       doc.line(M, y + 4, W-M, y + 4);
       y += 7;
     }
 
     // Row background
-    if (rowIdx % 2 === 0) { doc.setFillColor(252,255,252); } else { doc.setFillColor(246,252,246); }
+    if (rowIdx % 2 === 0) { doc.setFillColor(247,242,234); } else { doc.setFillColor(239,232,220); }
     doc.rect(M, y - 3, CW, 9, 'F');
 
     // Plan name
@@ -4821,7 +4898,7 @@ function exportFichaPDF() {
     doc.text(p.name, M + 2, y + 1);
 
     // Enganche (right-aligned in its column)
-    setStyle(7.5,[74,110,82],false);
+    setStyle(7.5,[74,110,82],false,'courier');
     doc.text(fmtMXN(p.downPayment), M + cPlan + cEng, y + 1, {align:'right'});
 
     // Mensualidad (bold, right-aligned)
@@ -4829,7 +4906,7 @@ function exportFichaPDF() {
       setStyle(8,[26,102,64],true);
       doc.text('Cubierto', M + cPlan + cEng + cMens, y + 1, {align:'right'});
     } else {
-      setStyle(8.5,[26,51,32],true);
+      setStyle(8.5,[26,51,32],true,'courier');
       doc.text(fmtMXN(p.monthlyPayment), M + cPlan + cEng + cMens, y + 1, {align:'right'});
     }
 
@@ -4842,7 +4919,7 @@ function exportFichaPDF() {
     doc.text(p.rate > 0 ? p.rate + '% anual' : 'Sin int.', M + CW - rPad, y + 1, {align:'right'});
 
     // Row divider
-    doc.setDrawColor(210,232,210); doc.setLineWidth(0.2);
+    doc.setDrawColor(216,206,188); doc.setLineWidth(0.2);
     doc.line(M, y + 5.5, W - M, y + 5.5);
 
     y += 9;
@@ -4974,7 +5051,7 @@ function pOnModelChange() {
     '<div>'+imgHtml+'</div>' +
     '<div>' +
     '<div class="p-kicker">Torre '+m.torre.charAt(1)+' · Modelo</div>' +
-    '<div style="font-family:\'Playfair Display\',Georgia,serif;font-size:22px;font-weight:700;color:var(--navy);line-height:1.2;margin:4px 0 8px">'+m.nombre+'</div>' +
+    '<div style="font-family:\'Cormorant Garamond\',Georgia,serif;font-size:22px;font-weight:700;color:var(--navy);line-height:1.2;margin:4px 0 8px">'+m.nombre+'</div>' +
     '<table style="width:100%;border-collapse:collapse;font-size:13px">' +
     '<tr><td style="padding:5px 0;color:var(--text-muted)">Superficie</td><td style="padding:5px 0;text-align:right;font-weight:600">'+m.m2+' m²</td></tr>' +
     '<tr><td style="padding:5px 0;color:var(--text-muted)">Recámaras</td><td style="padding:5px 0;text-align:right;font-weight:600">'+recLabel+'</td></tr>' +
@@ -5180,6 +5257,7 @@ function pUpdatePartSummary() {
     '<div class="p-summary">' +
     '<div><div class="p-kicker">Inversión total ('+c.qty+(c.qty===1?' participación':' participaciones')+')</div>' +
     '<div class="p-price">'+fmtMXN(c.total)+'</div>' +
+    '<div style="font-family:var(--font-mono);font-size:12px;color:var(--text-muted);margin-top:6px;font-variant-numeric:tabular-nums">'+fmtMXN(c.unitPrice)+' × '+c.qty+' = '+fmtMXN(c.total)+'</div>' +
     '<div class="p-note">'+fmtMXN(c.unitPrice)+' por participación · Apartado '+fmtMXN(c.admin)+' ('+fmtMXN(PARTI.adminPerUnit)+' c/u) — a cuenta del total, no es un costo adicional</div></div>' +
     payHtml +
     '<div style="margin-top:14px"><div class="p-kicker" style="margin-bottom:6px">Proyección de rendimiento — oficial (no garantía)</div>' +
@@ -5500,16 +5578,13 @@ function buildPropuestaDeptoHTML() {
     var flowAppr = flow.reduce(function(a,f){return a+f.appr;}, 0);
     var takeaway = 'En ' + opts.years + ' años entrarían ' + fmtMXN(flowRent + flowAppr, 0) + ' en total: ' + fmtMXN(flowRent, 0) + ' de renta (verde) y ' + fmtMXN(flowAppr, 0) + ' porque el departamento sube de precio (dorado).';
     roiChartHtmlStr = roiChartHtml('¿Cuánto dinero entra cada año?', flow.map(function(f){return f.label;}), flow.map(function(f){return f.rent;}), flow.map(function(f){return f.appr;}), 'Renta neta', 'Plusvalía', takeaway);
-    var sumCardsHtml = [
-      ['Inversión total', fmtMXN(r0.totalInv)],
-      ['Ganancia neta proyectada (' + opts.years + ' años)', fmtMXN(r0.netGain)],
-      ['ROI anualizado', fmtPct(r0.roiAnn, 2)],
-      ['Ingreso promedio por año', fmtMXN(Math.round((flowRent + flowAppr) / opts.years), 0)]
-    ];
     roiChartHtmlStr += '<div style="padding:16px 32px;border-top:1px solid #deeadc">' +
-      '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-dark);margin-bottom:10px">En resumen</div>' +
-      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">' +
-      sumCardsHtml.map(function(cd){ return '<div style="background:#f4f9f4;border:1px solid #c8dcc8;border-radius:6px;padding:10px 12px"><div style="font-size:11px;color:var(--green-soft)">'+cd[0]+'</div><div style="font-size:16px;font-weight:700;color:var(--green-text);margin-top:2px">'+cd[1]+'</div></div>'; }).join('') +
+      '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-dark);margin-bottom:6px">En resumen</div>' +
+      '<div class="ledger">' +
+      '<div class="ledger-row"><span class="ledger-label">Inversión total</span><span class="ledger-amount">'+fmtMXN(r0.totalInv)+'</span></div>' +
+      '<div class="ledger-row"><span class="ledger-label">ROI anualizado</span><span class="ledger-amount">'+fmtPct(r0.roiAnn, 2)+'</span></div>' +
+      '<div class="ledger-row"><span class="ledger-label">Ingreso promedio por año</span><span class="ledger-amount">'+fmtMXN(Math.round((flowRent + flowAppr) / opts.years), 0)+'</span></div>' +
+      '<div class="ledger-row ledger-total"><span class="ledger-label">Ganancia neta proyectada (' + opts.years + ' años)</span><span class="ledger-amount">'+fmtMXN(r0.netGain)+'</span></div>' +
       '</div></div>';
   }
 
@@ -5531,20 +5606,25 @@ function buildPropuestaDeptoHTML() {
 
   var noteHtml = cd.note ? '<div style="font-size:12px;color:var(--green-soft);margin-top:4px">'+cd.note+'</div>' : '';
 
-  return '<div style="font-family:\'Source Sans 3\',Arial,sans-serif;background:white;color:var(--green-text);max-width:800px;margin:0 auto">' +
-  '<div style="background:linear-gradient(135deg,#1a3a22 0%,#2d5a38 55%,#3a6e45 100%);padding:24px 32px">' +
+  return '<div style="font-family:\'IBM Plex Sans\',Arial,sans-serif;background:white;color:var(--green-text);max-width:800px;margin:0 auto">' +
+  '<div style="background:#1a3a22;padding:24px 32px">' +
   '<div style="display:flex;justify-content:space-between;align-items:flex-end">' +
-  '<div><div style="font-family:\'Playfair Display\',Georgia,serif;font-size:28px;font-weight:700;color:white;line-height:1;letter-spacing:0.05em">TORAM</div>' +
+  '<div><div style="font-family:\'Cormorant Garamond\',Georgia,serif;font-size:28px;font-weight:700;color:white;line-height:1;letter-spacing:0.05em">TORAM</div>' +
   '<div style="font-size:10px;letter-spacing:0.3em;color:#d4a84b;text-transform:uppercase;margin-top:4px">Propuesta personalizada</div></div>' +
   '<div style="text-align:right">' +
-  '<div style="font-family:\'Playfair Display\',Georgia,serif;font-size:22px;font-weight:700;color:white">'+inv.torre+'-'+inv.num+'</div>' +
+  '<div style="font-family:\'Cormorant Garamond\',Georgia,serif;font-size:22px;font-weight:700;color:white">'+inv.torre+'-'+inv.num+'</div>' +
   '<div style="font-size:11px;color:#b8d890;margin-top:2px">'+m.nombre+' · '+inv.tipo+'</div>' +
   '<div style="margin-top:6px"><span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;background:'+avail.bg+';color:'+avail.color+'">'+avail.status+'</span></div>' +
   '</div></div>' +
   '<div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.25)">' +
-  '<div style="font-family:\'Playfair Display\',Georgia,serif;font-size:20px;font-weight:700;color:white">Propuesta para '+cd.client+'</div>' +
+  '<div style="font-family:\'Cormorant Garamond\',Georgia,serif;font-size:20px;font-weight:700;color:white">Propuesta para '+cd.client+'</div>' +
   '<div style="font-size:12px;color:rgba(255,255,255,0.75);margin-top:2px">Asesor: '+cd.advisor+' · '+cd.dateStr+'</div>' + noteHtml +
   '</div></div>' +
+  '<div style="padding:20px 32px;border-bottom:1px solid #deeadc">' +
+  '<div style="font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold-dark)">Precio con descuento del 20%</div>' +
+  '<div style="font-family:var(--font-display);font-size:44px;font-weight:600;line-height:1.05;color:var(--navy);border-top:2px solid var(--gold);padding-top:10px;margin-top:8px">'+fmtMXN(plans[0].finalPrice)+'</div>' +
+  '<div style="font-family:var(--font-mono);font-size:12px;color:var(--text-muted);margin-top:6px;font-variant-numeric:tabular-nums">'+fmtMXN(inv.precio)+' − 20% = '+fmtMXN(plans[0].finalPrice)+'</div>' +
+  '</div>' +
   '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0">' +
   '<div style="border-right:1px solid #deeadc">' +
   '<div style="overflow:hidden">'+imgBlock+'</div>' +
@@ -5624,17 +5704,17 @@ function buildPropuestaPartHTML() {
       }).join('') +
       '</div>';
   }
-  return '<div style="font-family:\'Source Sans 3\',Arial,sans-serif;background:white;color:var(--green-text);max-width:800px;margin:0 auto">' +
-  '<div style="background:linear-gradient(135deg,#1a3a22 0%,#2d5a38 55%,#3a6e45 100%);padding:24px 32px">' +
+  return '<div style="font-family:\'IBM Plex Sans\',Arial,sans-serif;background:white;color:var(--green-text);max-width:800px;margin:0 auto">' +
+  '<div style="background:#1a3a22;padding:24px 32px">' +
   '<div style="display:flex;justify-content:space-between;align-items:flex-end">' +
-  '<div><div style="font-family:\'Playfair Display\',Georgia,serif;font-size:28px;font-weight:700;color:white;line-height:1;letter-spacing:0.05em">TORAM</div>' +
+  '<div><div style="font-family:\'Cormorant Garamond\',Georgia,serif;font-size:28px;font-weight:700;color:white;line-height:1;letter-spacing:0.05em">TORAM</div>' +
   '<div style="font-size:10px;letter-spacing:0.3em;color:#d4a84b;text-transform:uppercase;margin-top:4px">Propuesta de participaciones</div></div>' +
   '<div style="text-align:right">' +
-  '<div style="font-family:\'Playfair Display\',Georgia,serif;font-size:22px;font-weight:700;color:white">'+c.qty+(c.qty===1?' participación':' participaciones')+'</div>' +
+  '<div style="font-family:\'Cormorant Garamond\',Georgia,serif;font-size:22px;font-weight:700;color:white">'+c.qty+(c.qty===1?' participación':' participaciones')+'</div>' +
   '<div style="font-size:11px;color:#b8d890;margin-top:2px">Parque Temático · Mazatlán</div>' +
   '</div></div>' +
   '<div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.25)">' +
-  '<div style="font-family:\'Playfair Display\',Georgia,serif;font-size:20px;font-weight:700;color:white">Propuesta para '+cd.client+'</div>' +
+  '<div style="font-family:\'Cormorant Garamond\',Georgia,serif;font-size:20px;font-weight:700;color:white">Propuesta para '+cd.client+'</div>' +
   '<div style="font-size:12px;color:rgba(255,255,255,0.75);margin-top:2px">Asesor: '+cd.advisor+' · '+cd.dateStr+'</div>' + noteHtml +
   '</div></div>' +
   '<div style="padding:20px 32px">' +
@@ -5996,7 +6076,7 @@ function renderComparativa(){
       var bestRow = availRows.reduce(function(a,b){ return b.netGain > a.netGain ? b : a; });
       sumTxt += ' La que más te deja en 5 años es <strong>' + bestRow.u.torre + '-' + bestRow.u.num + '</strong> con <strong>' + fmtMXN(bestRow.netGain, 0) + '</strong> de ganancia.';
     }
-    h += '<div style="padding:0 24px 24px;font-size:14px;line-height:1.5;color:var(--green-text)"><strong>En resumen:</strong> ' + sumTxt + '</div>';
+    h += '<div style="margin:0 24px;padding:14px 0 24px;border-top:2px solid var(--gold);font-size:14px;line-height:1.5;color:var(--green-text)"><strong>En resumen:</strong> ' + sumTxt + '</div>';
   }
   h += '<div style="padding:0 24px 24px;font-size:12px;color:var(--green-soft)">Vigencia: 3 días a partir de la emisión (válida hasta el '+vigenciaHastaTxt()+'). Después de esa fecha, precios y disponibilidad pueden cambiar. Proyección a 5 años, no es una garantía de rendimiento.</div>';
   box.innerHTML = h;
@@ -6018,8 +6098,9 @@ function exportComparativaPDF(share){
   var planName = rows[0].plan.name;
   var doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
   var W = 297, M = 14, CW = W - M * 2;
-  function st(size, rgb, bold){
-    doc.setFont('helvetica', bold ? 'bold' : 'normal');
+  pdfPaper(doc, W, 210); pdfNewPage(doc, W, 210); pdfFrame(doc, W, 210);
+  function st(size, rgb, bold, font){
+    doc.setFont(font || 'helvetica', bold ? 'bold' : 'normal');
     doc.setFontSize(size);
     doc.setTextColor(rgb[0], rgb[1], rgb[2]);
   }
@@ -6030,8 +6111,9 @@ function exportComparativaPDF(share){
   doc.text('Cotización comparativa', W - M, 14, {align:'right'});
   st(8, [120,140,120], false);
   doc.text('Para ' + cd.client + '  ·  ' + cd.dateStr + '  ·  ' + cd.advisor + ', Asesor Comercial de TORAM', M, 20);
+  pdfGoldRule(doc, M, W - M, 23, 0.8);
   // Título en pregunta clara
-  st(16, [26,51,32], true);
+  st(16, [26,51,32], true, 'times');
   doc.text('¿Cuál te conviene más?', M, 30);
   var gainOn = cGainOn();
   st(9, [90,122,90], false);
@@ -6073,7 +6155,7 @@ function exportComparativaPDF(share){
   rows.forEach(function(r, i){
     var isBest = i === best;
     if (isBest) { doc.setFillColor(253, 243, 227); doc.rect(M, y, CW, rowH, 'F'); }
-    else if (i % 2 === 1) { doc.setFillColor(244, 248, 244); doc.rect(M, y, CW, rowH, 'F'); }
+    else if (i % 2 === 1) { doc.setFillColor(239,232,220); doc.rect(M, y, CW, rowH, 'F'); }
     var midY = y + 5;
     var vista = r.u.vista || (r.m ? r.m.vista : '—');
     var mensual = r.plan.available ? fmtMXN(r.plan.monthlyPayment, 0) : 'No disponible';
@@ -6086,18 +6168,19 @@ function exportComparativaPDF(share){
     st(9, [26,51,32], false);
     doc.text(String(r.m ? r.m.m2 : r.u.m2), cols[2].x + cols[2].w - 2, midY, {align:'right'});
     doc.text(vista, cols[3].x + 2, midY);
+    st(9, [26,51,32], false, 'courier');
     doc.text(fmtMXN(r.u.precio, 0), cols[4].x + cols[4].w - 2, midY, {align:'right'});
     doc.text(fmtMXN(r.plan.downPayment, 0), cols[5].x + cols[5].w - 2, midY, {align:'right'});
-    st(9, [26,51,32], true);
+    st(9, [26,51,32], true, 'courier');
     doc.text(mensual, cols[6].x + cols[6].w - 2, midY, {align:'right'});
-    st(9, [26,51,32], false);
+    st(9, [26,51,32], false, 'courier');
     doc.text(fmtMXN(r.rent, 0), cols[7].x + cols[7].w - 2, midY, {align:'right'});
     if (gainOn) {
-      st(9, [45,96,64], true);
+      st(9, [45,96,64], true, 'courier');
       doc.text(ganancia, cols[8].x + cols[8].w - 2, midY, {align:'right'});
     }
     // Línea divisoria
-    doc.setDrawColor(238, 243, 238);
+    doc.setDrawColor(216,206,188);
     doc.setLineWidth(0.2);
     doc.line(M, y + rowH, M + CW, y + rowH);
     y += rowH;
@@ -6163,9 +6246,10 @@ function exportPropuestaDeptoPDF(share) {
 
   var doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
   var W = 210, M = 14, CW = W - M * 2;
+  pdfPaper(doc, W, 297); pdfNewPage(doc, W, 297);
 
-  function setStyle(size, rgb, bold) {
-    doc.setFont('helvetica', bold ? 'bold' : 'normal');
+  function setStyle(size, rgb, bold, font) {
+    doc.setFont(font || 'helvetica', bold ? 'bold' : 'normal');
     doc.setFontSize(size);
     doc.setTextColor(rgb[0], rgb[1], rgb[2]);
   }
@@ -6196,7 +6280,7 @@ function exportPropuestaDeptoPDF(share) {
   catch(e) {}
   setStyle(7,[212,168,75],false);
   doc.text('PROPUESTA PERSONALIZADA', M, 22);
-  setStyle(17,[255,255,255],true);
+  setStyle(17,[255,255,255],true,'times');
   doc.text(inv.torre+'-'+inv.num, W-M, 14, {align:'right'});
   setStyle(8,[184,216,144],false);
   doc.text(m.nombre+' · '+inv.tipo, W-M, 21, {align:'right'});
@@ -6206,8 +6290,10 @@ function exportPropuestaDeptoPDF(share) {
   doc.roundedRect(W-M-stW, 24, stW, 6, 1, 1, 'F');
   setStyle(7,[255,255,255],true);
   doc.text(avail.status, W-M-stW/2, 28.2, {align:'center'});
+  pdfGoldRule(doc, 0, W, 40, 0.8);
+  pdfFrame(doc, W, 297);
   // Cliente (debajo de la banda, texto oscuro legible sobre blanco)
-  setStyle(13,[255,255,255],true);
+  setStyle(13,[255,255,255],true,'times');
   doc.text('Propuesta para '+cd.client, M, 36.5);
   setStyle(8,[74,106,82],false);
   doc.text('Asesor: '+cd.advisor+'  ·  '+cd.dateStr, M, 46);
@@ -6225,7 +6311,7 @@ function exportPropuestaDeptoPDF(share) {
     try { doc.addImage(imgSrc, 'JPEG', M, y, imgW, imgH); }
     catch(e) {}
   } else {
-    doc.setFillColor(240,246,240);
+    doc.setFillColor(239,232,220);
     doc.rect(M, y, imgW, imgH, 'F');
     setStyle(8,[160,180,160],false);
     doc.text('Planta no disponible', M + imgW/2, y + imgH/2, {align:'center'});
@@ -6234,7 +6320,7 @@ function exportPropuestaDeptoPDF(share) {
   var sw = W - M - sx;
   setStyle(7,[45,96,64],true);
   doc.text('ESPECIFICACIONES', sx, y + 2);
-  doc.setDrawColor(184,212,184); doc.setLineWidth(0.5);
+  doc.setDrawColor(216,206,188); doc.setLineWidth(0.5);
   doc.line(sx, y + 3.5, W - M, y + 3.5);
   var specs = [
     ['Precio de lista',      fmtMXN(inv.precio)],
@@ -6250,13 +6336,13 @@ function exportPropuestaDeptoPDF(share) {
   var rowH = 8.5;
   specs.forEach(function(sp, si) {
     var ry = y + 6 + si * rowH;
-    if (si % 2 === 0) { doc.setFillColor(248,252,248); } else { doc.setFillColor(255,255,255); }
+    if (si % 2 === 0) { doc.setFillColor(247,242,234); } else { doc.setFillColor(239,232,220); }
     doc.rect(sx, ry - 3, sw, rowH, 'F');
     setStyle(7.5,[90,122,90],false);
     doc.text(sp[0], sx + 2, ry + 1);
-    setStyle(7.5,[26,51,32],true);
+    setStyle(7.5,[26,51,32],true,'courier');
     doc.text(sp[1], W - M - 1, ry + 1, {align:'right'});
-    doc.setDrawColor(220,236,220); doc.setLineWidth(0.2);
+    doc.setDrawColor(216,206,188); doc.setLineWidth(0.2);
     doc.line(sx, ry + rowH - 3, W - M, ry + rowH - 3);
   });
   var specsBottom = y + 6 + specs.length * rowH + 4;
@@ -6264,7 +6350,7 @@ function exportPropuestaDeptoPDF(share) {
   y = Math.max(specsBottom, imageBottom);
 
   // ── PLANS TABLE ───────────────────────────────────────────────────────────
-  doc.setDrawColor(184,212,184); doc.setLineWidth(0.5);
+  doc.setDrawColor(216,206,188); doc.setLineWidth(0.5);
   doc.line(M, y, W - M, y);
   setStyle(7,[45,96,64],true);
   doc.text('PLANES DE FINANCIAMIENTO  -  ENGANCHE ' + dpLabel, M, y - 1.5);
@@ -6285,44 +6371,44 @@ function exportPropuestaDeptoPDF(share) {
     if (p.t2only && !isTower2) return;
     if (y > 268) { doc.addPage(); y = 20; }
     if (pi === 0) {
-      doc.setFillColor(232,242,232);
+      doc.setFillColor(239,232,220);
       doc.rect(M, y - 2, CW, 6, 'F');
       setStyle(6,[45,96,64],true);
       doc.text('Contado y financiamientos directos - 20% descuento', M + 2, y + 2);
-      doc.setDrawColor(200,226,200); doc.setLineWidth(0.3);
+      doc.setDrawColor(216,206,188); doc.setLineWidth(0.3);
       doc.line(M, y + 4, W-M, y + 4);
       y += 7;
     }
     if (pi === grpAEnd) {
-      doc.setFillColor(238,246,240);
+      doc.setFillColor(239,232,220);
       doc.rect(M, y - 2, CW, 6, 'F');
       setStyle(6,[45,96,64],true);
       var firstMsiDisc = ps[grpAEnd] ? ps[grpAEnd].disc : 15;
       var lastPlan = ps[ps.length-1];
       var lastDisc = lastPlan && !lastPlan.t2only ? lastPlan.disc : 5;
       doc.text('Meses sin intereses - descuento escalonado (' + firstMsiDisc + '% al ' + lastDisc + '%)', M + 2, y + 2);
-      doc.setDrawColor(200,226,200); doc.setLineWidth(0.3);
+      doc.setDrawColor(216,206,188); doc.setLineWidth(0.3);
       doc.line(M, y + 4, W-M, y + 4);
       y += 7;
     }
-    if (rowIdx % 2 === 0) { doc.setFillColor(252,255,252); } else { doc.setFillColor(246,252,246); }
+    if (rowIdx % 2 === 0) { doc.setFillColor(247,242,234); } else { doc.setFillColor(239,232,220); }
     doc.rect(M, y - 3, CW, 9, 'F');
     setStyle(8,[26,51,32],true);
     doc.text(p.name, M + 2, y + 1);
-    setStyle(7.5,[74,110,82],false);
+    setStyle(7.5,[74,110,82],false,'courier');
     doc.text(fmtMXN(p.downPayment), M + cPlan + cEng, y + 1, {align:'right'});
     if (p.financed <= 0.01) {
       setStyle(8,[26,102,64],true);
       doc.text('Cubierto', M + cPlan + cEng + cMens, y + 1, {align:'right'});
     } else {
-      setStyle(8.5,[26,51,32],true);
+      setStyle(8.5,[26,51,32],true,'courier');
       doc.text(fmtMXN(p.monthlyPayment), M + cPlan + cEng + cMens, y + 1, {align:'right'});
     }
     setStyle(7.5,[90,120,90],false);
     doc.text(p.months + 'm', M + cPlan + cEng + cMens + cPlaz, y + 1, {align:'right'});
     setStyle(7.5,[90,120,90],false);
     doc.text(p.rate > 0 ? p.rate + '% anual' : 'Sin int.', M + CW - rPad, y + 1, {align:'right'});
-    doc.setDrawColor(210,232,210); doc.setLineWidth(0.2);
+    doc.setDrawColor(216,206,188); doc.setLineWidth(0.2);
     doc.line(M, y + 5.5, W - M, y + 5.5);
     y += 9;
     rowIdx++;
@@ -6334,7 +6420,7 @@ function exportPropuestaDeptoPDF(share) {
     var r0 = roi[0];
     y += 4;
     if (y > 240) { doc.addPage(); y = 20; }
-    doc.setDrawColor(184,212,184); doc.setLineWidth(0.5);
+    doc.setDrawColor(216,206,188); doc.setLineWidth(0.5);
     doc.line(M, y, W - M, y);
     setStyle(7,[45,96,64],true);
     doc.text('ANALISIS DE RETORNO  -  PAGO DE CONTADO  -  HORIZONTE ' + opts.years + ' AÑOS', M, y - 1.5);
@@ -6349,13 +6435,16 @@ function exportPropuestaDeptoPDF(share) {
     ];
     roiRows.forEach(function(rr, ri){
       if (y > 268) { doc.addPage(); y = 20; }
-      if (ri % 2 === 0) { doc.setFillColor(248,252,248); } else { doc.setFillColor(255,255,255); }
+      var isTotal = rr[0] === 'Ganancia neta proyectada';
+      if (ri % 2 === 0) { doc.setFillColor(247,242,234); } else { doc.setFillColor(239,232,220); }
       doc.rect(M, y - 3, CW, 8.5, 'F');
+      if (isTotal) { pdfGoldRule(doc, M, W - M, y - 3, 0.8); }
       setStyle(8,[90,122,90],false);
       doc.text(rr[0], M + 2, y + 1);
-      setStyle(8,[26,51,32],true);
+      if (isTotal) { setStyle(9,[26,51,32],true,'times'); }
+      else { setStyle(8,[26,51,32],true,'courier'); }
       doc.text(rr[1], W - M - 1, y + 1, {align:'right'});
-      doc.setDrawColor(220,236,220); doc.setLineWidth(0.2);
+      doc.setDrawColor(216,206,188); doc.setLineWidth(0.2);
       doc.line(M, y + 5.5, W - M, y + 5.5);
       y += 8.5;
     });
@@ -6372,7 +6461,7 @@ function exportPropuestaDeptoPDF(share) {
 
     // ── EN RESUMEN: los 4 números clave en grande (para cualquiera) ──
     y += 6;
-    doc.setDrawColor(184,212,184); doc.setLineWidth(0.5);
+    doc.setDrawColor(216,206,188); doc.setLineWidth(0.5);
     doc.line(M, y, W - M, y);
     setStyle(7,[45,96,64],true);
     doc.text('EN RESUMEN', M, y - 1.5);
@@ -6387,13 +6476,13 @@ function exportPropuestaDeptoPDF(share) {
     sumCards.forEach(function(cd, ci){
       var cx = M + (ci % 2) * (cardW + 6);
       var cy = y + Math.floor(ci / 2) * (cardH + 4);
-      doc.setFillColor(244,249,244);
+      doc.setFillColor(239,232,220);
       doc.rect(cx, cy, cardW, cardH, 'F');
-      doc.setDrawColor(200,220,200); doc.setLineWidth(0.3);
+      doc.setDrawColor(216,206,188); doc.setLineWidth(0.3);
       doc.rect(cx, cy, cardW, cardH, 'D');
       setStyle(7,[90,122,90],false);
       doc.text(cd[0], cx + 5, cy + 8);
-      setStyle(11,[26,51,32],true);
+      setStyle(12,[26,51,32],true,'times');
       doc.text(cd[1], cx + 5, cy + 19);
     });
     y += cardH * 2 + 4 + 4;
@@ -6417,7 +6506,7 @@ function exportPropuestaDeptoPDF(share) {
     // Hoja dedicada al plano y los renders, contenido centrado verticalmente
     doc.addPage();
     y = 68;
-    doc.setDrawColor(184,212,184); doc.setLineWidth(0.5);
+    doc.setDrawColor(216,206,188); doc.setLineWidth(0.5);
     doc.line(M, y, W - M, y);
     setStyle(7,[45,96,64],true);
     doc.text('PLANO Y ACABADOS  -  ' + m.nombre.toUpperCase(), M, y - 1.5);
@@ -6442,7 +6531,7 @@ function exportPropuestaDeptoPDF(share) {
   var amW = 135, amH = Math.round(amW * 522 / 934);
   if (y + amH + 12 > 268) { doc.addPage(); y = 20; }
   y += 6;
-  doc.setDrawColor(184,212,184); doc.setLineWidth(0.5);
+  doc.setDrawColor(216,206,188); doc.setLineWidth(0.5);
   doc.line(M, y, W - M, y);
   setStyle(7,[45,96,64],true);
   doc.text('AMENIDADES  -  PLANTA DE CONJUNTO ALBERCA TORRE 1 Y 2', M, y - 1.5);
@@ -6474,7 +6563,7 @@ function exportPropuestaDeptoPDF(share) {
   var mapW = 140, mapH = Math.round(mapW * 675 / 1200);
   if (y + mapH + 12 > 268) { doc.addPage(); y = 20; }
   y += 6;
-  doc.setDrawColor(184,212,184); doc.setLineWidth(0.5);
+  doc.setDrawColor(216,206,188); doc.setLineWidth(0.5);
   doc.line(M, y, W - M, y);
   setStyle(7,[45,96,64],true);
   doc.text('CONOCE EL PARQUE  -  TORAM PARQUE TEMÁTICO', M, y - 1.5);
@@ -6527,9 +6616,10 @@ function exportPropuestaPartPDF(share) {
 
   var doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
   var W = 210, M = 14, CW = W - M * 2;
+  pdfPaper(doc, W, 297); pdfNewPage(doc, W, 297);
 
-  function setStyle(size, rgb, bold) {
-    doc.setFont('helvetica', bold ? 'bold' : 'normal');
+  function setStyle(size, rgb, bold, font) {
+    doc.setFont(font || 'helvetica', bold ? 'bold' : 'normal');
     doc.setFontSize(size);
     doc.setTextColor(rgb[0], rgb[1], rgb[2]);
   }
@@ -6542,12 +6632,14 @@ function exportPropuestaPartPDF(share) {
   catch(e) {}
   setStyle(7,[212,168,75],false);
   doc.text('PROPUESTA DE PARTICIPACIONES', M, 22);
-  setStyle(17,[255,255,255],true);
+  setStyle(17,[255,255,255],true,'times');
   doc.text(c.qty + (c.qty===1?' participación':' participaciones'), W-M, 14, {align:'right'});
   setStyle(8,[184,216,144],false);
   doc.text('Parque Temático · Mazatlán', W-M, 21, {align:'right'});
-  setStyle(13,[255,255,255],true);
+  setStyle(13,[255,255,255],true,'times');
   doc.text('Propuesta para '+cd.client, M, 36.5);
+  pdfGoldRule(doc, 0, W, 40, 0.8);
+  pdfFrame(doc, W, 297);
   setStyle(8,[74,106,82],false);
   doc.text('Asesor: '+cd.advisor+'  ·  '+cd.dateStr, M, 46);
   var y = 56;
@@ -6561,7 +6653,7 @@ function exportPropuestaPartPDF(share) {
   // ── TU INVERSIÓN ─────────────────────────────────────────────────────────
   setStyle(7,[45,96,64],true);
   doc.text('TU INVERSIÓN', M, y);
-  doc.setDrawColor(184,212,184); doc.setLineWidth(0.5);
+  doc.setDrawColor(216,206,188); doc.setLineWidth(0.5);
   doc.line(M, y + 1.5, W - M, y + 1.5);
   y += 6;
   var invRows = [
@@ -6578,13 +6670,17 @@ function exportPropuestaPartPDF(share) {
     invRows.push(['Forma de pago', 'Contado — ' + fmtMXN(c.total)]);
   }
   invRows.forEach(function(rr, ri){
-    if (ri % 2 === 0) { doc.setFillColor(248,252,248); } else { doc.setFillColor(255,255,255); }
+    if (ri % 2 === 0) { doc.setFillColor(247,242,234); } else { doc.setFillColor(239,232,220); }
     doc.rect(M, y - 3, CW, 8.5, 'F');
+    var isTotal = rr[0] === 'Inversión total';
+    var isMens = rr[0].indexOf('Mensualidad') === 0;
+    if (isTotal) { pdfGoldRule(doc, M, W - M, y - 3, 0.8); }
     setStyle(8,[90,122,90],false);
     doc.text(rr[0], M + 2, y + 1);
-    setStyle(8,[26,51,32],true);
+    if (isTotal || isMens) { setStyle(9,[26,51,32],true,'times'); }
+    else { setStyle(8,[26,51,32],true,'courier'); }
     doc.text(rr[1], W - M - 1, y + 1, {align:'right'});
-    doc.setDrawColor(220,236,220); doc.setLineWidth(0.2);
+    doc.setDrawColor(216,206,188); doc.setLineWidth(0.2);
     doc.line(M, y + 5.5, W - M, y + 5.5);
     y += 8.5;
   });
@@ -6596,7 +6692,7 @@ function exportPropuestaPartPDF(share) {
   y += 8;
 
   // ── PROYECCIÓN 2027–2030 ─────────────────────────────────────────────────
-  doc.setDrawColor(184,212,184); doc.setLineWidth(0.5);
+  doc.setDrawColor(216,206,188); doc.setLineWidth(0.5);
   doc.line(M, y, W - M, y);
   setStyle(7,[45,96,64],true);
   doc.text('PROYECCIÓN DE RENDIMIENTO  —  OFICIAL', M, y - 1.5);
@@ -6611,16 +6707,16 @@ function exportPropuestaPartPDF(share) {
   doc.text('%', M + CW - 2, y, {align:'right'});
   y += 6;
   PARTI.roi.forEach(function(r, ri){
-    if (ri % 2 === 0) { doc.setFillColor(252,255,252); } else { doc.setFillColor(246,252,246); }
+    if (ri % 2 === 0) { doc.setFillColor(247,242,234); } else { doc.setFillColor(239,232,220); }
     doc.rect(M, y - 3, CW, 9, 'F');
     setStyle(8,[26,51,32],true);
     doc.text(String(r.year), M + 2, y + 1);
-    setStyle(8,[26,51,32],false);
+    setStyle(8,[26,51,32],false,'courier');
     doc.text(fmtMXN(r.annual*c.qty), M + cAno + cAnu, y + 1, {align:'right'});
     doc.text(fmtMXN(r.monthly*c.qty), M + cAno + cAnu + cMen, y + 1, {align:'right'});
     setStyle(8,[26,102,64],true);
     doc.text(fmtPct(r.pct,2), M + CW - 2, y + 1, {align:'right'});
-    doc.setDrawColor(210,232,210); doc.setLineWidth(0.2);
+    doc.setDrawColor(216,206,188); doc.setLineWidth(0.2);
     doc.line(M, y + 5.5, W - M, y + 5.5);
     y += 9;
   });
@@ -6646,7 +6742,7 @@ function exportPropuestaPartPDF(share) {
   var mapW = 182, mapH = Math.round(mapW * 675 / 1200);
   if (y + mapH + 12 > 268) { doc.addPage(); y = 20; }
   y += 6;
-  doc.setDrawColor(184,212,184); doc.setLineWidth(0.5);
+  doc.setDrawColor(216,206,188); doc.setLineWidth(0.5);
   doc.line(M, y, W - M, y);
   setStyle(7,[45,96,64],true);
   doc.text('CONOCE EL PARQUE  -  TORAM PARQUE TEMÁTICO', M, y - 1.5);
@@ -6689,7 +6785,7 @@ function exportPropuestaPartPDF(share) {
     doc.addPage();
     y = 20;
     y += 6;
-    doc.setDrawColor(184,212,184); doc.setLineWidth(0.5);
+    doc.setDrawColor(216,206,188); doc.setLineWidth(0.5);
     doc.line(M, y, W - M, y);
     setStyle(7,[45,96,64],true);
     doc.text('ATRACCIONES DEL PARQUE', M, y - 1.5);
@@ -6845,7 +6941,7 @@ function lOnLocalChange() {
     : '';
   info.innerHTML =
     '<div class="l-kicker">Plaza TORAM · ETAPA 1 · Local</div>' +
-    '<div style="font-family:\'Playfair Display\',Georgia,serif;font-size:22px;font-weight:700;color:var(--navy);line-height:1.2;margin:4px 0 8px">Local '+loc.local+'</div>' +
+    '<div style="font-family:\'Cormorant Garamond\',Georgia,serif;font-size:22px;font-weight:700;color:var(--navy);line-height:1.2;margin:4px 0 8px">Local '+loc.local+'</div>' +
     '<table style="width:100%;border-collapse:collapse;font-size:13px">' +
     '<tr><td style="padding:5px 0;color:var(--text-muted)">Superficie</td><td style="padding:5px 0;text-align:right;font-weight:600">'+loc.m2+' m²</td></tr>' +
     '<tr><td style="padding:5px 0;color:var(--text-muted)">Precio por m²</td><td style="padding:5px 0;text-align:right;font-weight:600">'+fmtMXN(LOCALES_PRECIO_M2)+'</td></tr>' +
@@ -6957,19 +7053,19 @@ function buildLocalesHTML() {
   }).join('');
   var noteHtml = cd.note ? '<div style="font-size:12px;color:var(--green-soft);margin-top:4px">'+cd.note+'</div>' : '';
   var schedTitle = plan.meses === 0 ? 'Pago único' : 'Tabla de mensualidades — ' + plan.nombre;
-  return '<div style="font-family:\'Source Sans 3\',Arial,sans-serif;background:white;color:var(--green-text);max-width:800px;margin:0 auto">' +
-  '<div style="background:linear-gradient(135deg,#1a3a22 0%,#2d5a38 55%,#3a6e45 100%);padding:24px 32px">' +
+  return '<div style="font-family:\'IBM Plex Sans\',Arial,sans-serif;background:white;color:var(--green-text);max-width:800px;margin:0 auto">' +
+  '<div style="background:#1a3a22;padding:24px 32px">' +
   '<div style="display:flex;justify-content:space-between;align-items:flex-end">' +
-  '<div><div style="font-family:\'Playfair Display\',Georgia,serif;font-size:28px;font-weight:700;color:white;line-height:1;letter-spacing:0.05em">TORAM</div>' +
+  '<div><div style="font-family:\'Cormorant Garamond\',Georgia,serif;font-size:28px;font-weight:700;color:white;line-height:1;letter-spacing:0.05em">TORAM</div>' +
   '<div style="font-size:10px;letter-spacing:0.3em;color:#d4a84b;text-transform:uppercase;margin-top:4px">Cotización · Local comercial</div></div>' +
   '<div style="text-align:right">' +
-  '<div style="font-family:\'Playfair Display\',Georgia,serif;font-size:22px;font-weight:700;color:white">Local '+loc.local+'</div>' +
+  '<div style="font-family:\'Cormorant Garamond\',Georgia,serif;font-size:22px;font-weight:700;color:white">Local '+loc.local+'</div>' +
   '<div style="font-size:11px;color:#b8d890;margin-top:2px">Plaza TORAM · ETAPA 1</div>' +
   '<div style="margin-top:6px">'+statusBadge+'</div>' +
   apartNoteHtml +
   '</div></div>' +
   '<div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.25)">' +
-  '<div style="font-family:\'Playfair Display\',Georgia,serif;font-size:20px;font-weight:700;color:white">Cotización para '+cd.client+'</div>' +
+  '<div style="font-family:\'Cormorant Garamond\',Georgia,serif;font-size:20px;font-weight:700;color:white">Cotización para '+cd.client+'</div>' +
   '<div style="font-size:12px;color:rgba(255,255,255,0.75);margin-top:2px">Asesor: '+cd.advisor+' · '+cd.dateStr+'</div>' + noteHtml +
   '</div></div>' +
   '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0">' +
@@ -7044,9 +7140,10 @@ function exportLocalesPDF(share) {
 
   var doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
   var W = 210, M = 14, CW = W - M * 2;
+  pdfPaper(doc, W, 297); pdfNewPage(doc, W, 297);
 
-  function setStyle(size, rgb, bold) {
-    doc.setFont('helvetica', bold ? 'bold' : 'normal');
+  function setStyle(size, rgb, bold, font) {
+    doc.setFont(font || 'helvetica', bold ? 'bold' : 'normal');
     doc.setFontSize(size);
     doc.setTextColor(rgb[0], rgb[1], rgb[2]);
   }
@@ -7073,7 +7170,7 @@ function exportLocalesPDF(share) {
   catch(e) {}
   setStyle(7,[212,168,75],false);
   doc.text('COTIZACIÓN · LOCAL COMERCIAL', M, 22);
-  setStyle(17,[255,255,255],true);
+  setStyle(17,[255,255,255],true,'times');
   doc.text('Local '+loc.local, W-M, 14, {align:'right'});
   setStyle(8,[184,216,144],false);
   doc.text('Plaza TORAM · ETAPA 1', W-M, 21, {align:'right'});
@@ -7083,8 +7180,10 @@ function exportLocalesPDF(share) {
   doc.roundedRect(W-M-stW, 24, stW, 6, 1, 1, 'F');
   setStyle(7,[255,255,255],true);
   doc.text(stTxt, W-M-stW/2, 28.2, {align:'center'});
+  pdfGoldRule(doc, 0, W, 40, 0.8);
+  pdfFrame(doc, W, 297);
   // Cliente (debajo de la banda, texto oscuro legible sobre blanco)
-  setStyle(13,[255,255,255],true);
+  setStyle(13,[255,255,255],true,'times');
   doc.text('Cotización para '+cd.client, M, 36.5);
   setStyle(8,[74,106,82],false);
   doc.text('Asesor: '+cd.advisor+'  ·  '+cd.dateStr, M, 46);
@@ -7102,7 +7201,7 @@ function exportLocalesPDF(share) {
   }
 
   // ── DATOS DEL LOCAL ──────────────────────────────────────────────────────
-  doc.setDrawColor(184,212,184); doc.setLineWidth(0.5);
+  doc.setDrawColor(216,206,188); doc.setLineWidth(0.5);
   doc.line(M, y, W - M, y);
   setStyle(7,[45,96,64],true);
   doc.text('DATOS DEL LOCAL', M, y - 1.5);
@@ -7119,13 +7218,16 @@ function exportLocalesPDF(share) {
   ];
   specRows.forEach(function(sp, si){
     if (y > 268) { doc.addPage(); y = 20; }
-    if (si % 2 === 0) { doc.setFillColor(248,252,248); } else { doc.setFillColor(255,255,255); }
+    var isTotal = sp[0] === 'Precio con descuento';
+    if (si % 2 === 0) { doc.setFillColor(247,242,234); } else { doc.setFillColor(239,232,220); }
     doc.rect(M, y - 3, CW, 8.5, 'F');
+    if (isTotal) { pdfGoldRule(doc, M, W - M, y - 3, 0.8); }
     setStyle(8,[90,122,90],false);
     doc.text(sp[0], M + 2, y + 1);
-    setStyle(8,[26,51,32],true);
+    if (isTotal) { setStyle(9,[26,51,32],true,'times'); }
+    else { setStyle(8,[26,51,32],true,'courier'); }
     doc.text(sp[1], W - M - 1, y + 1, {align:'right'});
-    doc.setDrawColor(220,236,220); doc.setLineWidth(0.2);
+    doc.setDrawColor(216,206,188); doc.setLineWidth(0.2);
     doc.line(M, y + 5.5, W - M, y + 5.5);
     y += 8.5;
   });
@@ -7133,7 +7235,7 @@ function exportLocalesPDF(share) {
 
   // ── PLANES ───────────────────────────────────────────────────────────────
   if (y > 240) { doc.addPage(); y = 20; }
-  doc.setDrawColor(184,212,184); doc.setLineWidth(0.5);
+  doc.setDrawColor(216,206,188); doc.setLineWidth(0.5);
   doc.line(M, y, W - M, y);
   setStyle(7,[45,96,64],true);
   doc.text('PLANES DE PAGO  -  DESCUENTOS SOBRE PRECIO DE LISTA  -  SIN INTERESES', M, y - 1.5);
@@ -7152,21 +7254,21 @@ function exportLocalesPDF(share) {
   plans.forEach(function(p, pi){
     if (y > 268) { doc.addPage(); y = 20; }
     if (pi === lSelectedPlanIdx) { doc.setFillColor(253,246,224); }
-    else if (pi % 2 === 0) { doc.setFillColor(252,255,252); }
-    else { doc.setFillColor(246,252,246); }
+    else if (pi % 2 === 0) { doc.setFillColor(247,242,234); }
+    else { doc.setFillColor(239,232,220); }
     doc.rect(M, y - 3, CW, 9, 'F');
     setStyle(8,[26,51,32],true);
     doc.text(p.nombre + (pi === lSelectedPlanIdx ? ' ★' : ''), M + 2, y + 1);
-    setStyle(8,[26,51,32],true);
+    setStyle(8,[26,51,32],true,'courier');
     doc.text(fmtMXN(p.precioConDesc), M + cPlan + cPrecio, y + 1, {align:'right'});
-    setStyle(7.5,[74,110,82],false);
+    setStyle(7.5,[74,110,82],false,'courier');
     doc.text(fmtMXN(p.enganche), M + cPlan + cPrecio + cEng, y + 1, {align:'right'});
     doc.text(fmtMXN(p.resto), M + cPlan + cPrecio + cEng + cResto, y + 1, {align:'right'});
-    setStyle(8.5,[26,51,32],true);
+    setStyle(8.5,[26,51,32],true,'courier');
     doc.text(fmtMXN(p.mensualidad), M + cPlan + cPrecio + cEng + cResto + cMens, y + 1, {align:'right'});
     setStyle(7.5,[90,120,90],false);
     doc.text(p.meses === 0 ? 'Único' : p.meses + 'm', M + CW - 2, y + 1, {align:'right'});
-    doc.setDrawColor(210,232,210); doc.setLineWidth(0.2);
+    doc.setDrawColor(216,206,188); doc.setLineWidth(0.2);
     doc.line(M, y + 5.5, W - M, y + 5.5);
     y += 9;
   });
@@ -7174,7 +7276,7 @@ function exportLocalesPDF(share) {
 
   // ── TABLA DE MENSUALIDADES (plan a cotizar) ──────────────────────────────
   if (y > 240) { doc.addPage(); y = 20; }
-  doc.setDrawColor(184,212,184); doc.setLineWidth(0.5);
+  doc.setDrawColor(216,206,188); doc.setLineWidth(0.5);
   doc.line(M, y, W - M, y);
   setStyle(7,[45,96,64],true);
   doc.text(plan.meses === 0 ? 'PAGO ÚNICO  -  ' + plan.nombre.toUpperCase() : 'TABLA DE MENSUALIDADES  -  ' + plan.nombre.toUpperCase(), M, y - 1.5);
@@ -7189,16 +7291,16 @@ function exportLocalesPDF(share) {
   y += 6;
   sched.forEach(function(r, ri){
     if (y > 268) { doc.addPage(); y = 20; }
-    if (ri % 2 === 0) { doc.setFillColor(248,252,248); } else { doc.setFillColor(255,255,255); }
+    if (ri % 2 === 0) { doc.setFillColor(247,242,234); } else { doc.setFillColor(239,232,220); }
     doc.rect(M, y - 3, CW, 6.5, 'F');
     setStyle(8,[90,122,90],false);
     doc.text(String(r.no), M + 2, y + 1);
     var lastAdj = (ri === sched.length - 1 && sched.length > 1 && r.pago !== plan.mensualidad);
-    setStyle(8,[26,51,32],true);
+    setStyle(8,[26,51,32],true,'courier');
     doc.text(fmtMXN(r.pago) + (lastAdj ? ' *' : ''), M + cNo + cPago, y + 1, {align:'right'});
-    setStyle(8,[90,122,90],false);
+    setStyle(8,[90,122,90],false,'courier');
     doc.text(fmtMXN(r.saldo), M + CW - 2, y + 1, {align:'right'});
-    doc.setDrawColor(220,236,220); doc.setLineWidth(0.2);
+    doc.setDrawColor(216,206,188); doc.setLineWidth(0.2);
     doc.line(M, y + 3.5, W - M, y + 3.5);
     y += 6.5;
   });
@@ -7215,7 +7317,7 @@ function exportLocalesPDF(share) {
   var plW = 150, plH = Math.round(plW * 839 / 1179);
   if (y + plH + 14 > 268) { doc.addPage(); y = 20; }
   y += 6;
-  doc.setDrawColor(184,212,184); doc.setLineWidth(0.5);
+  doc.setDrawColor(216,206,188); doc.setLineWidth(0.5);
   doc.line(M, y, W - M, y);
   setStyle(7,[45,96,64],true);
   doc.text('PLANO DE LA PLAZA  -  ETAPA 1', M, y - 1.5);
@@ -7230,7 +7332,7 @@ function exportLocalesPDF(share) {
   // ── LA PLAZA + LEYENDA ───────────────────────────────────────────────────
   y += 3;
   if (y > 250) { doc.addPage(); y = 20; }
-  doc.setDrawColor(184,212,184); doc.setLineWidth(0.5);
+  doc.setDrawColor(216,206,188); doc.setLineWidth(0.5);
   doc.line(M, y, W - M, y);
   setStyle(7,[45,96,64],true);
   doc.text('LA PLAZA', M, y - 1.5);
@@ -7247,7 +7349,7 @@ function exportLocalesPDF(share) {
 
   // ── RENDERS DE LA PLAZA (brochure oficial) ──────────────────
   doc.addPage(); y = 20;
-  doc.setDrawColor(184,212,184); doc.setLineWidth(0.5);
+  doc.setDrawColor(216,206,188); doc.setLineWidth(0.5);
   doc.line(M, y, W - M, y);
   setStyle(7,[45,96,64],true);
   doc.text('RENDERS DE LA PLAZA', M, y - 1.5);
@@ -7538,6 +7640,8 @@ window.addEventListener('DOMContentLoaded', function() {
   if (sideLogo && typeof TORAM_LOGO === 'string') sideLogo.src = TORAM_LOGO;
   var locLogo = document.getElementById('lHeroLogo');
   if (locLogo && typeof TORAM_LOGO === 'string') locLogo.src = TORAM_LOGO;
+  var inicioMap = document.getElementById('inicioMapImg');
+  if (inicioMap && typeof PARK_MAP_IMG === 'string') inicioMap.src = PARK_MAP_IMG;
   lPopulateLocales();
 });
 
