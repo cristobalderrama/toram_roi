@@ -1382,6 +1382,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
       <p>Cada propuesta que descargues o compartas con el nombre del cliente se guarda aquí sola, con su llamada a los 3 días. Todo queda en tu teléfono, funciona sin internet.</p>
     </div>
     <div class="card">
+      <div id="segPerfil" style="font-size:12px;color:#5a7a62;margin-bottom:12px"></div>
       <div id="segList"></div>
     </div>
   </div>
@@ -5259,6 +5260,7 @@ function savePerfil(){
   };
   try { localStorage.setItem('toram_perfil_v1', JSON.stringify(p)); } catch(e){}
   applyPerfilToInputs();
+  renderSeguimiento();
   alert('Perfil guardado. Desde ahora tus propuestas, cotizaciones y comparativas salen con tu nombre y tu teléfono.');
 }
 function applyPerfilToInputs(){
@@ -5561,9 +5563,17 @@ function sharePDFBlob(doc, filename, text){
 
 // Seguimiento: guarda a quién se le mandó cada propuesta (en el teléfono,
 // funciona sin internet) y recuerda la llamada a los 3 días.
-var SEGUIMIENTO_KEY = 'toram_seguimiento_v1';
-function loadFollowUps(){ try { return JSON.parse(localStorage.getItem(SEGUIMIENTO_KEY)) || []; } catch(e){ return []; } }
-function saveFollowUps(list){ try { localStorage.setItem(SEGUIMIENTO_KEY, JSON.stringify(list)); } catch(e){} }
+// Por perfil: cada asesor (nombre + teléfono) lleva SU propio registro, sin
+// mezclar. El perfil de Cristo usa la clave original para no perder su
+// registro actual.
+function seguimientoKey(){
+  var p = getPerfil();
+  if (p.name === PERFIL_DEFAULT.name && p.phone === PERFIL_DEFAULT.phone) return 'toram_seguimiento_v1';
+  function s(x){ return String(x||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,''); }
+  return 'toram_seguimiento_v1_' + s(p.name) + '_' + s(p.phone);
+}
+function loadFollowUps(){ try { return JSON.parse(localStorage.getItem(seguimientoKey())) || []; } catch(e){ return []; } }
+function saveFollowUps(list){ try { localStorage.setItem(seguimientoKey(), JSON.stringify(list)); } catch(e){} }
 function todayISO(){ var d = new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 function addDaysISO(iso, n){ var d = new Date(iso+'T12:00:00'); d.setDate(d.getDate()+n); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 function fmtFechaCorta(iso){ var p = String(iso).split('-'); return p.length===3 ? p[2]+'/'+p[1]+'/'+p[0].slice(2) : iso; }
@@ -5598,6 +5608,8 @@ function deleteFollowUp(id){
 function renderSeguimiento(){
   var box = document.getElementById('segList');
   if (!box) return;
+  var pf = document.getElementById('segPerfil');
+  if (pf) pf.textContent = 'Registro de: ' + perfilName() + ' (' + perfilPhone() + ')';
   var list = loadFollowUps();
   var today = todayISO();
   var pend = list.filter(function(f){ return f.status==='pendiente'; });
