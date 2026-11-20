@@ -6007,7 +6007,7 @@ function buildPropuestaPartHTML() {
   '</tr></thead><tbody>'+roiRows+'</tbody></table>' +
   partChartHtml +
   '<div style="font-size:10px;color:#7a9a82;margin-top:8px">Proyecciones basadas en el desempeño esperado del parque; no constituyen garantía. Cada participación equivale al 0.05% del ingreso neto del parque, con pagos trimestrales.</div>' +
-  '<div style="font-size:10px;color:#7a9a82;margin-top:4px"><b>Los cobros para el socio son trimestrales.</b> Ejemplo: el primer trimestre (octubre 2027–enero 2028) se recibe en febrero de 2028; el segundo trimestre (febrero–abril 2028) se recibe en junio de 2028, y así sucesivamente cada trimestre.</div>' +
+  '<div style="font-size:10px;color:#7a9a82;margin-top:4px"><b>Los cobros para el socio son trimestrales.</b> Ejemplo: el primer trimestre (octubre–diciembre 2027) se recibe en enero de 2028; el segundo trimestre (enero–marzo 2028) se recibe en abril de 2028, y así sucesivamente cada trimestre.</div>' +
   '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-dark);margin:18px 0 12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Retorno de inversión — de dónde sale el rendimiento</div>' +
   '<div style="overflow-x:auto">' +
   '<table style="width:100%;min-width:560px;border-collapse:collapse;font-size:11px">' +
@@ -7014,7 +7014,7 @@ function exportPropuestaPartPDF(share) {
   y = drawROIChart(doc, M, y + 2, CW, '¿CUÁNTO GANAS CADA AÑO?', PARTI.roi.map(function(r){return String(r.year);}), PARTI.roi.map(function(r){return r.annual * c.qty;}), null, '', '', partTake);
   doc.text('Sujeto a disponibilidad.', M, y);
   y += 4;
-  var legLines = doc.splitTextToSize('Los cobros para el socio son trimestrales. Ejemplo: el primer trimestre (octubre 2027–enero 2028) se recibe en febrero de 2028; el segundo trimestre (febrero–abril 2028) se recibe en junio de 2028, y así sucesivamente cada trimestre.', CW);
+  var legLines = doc.splitTextToSize('Los cobros para el socio son trimestrales. Ejemplo: el primer trimestre (octubre–diciembre 2027) se recibe en enero de 2028; el segundo trimestre (enero–marzo 2028) se recibe en abril de 2028, y así sucesivamente cada trimestre.', CW);
   doc.text(legLines, M, y);
   y += legLines.length * 4;
   if (y > 270) { doc.addPage(); y = 20; }
