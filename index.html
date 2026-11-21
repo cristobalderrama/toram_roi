@@ -1660,6 +1660,12 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
             <option value="">— Primero elige un modelo —</option>
           </select>
         </div>
+        <div class="field" style="width:200px">
+          <span class="label">Plan de financiamiento</span>
+          <select id="cPlanAdd" class="input-lg">
+            <option value="">— Elige un modelo —</option>
+          </select>
+        </div>
         <div class="field" style="width:180px">
           <span class="label">Renta mensual estimada ($)</span>
           <input type="number" id="cRentInput" value="45000" step="1000" min="0" style="width:100%;height:42px;border:1px solid var(--border-strong);border-radius:var(--radius);padding:0 10px;font-size:16px">
@@ -1668,13 +1674,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
       </div>
       <div id="cUnitsList" style="display:flex;gap:8px;flex-wrap:wrap"></div>
       <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-top:16px">
-        <div class="field" style="flex:1;min-width:240px">
-          <span class="label">Plan de financiamiento (el mismo para todas las unidades)</span>
-          <select id="cPlanSelect" onchange="renderComparativa()" class="input-lg">
-            <option value="">— Cargando planes —</option>
-          </select>
-        </div>
-        <div style="font-size:12px;color:var(--green-soft);padding-bottom:12px">Enganche del 15%</div>
+        <div style="font-size:12px;color:var(--green-soft);padding-bottom:12px">Enganche del 15% · Cada unidad lleva su propio plan de financiamiento</div>
         <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--green-text);padding-bottom:12px;cursor:pointer">
           <input type="checkbox" id="cGainToggle" checked onchange="renderComparativa()" style="width:18px;height:18px;accent-color:var(--green-dark)">
           Mostrar ganancia proyectada a 5 años
@@ -2363,7 +2363,7 @@ function showPage(id) {
     populateCompareTable();
   }
   if (id === 'seguimiento') renderSeguimiento();
-  if (id === 'comparativa') { cPopulateModels(); cPopulatePlans(); renderComparativa(); }
+  if (id === 'comparativa') { cPopulateModels(); renderComparativa(); }
   if (id === 'perfil') applyPerfilToInputs();
   closeMoreMenu();
 
@@ -6292,24 +6292,15 @@ function cPopulateModels(){
   });
   sel.innerHTML = html;
 }
-function cPopulatePlans(){
-  var sel = document.getElementById('cPlanSelect');
-  if (!sel) return;
-  if (sel.options && sel.options.length > 1) return;
-  var ref = INVENTORY[0];
-  var plans = buildQuotePlans(ref, 15);
-  var html = '';
-  plans.forEach(function(p, i){ html += '<option value="'+i+'">'+p.name+'</option>'; });
-  sel.innerHTML = html;
-  sel.value = '2'; // 5 Años (60 meses) por defecto
-}
 function cOnModelChange(){
   var key = document.getElementById('cModelSelect').value;
   var unitSel = document.getElementById('cUnitSelect');
+  var planSel = document.getElementById('cPlanAdd');
   cCurrentUnits = [];
   if (!key) {
     unitSel.innerHTML = '<option value="">— Primero elige un modelo —</option>';
     unitSel.disabled = true;
+    if (planSel) planSel.innerHTML = '<option value="">— Elige un modelo —</option>';
     return;
   }
   var units = pModelAllUnits(key);
@@ -6321,10 +6312,32 @@ function cOnModelChange(){
   });
   unitSel.innerHTML = html;
   unitSel.disabled = false;
+  // Planes disponibles para la torre de este modelo (T1: hasta 5 años; T2: hasta 7 años)
+  if (planSel && units.length) {
+    var plans = buildQuotePlans(units[0], 15);
+    var ph = '';
+    plans.forEach(function(p, i){
+      if (!p.available) return;
+      ph += '<option value="'+i+'">'+p.name+'</option>';
+    });
+    planSel.innerHTML = ph;
+    planSel.value = '2'; // 5 Años (60 meses) por defecto
+  }
 }
 function cGainOn(){
   var t = document.getElementById('cGainToggle');
   return t ? t.checked : true;
+}
+// Nombre corto del plan para la tabla ("5 Años (60 meses)" -> "5 años", "12 Meses Sin Intereses" -> "12 MSI")
+function cPlanShort(plan){
+  if (!plan) return '—';
+  var n = plan.name || '';
+  if (n.indexOf('Contado') === 0) return 'Contado';
+  var m = n.match(/^(\d+) Años/);
+  if (m) return m[1] + ' años';
+  var m2 = n.match(/^(\d+) Meses/);
+  if (m2) return m2[1] + ' MSI';
+  return n;
 }
 function cAddUnit(){
   var unitSel = document.getElementById('cUnitSelect');
@@ -6335,39 +6348,58 @@ function cAddUnit(){
   var dup = cUnits.some(function(x){ return x.inv.torre===u.torre && x.inv.num===u.num; });
   if (dup) { alert('Esa unidad ya está en la comparación.'); return; }
   var rent = parseFloat(document.getElementById('cRentInput').value) || 0;
-  cUnits.push({inv:u, rent:rent});
+  var planSel = document.getElementById('cPlanAdd');
+  var planIdx = planSel ? parseInt(planSel.value, 10) : 2;
+  if (isNaN(planIdx)) planIdx = 2;
+  cUnits.push({inv:u, rent:rent, rentOn:true, plan:planIdx});
   renderComparativa();
 }
 function cSetRent(i, v){
   if (cUnits[i]) { cUnits[i].rent = parseFloat(v) || 0; renderComparativa(); }
+}
+function cSetRentOn(i, checked){
+  if (cUnits[i]) { cUnits[i].rentOn = !!checked; renderComparativa(); }
+}
+function cSetPlan(i, v){
+  if (cUnits[i]) { var p = parseInt(v, 10); cUnits[i].plan = isNaN(p) ? 2 : p; renderComparativa(); }
 }
 function cRemoveUnit(i){
   cUnits.splice(i, 1);
   renderComparativa();
 }
 // Una fila por unidad: precio, enganche 15%, mensualidad del plan elegido
-// y ganancia neta proyectada a 5 años (mismos supuestos que la propuesta).
+// (cada unidad lleva SU propio plan) y ganancia neta proyectada a 5 años
+// (mismos supuestos que la propuesta). Si una unidad no lleva renta, no hay
+// ingreso ni ganancia para ella (rent y netGain quedan en null).
 function cComputeRows(){
-  var planIdx = parseInt(document.getElementById('cPlanSelect').value, 10);
-  if (isNaN(planIdx)) planIdx = 2;
   return cUnits.map(function(item){
     var u = item.inv;
     var plans = oRoundPlans(buildQuotePlans(u, 15));
-    var p = plans[planIdx] || plans[0];
-    // La ganancia usa la renta QUE TÚ DISTE para esa unidad (cada depto renta
-    // distinto según su capacidad de huéspedes), no una sola renta para todas.
-    var opts = {years:5, appr:5, rent:item.rent || 0, exp:3000, taxes:3500, escPct:6};
-    var roi = calcPropuestaROI(u, plans, opts);
-    var r = roi[planIdx] || roi[0];
+    var planIdx = (typeof item.plan === 'number' && !isNaN(item.plan)) ? item.plan : 2;
+    var p = plans[planIdx] || plans[2] || plans[0];
+    var rentOn = item.rentOn !== false;
+    var rent = rentOn ? (item.rent || 0) : null;
+    var netGain = null;
+    if (rent !== null) {
+      // La ganancia usa la renta QUE TÚ DISTE para esa unidad (cada depto renta
+      // distinto según su capacidad de huéspedes), no una sola renta para todas.
+      var opts = {years:5, appr:5, rent:rent, exp:3000, taxes:3500, escPct:6};
+      var roi = calcPropuestaROI(u, plans, opts);
+      var r = roi[planIdx] || roi[0];
+      netGain = r ? r.netGain : null;
+    }
     var m = MODELS.find(function(x){ return x.key === getUnitImageKey(u.torre, u.num); });
-    return {u:u, m:m, plan:p, rent:item.rent || 0, netGain:r ? r.netGain : 0, avail:getAvailability(u.torre, u.num)};
+    return {u:u, m:m, plan:p, planIdx:planIdx, rent:rent, rentOn:rentOn, netGain:netGain, avail:getAvailability(u.torre, u.num)};
   });
+}
+function cRentOnAny(rows){
+  return rows.some(function(r){ return r.rent !== null && r.rent !== undefined; });
 }
 function cBestIdx(rows){
   if (!cGainOn()) return -1;
   var best = -1, bestGain = -Infinity;
   rows.forEach(function(r, i){
-    if (r.plan.available && r.netGain > bestGain) { bestGain = r.netGain; best = i; }
+    if (r.plan.available && r.netGain !== null && r.netGain !== undefined && r.netGain > bestGain) { bestGain = r.netGain; best = i; }
   });
   return best;
 }
@@ -6376,9 +6408,18 @@ function cUnitsListHtml(){
   var h = '';
   cUnits.forEach(function(item, i){
     var u = item.inv;
+    var plans = buildQuotePlans(u, 15);
+    var planIdx = (typeof item.plan === 'number' && !isNaN(item.plan)) ? item.plan : 2;
+    var planOpts = '';
+    plans.forEach(function(p, pi){
+      if (!p.available) return;
+      planOpts += '<option value="'+pi+'"'+(pi===planIdx?' selected':'')+'>'+p.name+'</option>';
+    });
+    var rentOn = item.rentOn !== false;
     h += '<span style="display:inline-flex;align-items:center;gap:8px;background:#e8f5e9;border:1px solid #c8dcc8;border-radius:12px;padding:6px 6px 6px 12px;font-size:13px;font-weight:600;color:var(--green-text)">'
       + u.torre+'-'+u.num+' · '+fmtMXN(u.precio)
-      + ' <label style="font-weight:400;font-size:12px;color:var(--green-soft)">Renta $ <input type="number" value="'+(item.rent||0)+'" step="1000" min="0" onchange="cSetRent('+i+', this.value)" style="width:90px;height:28px;border:1px solid #c8dcc8;border-radius:6px;padding:0 6px;font-size:12px"></label>'
+      + ' <label style="font-weight:400;font-size:12px;color:var(--green-soft)">Plan <select onchange="cSetPlan('+i+', this.value)" style="height:28px;border:1px solid #c8dcc8;border-radius:6px;padding:0 4px;font-size:12px;max-width:170px">'+planOpts+'</select></label>'
+      + ' <label style="font-weight:400;font-size:12px;color:var(--green-soft)"><input type="checkbox" '+(rentOn?'checked':'')+' onchange="cSetRentOn('+i+', this.checked)" style="width:15px;height:15px;accent-color:var(--green-dark);vertical-align:middle"> Renta $ <input type="number" value="'+(item.rent||0)+'" step="1000" min="0" '+(rentOn?'':'disabled')+' onchange="cSetRent('+i+', this.value)" style="width:90px;height:28px;border:1px solid #c8dcc8;border-radius:6px;padding:0 6px;font-size:12px"></label>'
       + ' <button onclick="cRemoveUnit('+i+')" style="border:none;background:var(--green-text);color:white;width:20px;height:20px;border-radius:50%;cursor:pointer;font-size:11px;line-height:1">✕</button></span>';
   });
   return h;
@@ -6395,11 +6436,13 @@ function renderComparativa(){
   var rows = cComputeRows();
   var best = cBestIdx(rows);
   var gainOn = cGainOn();
-  var planName = rows[0].plan.name;
+  var rentOnAny = cRentOnAny(rows);
+  // La ganancia solo existe si hay al menos una unidad con renta
+  var gainShown = gainOn && rentOnAny && rows.some(function(r){ return r.netGain !== null && r.netGain !== undefined; });
   var h = '<div style="padding:24px 24px 8px">'
     + '<div style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--green-dark);font-weight:700">TORAM Residencial · Cotización comparativa</div>'
     + '<div style="font-size:22px;font-weight:800;color:var(--green-text);margin:6px 0 2px">¿Cuál te conviene más?</div>'
-    + '<div style="font-size:13px;color:var(--green-soft)">Para '+escHtml(cClientData().client)+' · '+escHtml(cClientData().dateStr)+' · Plan: '+escHtml(planName)+' · Enganche del 15%</div>'
+    + '<div style="font-size:13px;color:var(--green-soft)">Para '+escHtml(cClientData().client)+' · '+escHtml(cClientData().dateStr)+' · Cada unidad con su propio plan · Enganche del 15%</div>'
     + '</div>';
   h += '<div style="padding:8px 24px 24px;overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:13px">'
     + '<thead><tr style="background:#0e1a12;color:white">'
@@ -6409,9 +6452,10 @@ function renderComparativa(){
     + '<th style="text-align:left;padding:10px 8px">Vista</th>'
     + '<th style="text-align:right;padding:10px 8px">Precio de lista</th>'
     + '<th style="text-align:right;padding:10px 8px">Enganche 15%</th>'
+    + '<th style="text-align:left;padding:10px 8px">Plan</th>'
     + '<th style="text-align:right;padding:10px 8px">Mensualidad</th>'
-    + '<th style="text-align:right;padding:10px 8px">Ingreso mensual</th>'
-    + (gainOn ? '<th style="text-align:right;padding:10px 8px">Ganancia 5 años</th>' : '')
+    + (rentOnAny ? '<th style="text-align:right;padding:10px 8px">Ingreso mensual</th>' : '')
+    + (gainShown ? '<th style="text-align:right;padding:10px 8px">Ganancia 5 años</th>' : '')
     + '</tr></thead><tbody>';
   rows.forEach(function(r, i){
     var isBest = i === best;
@@ -6419,7 +6463,8 @@ function renderComparativa(){
     var unitCell = r.u.torre+'-'+r.u.num + (isBest ? '<div style="font-size:11px;font-weight:700;color:#8a6d00">★ Recomendada</div>' : '');
     var vista = r.u.vista || (r.m ? r.m.vista : '—');
     var mensual = r.plan.available ? fmtMXN(r.plan.monthlyPayment, 0) : 'No disponible';
-    var ganancia = r.plan.available ? fmtMXN(r.netGain, 0) : '—';
+    var ganancia = (r.plan.available && r.netGain !== null && r.netGain !== undefined) ? fmtMXN(r.netGain, 0) : '—';
+    var ingreso = (r.rent !== null && r.rent !== undefined) ? fmtMXN(r.rent, 0) : '—';
     h += '<tr style="background:'+bg+';border-bottom:1px solid #eef3ee">'
       + '<td style="padding:10px 8px;font-weight:700;color:var(--green-text)">'+unitCell+'</td>'
       + '<td style="padding:10px 8px">'+(r.m ? r.m.nombre : '—')+'</td>'
@@ -6427,22 +6472,32 @@ function renderComparativa(){
       + '<td style="padding:10px 8px">'+vista+'</td>'
       + '<td style="text-align:right;padding:10px 8px">'+fmtMXN(r.u.precio, 0)+'</td>'
       + '<td style="text-align:right;padding:10px 8px">'+fmtMXN(r.plan.downPayment, 0)+'</td>'
+      + '<td style="padding:10px 8px">'+cPlanShort(r.plan)+'</td>'
       + '<td style="text-align:right;padding:10px 8px;font-weight:600">'+mensual+'</td>'
-      + '<td style="text-align:right;padding:10px 8px">'+fmtMXN(r.rent, 0)+'</td>'
-      + (gainOn ? '<td style="text-align:right;padding:10px 8px;font-weight:700;color:var(--green-dark)">'+ganancia+'</td>' : '')
+      + (rentOnAny ? '<td style="text-align:right;padding:10px 8px">'+ingreso+'</td>' : '')
+      + (gainShown ? '<td style="text-align:right;padding:10px 8px;font-weight:700;color:var(--green-dark)">'+ganancia+'</td>' : '')
       + '</tr>';
   });
   h += '</tbody></table></div>';
-  // Resumen en palabras simples
+  // Resumen en palabras simples (solo habla de lo que sí se incluyó)
   var availRows = rows.filter(function(r){ return r.plan.available; });
   if (availRows.length) {
-    var avgRent = availRows.reduce(function(s,r){ return s + r.rent; }, 0) / availRows.length;
     var lowRow = availRows.reduce(function(a,b){ return b.plan.monthlyPayment < a.plan.monthlyPayment ? b : a; });
-    var topRentRow = availRows.reduce(function(a,b){ return b.rent > a.rent ? b : a; });
-    var sumTxt = 'El ingreso mensual promedio de estas ' + availRows.length + ' opciones es <strong>' + fmtMXN(avgRent, 0) + '</strong>. La que más renta genera es <strong>' + topRentRow.u.torre + '-' + topRentRow.u.num + '</strong> con <strong>' + fmtMXN(topRentRow.rent, 0) + ' al mes</strong>. La mensualidad más baja es la de <strong>' + lowRow.u.torre + '-' + lowRow.u.num + '</strong> con <strong>' + fmtMXN(lowRow.plan.monthlyPayment, 0) + ' al mes</strong>.';
-    if (gainOn) {
-      var bestRow = availRows.reduce(function(a,b){ return b.netGain > a.netGain ? b : a; });
-      sumTxt += ' La que más te deja en 5 años es <strong>' + bestRow.u.torre + '-' + bestRow.u.num + '</strong> con <strong>' + fmtMXN(bestRow.netGain, 0) + '</strong> de ganancia.';
+    var sumTxt = 'La mensualidad más baja es la de <strong>' + lowRow.u.torre + '-' + lowRow.u.num + '</strong> con <strong>' + fmtMXN(lowRow.plan.monthlyPayment, 0) + ' al mes</strong> (' + escHtml(cPlanShort(lowRow.plan)) + ').';
+    if (rentOnAny) {
+      var rentRows = availRows.filter(function(r){ return r.rent !== null && r.rent !== undefined; });
+      if (rentRows.length) {
+        var avgRent = rentRows.reduce(function(s,r){ return s + r.rent; }, 0) / rentRows.length;
+        var topRentRow = rentRows.reduce(function(a,b){ return b.rent > a.rent ? b : a; });
+        sumTxt = 'El ingreso mensual promedio de estas ' + rentRows.length + ' opciones es <strong>' + fmtMXN(avgRent, 0) + '</strong>. La que más renta genera es <strong>' + topRentRow.u.torre + '-' + topRentRow.u.num + '</strong> con <strong>' + fmtMXN(topRentRow.rent, 0) + ' al mes</strong>. ' + sumTxt;
+      }
+    }
+    if (gainShown) {
+      var gainRows = availRows.filter(function(r){ return r.netGain !== null && r.netGain !== undefined; });
+      if (gainRows.length) {
+        var bestRow = gainRows.reduce(function(a,b){ return b.netGain > a.netGain ? b : a; });
+        sumTxt += ' La que más te deja en 5 años es <strong>' + bestRow.u.torre + '-' + bestRow.u.num + '</strong> con <strong>' + fmtMXN(bestRow.netGain, 0) + '</strong> de ganancia.';
+      }
     }
     h += '<div style="margin:0 24px;padding:14px 0 24px;border-top:2px solid var(--gold);font-size:14px;line-height:1.5;color:var(--green-text)"><strong>En resumen:</strong> ' + sumTxt + '</div>';
   }
@@ -6463,7 +6518,9 @@ function exportComparativaPDF(share){
   var cd = cClientData();
   var rows = cComputeRows();
   var best = cBestIdx(rows);
-  var planName = rows[0].plan.name;
+  var gainOn = cGainOn();
+  var rentOnAny = cRentOnAny(rows);
+  var gainShown = gainOn && rentOnAny && rows.some(function(r){ return r.netGain !== null && r.netGain !== undefined; });
   var doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
   var W = 297, M = 14, CW = W - M * 2;
   pdfPaper(doc, W, 210); pdfNewPage(doc, W, 210); pdfFrame(doc, W, 210);
@@ -6483,30 +6540,30 @@ function exportComparativaPDF(share){
   // Título en pregunta clara
   st(16, [26,51,32], true, 'times');
   doc.text('¿Cuál te conviene más?', M, 30);
-  var gainOn = cGainOn();
   st(9, [90,122,90], false);
-  doc.text('Plan: ' + planName + '  ·  Enganche del 15%' + (gainOn ? '  ·  Ganancia proyectada a 5 años' : ''), M, 36);
-  // Tabla — columnas bien alineadas (números a la derecha, mismo formato)
-  var cols = gainOn ? [
-    {label:'Unidad', w:28, align:'left'},
-    {label:'Modelo', w:32, align:'left'},
-    {label:'m²', w:16, align:'right'},
-    {label:'Vista', w:22, align:'left'},
-    {label:'Precio de lista', w:34, align:'right'},
-    {label:'Enganche 15%', w:32, align:'right'},
-    {label:'Mensualidad', w:34, align:'right'},
-    {label:'Ingreso mensual', w:34, align:'right'},
-    {label:'Ganancia 5 años', w:34, align:'right'}
-  ] : [
-    {label:'Unidad', w:30, align:'left'},
-    {label:'Modelo', w:36, align:'left'},
-    {label:'m²', w:18, align:'right'},
-    {label:'Vista', w:26, align:'left'},
-    {label:'Precio de lista', w:38, align:'right'},
-    {label:'Enganche 15%', w:36, align:'right'},
-    {label:'Mensualidad', w:38, align:'right'},
-    {label:'Ingreso mensual', w:38, align:'right'}
+  doc.text('Cada unidad con su propio plan  ·  Enganche del 15%' + (gainShown ? '  ·  Ganancia proyectada a 5 años' : ''), M, 36);
+  // Tabla — columnas bien alineadas (números a la derecha, mismo formato).
+  // El plan acompaña a cada unidad; Ingreso y Ganancia solo aparecen si se incluyeron.
+  var cols = [
+    {label:'Unidad', w:26, align:'left'},
+    {label:'Modelo', w:30, align:'left'},
+    {label:'m²', w:14, align:'right'},
+    {label:'Vista', w:20, align:'left'},
+    {label:'Precio de lista', w:30, align:'right'},
+    {label:'Enganche 15%', w:28, align:'right'},
+    {label:'Plan', w:26, align:'left'},
+    {label:'Mensualidad', w:30, align:'right'}
   ];
+  if (rentOnAny) cols.push({label:'Ingreso mensual', w:30, align:'right'});
+  if (gainShown) cols.push({label:'Ganancia 5 años', w:30, align:'right'});
+  // Reparte el ancho sobrante entre las columnas de dinero
+  var totW = cols.reduce(function(s,c){ return s + c.w; }, 0);
+  var extra = CW - totW;
+  if (extra > 0) {
+    var moneyIdx = cols.map(function(c,i){ return c.align==='right' ? i : -1; }).filter(function(i){ return i>=0; });
+    var per = Math.floor(extra / moneyIdx.length);
+    moneyIdx.forEach(function(i){ cols[i].w += per; });
+  }
   var x = M;
   cols.forEach(function(c){ c.x = x; x += c.w; });
   var y = 44, rowH = 12, headH = 8;
@@ -6527,7 +6584,8 @@ function exportComparativaPDF(share){
     var midY = y + 5;
     var vista = r.u.vista || (r.m ? r.m.vista : '—');
     var mensual = r.plan.available ? fmtMXN(r.plan.monthlyPayment, 0) : 'No disponible';
-    var ganancia = r.plan.available ? fmtMXN(r.netGain, 0) : '—';
+    var ganancia = (r.plan.available && r.netGain !== null && r.netGain !== undefined) ? fmtMXN(r.netGain, 0) : '—';
+    var ingreso = (r.rent !== null && r.rent !== undefined) ? fmtMXN(r.rent, 0) : '—';
     st(9, [26,51,32], true);
     doc.text(r.u.torre + '-' + r.u.num, cols[0].x + 2, midY);
     if (isBest) { st(7, [138,109,0], true); doc.text('Recomendada', cols[0].x + 2, midY + 4.5); }
@@ -6539,13 +6597,19 @@ function exportComparativaPDF(share){
     st(9, [26,51,32], false, 'courier');
     doc.text(fmtMXN(r.u.precio, 0), cols[4].x + cols[4].w - 2, midY, {align:'right'});
     doc.text(fmtMXN(r.plan.downPayment, 0), cols[5].x + cols[5].w - 2, midY, {align:'right'});
+    st(9, [26,51,32], false);
+    doc.text(cPlanShort(r.plan), cols[6].x + 2, midY);
     st(9, [26,51,32], true, 'courier');
-    doc.text(mensual, cols[6].x + cols[6].w - 2, midY, {align:'right'});
-    st(9, [26,51,32], false, 'courier');
-    doc.text(fmtMXN(r.rent, 0), cols[7].x + cols[7].w - 2, midY, {align:'right'});
-    if (gainOn) {
+    doc.text(mensual, cols[7].x + cols[7].w - 2, midY, {align:'right'});
+    var ci = 8;
+    if (rentOnAny) {
+      st(9, [26,51,32], false, 'courier');
+      doc.text(ingreso, cols[ci].x + cols[ci].w - 2, midY, {align:'right'});
+      ci++;
+    }
+    if (gainShown) {
       st(9, [45,96,64], true, 'courier');
-      doc.text(ganancia, cols[8].x + cols[8].w - 2, midY, {align:'right'});
+      doc.text(ganancia, cols[ci].x + cols[ci].w - 2, midY, {align:'right'});
     }
     // Línea divisoria
     doc.setDrawColor(216,206,188);
@@ -6554,22 +6618,31 @@ function exportComparativaPDF(share){
     y += rowH;
   });
   y += 6;
-  // Resumen en palabras simples
+  // Resumen en palabras simples (solo habla de lo que sí se incluyó)
   var availRows = rows.filter(function(r){ return r.plan.available; });
   if (availRows.length) {
-    var avgRent = availRows.reduce(function(s,r){ return s + r.rent; }, 0) / availRows.length;
     var lowRow = availRows.reduce(function(a,b){ return b.plan.monthlyPayment < a.plan.monthlyPayment ? b : a; });
-    var topRentRow = availRows.reduce(function(a,b){ return b.rent > a.rent ? b : a; });
     st(10, [26,51,32], true);
     doc.text('En resumen:', M, y);
     st(10, [26,51,32], false);
-    var sumTxt = 'el ingreso mensual promedio de estas ' + availRows.length + ' opciones es ' + fmtMXN(avgRent, 0)
-      + '. La que más renta genera es ' + topRentRow.u.torre + '-' + topRentRow.u.num + ' con ' + fmtMXN(topRentRow.rent, 0)
-      + ' al mes. La mensualidad más baja es la de ' + lowRow.u.torre + '-' + lowRow.u.num
-      + ' con ' + fmtMXN(lowRow.plan.monthlyPayment, 0) + ' al mes.';
-    if (gainOn) {
-      var bestRow = availRows.reduce(function(a,b){ return b.netGain > a.netGain ? b : a; });
-      sumTxt += ' La que más te deja en 5 años es ' + bestRow.u.torre + '-' + bestRow.u.num + ' con ' + fmtMXN(bestRow.netGain, 0) + ' de ganancia.';
+    var sumTxt = 'la mensualidad más baja es la de ' + lowRow.u.torre + '-' + lowRow.u.num
+      + ' con ' + fmtMXN(lowRow.plan.monthlyPayment, 0) + ' al mes (' + cPlanShort(lowRow.plan) + ').';
+    if (rentOnAny) {
+      var rentRows = availRows.filter(function(r){ return r.rent !== null && r.rent !== undefined; });
+      if (rentRows.length) {
+        var avgRent = rentRows.reduce(function(s,r){ return s + r.rent; }, 0) / rentRows.length;
+        var topRentRow = rentRows.reduce(function(a,b){ return b.rent > a.rent ? b : a; });
+        sumTxt = 'el ingreso mensual promedio de estas ' + rentRows.length + ' opciones es ' + fmtMXN(avgRent, 0)
+          + '. La que más renta genera es ' + topRentRow.u.torre + '-' + topRentRow.u.num + ' con ' + fmtMXN(topRentRow.rent, 0)
+          + ' al mes. ' + sumTxt;
+      }
+    }
+    if (gainShown) {
+      var gainRows = availRows.filter(function(r){ return r.netGain !== null && r.netGain !== undefined; });
+      if (gainRows.length) {
+        var bestRow = gainRows.reduce(function(a,b){ return b.netGain > a.netGain ? b : a; });
+        sumTxt += ' La que más te deja en 5 años es ' + bestRow.u.torre + '-' + bestRow.u.num + ' con ' + fmtMXN(bestRow.netGain, 0) + ' de ganancia.';
+      }
     }
     var sumLines = doc.splitTextToSize(sumTxt, CW - 28);
     doc.text(sumLines, M + 28, y);
@@ -6577,7 +6650,7 @@ function exportComparativaPDF(share){
   }
   // Nota + vigencia + contacto
   st(8, [90,122,90], false);
-  var noteLines = doc.splitTextToSize('Vigencia: 3 días a partir de la emisión (válida hasta el ' + vigenciaHastaTxt() + '). Después de esa fecha, precios y disponibilidad pueden cambiar. La ganancia es una proyección a 5 años, no una garantía de rendimiento.', CW);
+  var noteLines = doc.splitTextToSize('Vigencia: 3 días a partir de la emisión (válida hasta el ' + vigenciaHastaTxt() + '). Después de esa fecha, precios y disponibilidad pueden cambiar.' + (gainShown ? ' La ganancia es una proyección a 5 años, no una garantía de rendimiento.' : ''), CW);
   doc.text(noteLines, M, y);
   y += noteLines.length * 4 + 6;
   var mapaTxt = 'Conoce el parque: https://cristobalderrama.github.io/Toram/mapa/';
