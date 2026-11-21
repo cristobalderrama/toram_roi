@@ -1328,7 +1328,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
         <div class="card-title">Participaciones del parque</div>
         <p class="p-note" style="margin-bottom:14px">
           Precio por participación según paquete. Sin descuento por pago de contado: la participación siempre cuesta lo mismo.
-          Financiamiento directo: 30% de enganche y el resto a 20 o 24 meses sin intereses.
+          Financiamiento directo: 30% de enganche y el resto a 20 meses sin intereses (24 MSI como herramienta de cierre).
         </p>
         <div class="field-row" style="margin-bottom:16px">
           <div class="field" style="flex:1;min-width:200px">
@@ -1358,8 +1358,8 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
           <div class="field" id="pPartMsiWrap" style="width:150px;display:none">
             <span class="label">Meses sin intereses</span>
             <select id="pPartMsi" onchange="pUpdatePartSummary()" class="input-lg">
-              <option value="24">24 MSI</option>
               <option value="20">20 MSI</option>
+              <option value="24">24 MSI (cierre)</option>
             </select>
           </div>
         </div>
@@ -5555,7 +5555,7 @@ function pPartCalc() {
   if (adminChk) adminSingle = adminChk.checked;
   var admin = adminSingle ? PARTI.adminPerUnit : PARTI.adminPerUnit * qty;
   var pay = document.getElementById('pPartPay').value;
-  var msi = parseInt(document.getElementById('pPartMsi').value, 10) || 24;
+  var msi = parseInt(document.getElementById('pPartMsi').value, 10) || 20;
   var down = 0, monthly = 0, financed = 0;
   if (pay === 'fin') {
     down = total * PARTI.downPct / 100;
