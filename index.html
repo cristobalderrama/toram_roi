@@ -6013,12 +6013,12 @@ function buildPropuestaPartHTML() {
   var partTotal = PARTI.roi.reduce(function(a,r){return a + r.annual * c.qty;}, 0);
   var partTake = 'En 4 años (2028–2031), tus ' + c.qty + (c.qty === 1 ? ' participación' : ' participaciones') + ' te dejarían ' + fmtMXN(partTotal, 0) + ' en total.';
   var partChartHtml = roiChartHtml('¿Cuánto ganas cada año?', PARTI.roi.map(function(r){return String(r.year);}), PARTI.roi.map(function(r){return r.annual * c.qty;}), null, '', '', partTake);
-  var atrHtml = '';
+  var atrGridHtml = '';
   if (typeof PART_ATRACCIONES !== 'undefined' && PART_ATRACCIONES.length) {
-    atrHtml = '<div style="padding:20px 32px;border-top:1px solid #deeadc">' +
-      '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-dark);margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Capítulo 03 · Atracciones del parque</div>' +
+    atrGridHtml = '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-dark);margin:18px 0 12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Atracciones del parque</div>' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">' +
       PART_ATRACCIONES.map(function(at){
-        return '<div style="text-align:center;margin-bottom:16px"><img src="' + at.src + '" style="width:100%;max-width:420px;display:block;margin:0 auto;border-radius:4px;border:1px solid #deeadc" alt="' + at.label + '"><div style="font-size:11px;color:var(--green-soft);margin-top:6px">' + at.label + '</div></div>';
+        return '<div style="text-align:center"><img src="' + at.src + '" style="width:100%;display:block;border-radius:4px;border:1px solid #deeadc" alt="' + at.label + '"><div style="font-size:11px;color:var(--green-soft);margin-top:6px">' + at.label + '</div></div>';
       }).join('') +
       '</div>';
   }
@@ -6073,8 +6073,8 @@ function buildPropuestaPartHTML() {
   '<img src="'+PARK_MAP_IMG+'" style="width:100%;display:block;border-radius:4px;border:1px solid #deeadc" alt="Mapa del parque TORAM">' +
   '<div style="font-size:11px;color:var(--green-soft);margin-top:8px">El parque es la inversión: atracciones, cenote, playa y experiencias en Mazatlán.</div>' +
   (perfilShowQR() ? '<div style="display:flex;align-items:center;gap:12px;margin-top:12px"><img src="'+MAPA_QR_IMG+'" style="width:64px;height:64px" alt="QR mapa interactivo"><div><div style="font-size:12px;font-weight:700;color:var(--green-dark)">Escanea el código con tu celular</div><div style="font-size:11px;color:var(--green-soft)">para recorrer el parque en el mapa interactivo.</div></div></div>' : '') +
+  atrGridHtml +
   '</div>' +
-  atrHtml +
   '<div style="background:#1a3a22;padding:12px 32px;display:flex;justify-content:space-between;align-items:center">' +
   '<div style="font-size:10px;color:rgba(255,255,255,0.4)">TORAM Parque Temático · Proyecciones basadas en el desempeño esperado; no constituyen garantía.</div>' +
   '<div style="font-size:10px;color:rgba(255,255,255,0.35)">Vigencia 3 días · Sujeto a disponibilidad · '+cd.dateStr+'</div>' +
@@ -7114,7 +7114,8 @@ function exportPropuestaPartPDF(share) {
   y += expLines.length * 4;
 
   // ── Mapa del parque ──────────────────────────────────────────
-  var mapW = 182, mapH = Math.round(mapW * 675 / 1200);
+  // Más angosto (169 mm) para dejar sitio a las atracciones 2×2 en la misma hoja.
+  var mapW = 169, mapH = Math.round(mapW * 675 / 1200);
   if (y + mapH + 12 > 268) { doc.addPage(); y = 20; }
   y += 6;
   doc.setDrawColor(216,206,188); doc.setLineWidth(0.5);
@@ -7145,35 +7146,43 @@ function exportPropuestaPartPDF(share) {
   // Solo si el perfil lo incluye (los compañeros que solo entregan
   // cotizaciones pueden quitarlo en Mi perfil).
   if (perfilShowQR()) {
-    if (y + 24 > 268) { doc.addPage(); y = 20; }
+    if (y + 20 > 268) { doc.addPage(); y = 20; }
     y += 2;
-    try { doc.addImage(MAPA_QR_IMG, 'PNG', M, y, 20, 20); } catch(e) {}
+    try { doc.addImage(MAPA_QR_IMG, 'PNG', M, y, 16, 16); } catch(e) {}
     setStyle(7,[45,96,64],true);
-    doc.text('Escanea el código con tu celular', M + 24, y + 8);
+    doc.text('Escanea el código con tu celular', M + 20, y + 7);
     setStyle(7,[90,122,90],false);
-    doc.text('para recorrer el parque en el mapa interactivo.', M + 24, y + 13);
-    y += 20;
+    doc.text('para recorrer el parque en el mapa interactivo.', M + 20, y + 12);
+    y += 16;
   }
 
-  // ── Atracciones del parque (franja vertical, hoja dedicada) ──
+  // ── Atracciones del parque (cuadrícula 2×2 en la misma hoja del mapa) ──
+  // Antes era una hoja dedicada (Capítulo 03) con las 4 fotos apiladas y mucho
+  // margen vacío; ahora van en el espacio libre bajo el mapa y la propuesta
+  // de participaciones vuelve a 3 páginas.
   if (typeof PART_ATRACCIONES !== 'undefined' && PART_ATRACCIONES.length) {
-    doc.addPage();
-    y = 20;
     y += 6;
     doc.setDrawColor(216,206,188); doc.setLineWidth(0.5);
     doc.line(M, y, W - M, y);
     setStyle(7,[45,96,64],true);
-    doc.text('ATRACCIONES DEL PARQUE · CAPITULO 03', M, y - 1.5);
+    doc.text('ATRACCIONES DEL PARQUE', M, y - 1.5);
     y += 4;
-    var atW = 72, atH = 48; // mismo tamaño para todas (3:2)
-    PART_ATRACCIONES.forEach(function(at) {
-      var atX = M + (CW - atW)/2;
-      try { doc.addImage(at.src, 'JPEG', atX, y, atW, atH); } catch(e) {}
-      y += atH + 2;
+    // Tamaño según el espacio que queda en la hoja (hasta 268, con 4 mm de margen).
+    var attAvail = 268 - y - 4;
+    var attGap = 6, attLabelH = 5;
+    var attImgH = Math.max(28, Math.floor((attAvail - attGap) / 2 - attLabelH));
+    var attImgW = Math.min(88, Math.floor(attImgH * 1.5));
+    attImgH = Math.floor(attImgW / 1.5);
+    var attColW = (CW - attGap) / 2;
+    PART_ATRACCIONES.forEach(function(at, i) {
+      var col = i % 2, row = Math.floor(i / 2);
+      var ax = M + col * (attColW + attGap) + (attColW - attImgW) / 2;
+      var ay = y + row * (attImgH + attLabelH + attGap);
+      try { doc.addImage(at.src, 'JPEG', ax, ay, attImgW, attImgH); } catch(e) {}
       setStyle(6.5,[90,122,90],false);
-      doc.text(at.label, M + CW/2, y, {align:'center'});
-      y += 6;
+      doc.text(at.label, ax + attImgW / 2, ay + attImgH + 4, {align:'center'});
     });
+    y += 2 * (attImgH + attLabelH) + attGap;
   }
 
   // ── PAGE FOOTER ───────────────────────────────────────────────────────────
