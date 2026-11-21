@@ -1363,6 +1363,11 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
             </select>
           </div>
         </div>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--green-text);margin-bottom:12px;cursor:pointer">
+          <input type="checkbox" id="pPartAdminSingle" onchange="pUpdatePartSummary()" style="width:18px;height:18px;accent-color:var(--green-dark)">
+          Apartado único: $30,000 en total (herramienta de cierre)
+        </label>
+        <div style="font-size:12px;color:var(--green-soft);margin:-8px 0 12px 26px">Oficialmente el apartado es de $30,000 por participación. El costo único es una oportunidad al cerrar, no la regla general.</div>
         <div id="pPartSummary"></div>
       </div>
     </div>
@@ -5541,7 +5546,14 @@ function pPartCalc() {
   var qty = pGetPartQty();
   var unitPrice = pPartUnitPrice(qty);
   var total = unitPrice * qty;
-  var admin = PARTI.adminPerUnit * qty;
+  // Apartado de participaciones: $30,000 por participación, APARTE del total de
+  // la inversión (gastos administrativos para la elaboración del fideicomiso).
+  // Como herramienta de cierre, el asesor puede cobrarlo una sola vez ($30,000
+  // en total aunque sean 2 o más participaciones) — no es la regla general.
+  var adminSingle = false;
+  var adminChk = document.getElementById('pPartAdminSingle');
+  if (adminChk) adminSingle = adminChk.checked;
+  var admin = adminSingle ? PARTI.adminPerUnit : PARTI.adminPerUnit * qty;
   var pay = document.getElementById('pPartPay').value;
   var msi = parseInt(document.getElementById('pPartMsi').value, 10) || 24;
   var down = 0, monthly = 0, financed = 0;
@@ -5550,7 +5562,7 @@ function pPartCalc() {
     financed = total - down;
     monthly = financed / msi;
   }
-  return {qty:qty, unitPrice:unitPrice, total:total, admin:admin, pay:pay, msi:msi, down:down, financed:financed, monthly:monthly};
+  return {qty:qty, unitPrice:unitPrice, total:total, admin:admin, adminSingle:adminSingle, pay:pay, msi:msi, down:down, financed:financed, monthly:monthly};
 }
 
 function pUpdatePartSummary() {
@@ -5579,7 +5591,7 @@ function pUpdatePartSummary() {
     '<div><div class="p-kicker">Inversión total ('+c.qty+(c.qty===1?' participación':' participaciones')+')</div>' +
     '<div class="p-price">'+fmtMXNLead(c.total)+'</div>' +
     '<div style="font-family:var(--font-mono);font-size:12px;color:var(--text-muted);margin-top:6px;font-variant-numeric:tabular-nums">'+fmtMXN(c.unitPrice)+' × '+c.qty+' = '+fmtMXN(c.total)+'</div>' +
-    '<div class="p-note">'+fmtMXN(c.unitPrice)+' por participación · Apartado '+fmtMXN(c.admin)+' ('+fmtMXN(PARTI.adminPerUnit)+' c/u) — a cuenta del total, no es un costo adicional</div></div>' +
+    '<div class="p-note">'+fmtMXN(c.unitPrice)+' por participación · Apartado '+fmtMXN(c.admin)+(c.adminSingle ? ' (costo único, herramienta de cierre)' : ' ('+fmtMXN(PARTI.adminPerUnit)+' c/u)')+' — gastos administrativos para la elaboración del fideicomiso, aparte del total de la inversión'+(c.adminSingle ? '. Oficialmente son '+fmtMXN(PARTI.adminPerUnit)+' por participación.' : '')+'</div></div>' +
     payHtml +
     '<div style="margin-top:14px"><div class="p-kicker" style="margin-bottom:6px">Proyección de rendimiento — oficial (no garantía)</div>' +
     '<table style="width:100%;border-collapse:collapse;font-size:12px;background:#fff;border-radius:8px;overflow:hidden">' +
@@ -6100,7 +6112,7 @@ function buildPropuestaPartHTML() {
   '<tr><td style="padding:6px 0;color:var(--green-soft);border-bottom:1px solid #eef3ee">Cantidad</td><td style="padding:6px 0;text-align:right;font-weight:600;color:var(--green-text);border-bottom:1px solid #eef3ee">'+c.qty+(c.qty===1?' participación':' participaciones')+'</td></tr>' +
   '<tr><td style="padding:6px 0;color:var(--green-soft);border-bottom:1px solid #eef3ee">Precio por participación</td><td style="padding:6px 0;text-align:right;font-weight:600;color:var(--green-text);border-bottom:1px solid #eef3ee">'+fmtMXN(c.unitPrice)+'</td></tr>' +
   '<tr><td style="padding:6px 0;color:var(--green-soft);border-bottom:1px solid #eef3ee">Inversión total</td><td style="padding:6px 0;text-align:right;font-weight:700;color:var(--green-text);border-bottom:1px solid #eef3ee">'+fmtMXN(c.total)+'</td></tr>' +
-  '<tr><td style="padding:6px 0;color:var(--green-soft);border-bottom:1px solid #eef3ee">Apartado (a cuenta del total)</td><td style="padding:6px 0;text-align:right;font-weight:600;color:var(--green-text);border-bottom:1px solid #eef3ee">'+fmtMXN(c.admin)+' ('+fmtMXN(PARTI.adminPerUnit)+' c/u)</td></tr>' +
+  '<tr><td style="padding:6px 0;color:var(--green-soft);border-bottom:1px solid #eef3ee">Apartado (gastos administrativos del fideicomiso)</td><td style="padding:6px 0;text-align:right;font-weight:600;color:var(--green-text);border-bottom:1px solid #eef3ee">'+fmtMXN(c.admin)+(c.adminSingle ? ' (costo único)' : ' ('+fmtMXN(PARTI.adminPerUnit)+' c/u)')+'</td></tr>' +
   payRows +
   '</table>' +
   '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-dark);margin:18px 0 12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Proyección de rendimiento — oficial</div>' +
@@ -7125,7 +7137,7 @@ function exportPropuestaPartPDF(share) {
     ['Cantidad', c.qty + (c.qty===1?' participación':' participaciones')],
     ['Precio por participación', fmtMXN(c.unitPrice)],
     ['Inversión total', fmtMXN(c.total)],
-    ['Apartado (a cuenta del total)', fmtMXN(c.admin) + ' (' + fmtMXN(PARTI.adminPerUnit) + ' c/u)']
+    ['Apartado (gastos administrativos del fideicomiso)', fmtMXN(c.admin) + (c.adminSingle ? ' (costo único)' : ' (' + fmtMXN(PARTI.adminPerUnit) + ' c/u)')]
   ];
   if (c.pay === 'fin') {
     invRows.push(['Enganche (30%)', fmtMXN(c.down)]);
