@@ -5782,6 +5782,41 @@ function getPerfil(){
 function perfilName(){ return getPerfil().name; }
 function perfilPhone(){ return getPerfil().phone; }
 function perfilShowQR(){ return getPerfil().showQR; }
+
+// ── Link de WhatsApp con mensaje prellenado (wa.me) ───────────────────────
+// El cliente lo toca en la propuesta (PDF o vista previa) y se le abre el
+// chat con el asesor con el mensaje ya escrito y la unidad puesta.
+// Usa el teléfono de Mi perfil, así cada asesor apunta a su propio WhatsApp.
+function waNumber(){
+  var d = perfilPhone().replace(/\D/g, '');
+  if (d.length === 10) return '52' + d;          // 669 139 3136 -> 526691393136
+  if (d.length === 12 && d.indexOf('52') === 0) return d;
+  if (d.length === 11 && d.charAt(0) === '1') return '52' + d.slice(1);
+  return d;
+}
+function waFirstName(){
+  var n = perfilName().trim().split(/\s+/)[0];
+  return n || 'Cristobal';
+}
+function waLink(msg){
+  return 'https://wa.me/' + waNumber() + '?text=' + encodeURIComponent(msg);
+}
+function waMsgDepto(unit){
+  return 'Hola ' + waFirstName() + ', vi la propuesta del departamento ' + unit + ' y quiero más información.';
+}
+function waMsgPart(qty){
+  return 'Hola ' + waFirstName() + ', vi la propuesta de ' + qty + (qty === 1 ? ' participación' : ' participaciones') + ' en TORAM y quiero más información.';
+}
+function waMsgLocal(localId){
+  return 'Hola ' + waFirstName() + ', vi la propuesta del local ' + localId + ' y quiero más información.';
+}
+// Botón de WhatsApp para la vista previa (HTML): abre el chat con el mensaje ya escrito.
+function waCtaHtml(msg){
+  return '<div style="padding:16px 32px;text-align:center;border-top:1px solid #deeadc">' +
+  '<a href="' + waLink(msg) + '" style="display:inline-block;background:#1a6640;color:#fff;font-weight:700;font-size:13px;padding:10px 22px;border-radius:6px;text-decoration:none">Escríbeme por WhatsApp</a>' +
+  '<div style="font-size:11px;color:var(--green-soft);margin-top:6px">Te abre el chat con el mensaje ya escrito, con la unidad puesta.</div>' +
+  '</div>';
+}
 function savePerfil(){
   var p = {
     name: (document.getElementById('pfName').value || '').trim(),
@@ -5971,6 +6006,7 @@ function buildPropuestaDeptoHTML() {
   '<div style="font-size:11px;color:var(--green-soft);margin-top:8px">TORAM Parque Temático · Mazatlán — el desarrollo completo: parque, plaza y residencial.</div>' +
   (perfilShowQR() ? '<div style="display:flex;align-items:center;gap:12px;margin-top:12px"><img src="'+MAPA_QR_IMG+'" style="width:64px;height:64px" alt="QR mapa interactivo"><div><div style="font-size:12px;font-weight:700;color:var(--green-dark)">Escanea el código con tu celular</div><div style="font-size:11px;color:var(--green-soft)">para recorrer el parque en el mapa interactivo.</div></div></div>' : '') +
   '</div>' +
+  waCtaHtml(waMsgDepto(inv.torre + '-' + inv.num)) +
   '<div style="background:#1a3a22;padding:12px 32px;display:flex;justify-content:space-between;align-items:center">' +
   '<div style="font-size:10px;color:rgba(255,255,255,0.4)">TORAM Residencial · Proyecciones basadas en el desempeño esperado; no constituyen garantía.</div>' +
   '<div style="font-size:10px;color:rgba(255,255,255,0.35)">Vigencia 3 días · Precios sujetos a disponibilidad · '+cd.dateStr+'</div>' +
@@ -6075,6 +6111,7 @@ function buildPropuestaPartHTML() {
   (perfilShowQR() ? '<div style="display:flex;align-items:center;gap:12px;margin-top:12px"><img src="'+MAPA_QR_IMG+'" style="width:64px;height:64px" alt="QR mapa interactivo"><div><div style="font-size:12px;font-weight:700;color:var(--green-dark)">Escanea el código con tu celular</div><div style="font-size:11px;color:var(--green-soft)">para recorrer el parque en el mapa interactivo.</div></div></div>' : '') +
   atrGridHtml +
   '</div>' +
+  waCtaHtml(waMsgPart(c.qty)) +
   '<div style="background:#1a3a22;padding:12px 32px;display:flex;justify-content:space-between;align-items:center">' +
   '<div style="font-size:10px;color:rgba(255,255,255,0.4)">TORAM Parque Temático · Proyecciones basadas en el desempeño esperado; no constituyen garantía.</div>' +
   '<div style="font-size:10px;color:rgba(255,255,255,0.35)">Vigencia 3 días · Sujeto a disponibilidad · '+cd.dateStr+'</div>' +
@@ -6600,6 +6637,9 @@ function exportPropuestaDeptoPDF(share) {
       doc.text('Vigencia 3 días · ' + cd.dateStr + ' · Pág. ' + pg + ' de ' + pages, W/2, 292, {align:'center'});
       setStyle(8,[212,168,75],true);
       doc.text(perfilPhone(), W - M, 292, {align:'right'});
+      // Teléfono del pie clicable: abre WhatsApp con el mensaje prellenado.
+      var waPhW = doc.getTextWidth(perfilPhone());
+      doc.link(W - M - waPhW, 292 - 3.5, waPhW, 6, {url: waLink(waMsgDepto(inv.torre + '-' + inv.num))});
     }
   }
 
@@ -7197,6 +7237,9 @@ function exportPropuestaPartPDF(share) {
     doc.text('Vigencia 3 días · ' + cd.dateStr + ' · Pág. ' + pg + ' de ' + pages, W/2, 292, {align:'center'});
     setStyle(8,[212,168,75],true);
     doc.text(perfilPhone(), W - M, 292, {align:'right'});
+    // Teléfono del pie clicable: abre WhatsApp con el mensaje prellenado.
+    var waPhW = doc.getTextWidth(perfilPhone());
+    doc.link(W - M - waPhW, 292 - 3.5, waPhW, 6, {url: waLink(waMsgPart(c.qty))});
   }
 
   var fname = 'Toram_Propuesta_' + pClientFileName() + '.pdf';
@@ -7505,6 +7548,7 @@ function buildLocalesHTML() {
   PLAZA_RENDERS.map(function(rd){ return '<div style="margin-bottom:14px"><img src="'+rd.src+'" style="width:100%;max-width:520px;display:block;margin:0 auto;border-radius:4px;border:1px solid #deeadc" alt="'+rd.label+' de la plaza comercial TORAM"><div style="font-size:11px;color:var(--green-soft);margin-top:4px;text-align:center">'+rd.label+'</div></div>'; }).join('') +
   '<div style="font-size:10px;color:#7a9a82;margin-top:10px">Vigencia 3 días · Sujeto a disponibilidad · Precios sin intereses · Descuentos sobre precio de lista · 669 139 3136</div>' +
   '</div>' +
+  waCtaHtml(waMsgLocal(loc.local)) +
   '</div>';
 }
 
@@ -7548,6 +7592,9 @@ function exportLocalesPDF(share) {
       doc.text('Vigencia 3 días · ' + cd.dateStr + ' · Pág. ' + pg + ' de ' + pages, W/2, 292, {align:'center'});
       setStyle(8,[212,168,75],true);
       doc.text(perfilPhone(), W - M, 292, {align:'right'});
+      // Teléfono del pie clicable: abre WhatsApp con el mensaje prellenado.
+      var waPhW = doc.getTextWidth(perfilPhone());
+      doc.link(W - M - waPhW, 292 - 3.5, waPhW, 6, {url: waLink(waMsgLocal(loc.local))});
     }
   }
 
