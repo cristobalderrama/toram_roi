@@ -4181,7 +4181,7 @@ const MODELS = [
 // Precios de paquete correctos como están impresos. Sin descuento por pago de contado.
 // Financiamiento: 30% enganche + 70% a 20 MSI o 24 MSI (ambas opciones, decisión de Cristo).
 const PARTI = {
-  unitPriceByQty: {1:1150000, 3:1075000, 5:1050000, 10:1025000, 25:1000000, 50:975000, 100:950000},
+  unitPriceByQty: {1:1150000, 3:1125000, 5:1075000, 10:1050000, 25:1025000, 50:1000000, 100:975000},
   adminPerUnit: 30000,
   downPct: 30,
   msiOptions: [20, 24],
@@ -6095,7 +6095,7 @@ function buildPropuestaPartHTML() {
   '</tr></thead><tbody>'+roiRows+'</tbody></table>' +
   partChartHtml +
   '<div style="font-size:10px;color:#7a9a82;margin-top:8px">Proyecciones basadas en el desempeño esperado del parque; no constituyen garantía. Cada participación equivale al 0.05% del ingreso neto del parque, con pagos trimestrales.</div>' +
-  '<div style="font-size:10px;color:#7a9a82;margin-top:4px"><b>Los cobros para el socio son trimestrales.</b> Ejemplo: el primer trimestre (octubre–diciembre 2027) se recibe en enero de 2028; el segundo trimestre (enero–marzo 2028) se recibe en abril de 2028, y así sucesivamente cada trimestre.</div>' +
+  '<div style="font-size:10px;color:#7a9a82;margin-top:4px"><b>Los cobros para el socio son trimestrales.</b> Ejemplo: el primer trimestre (octubre–diciembre 2027) se recibe en enero de 2028; el segundo trimestre (enero–marzo 2028) se recibe en abril de 2028, y así sucesivamente cada trimestre. <b>Los rendimientos se empiezan a cobrar solo cuando la participación ya está liquidada en su totalidad;</b> si todavía estás pagando mensualidades, los cobros inician al terminar de pagar.</div>' +
   '<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-dark);margin:18px 0 12px;padding-bottom:6px;border-bottom:2px solid #c8dcc8">Retorno de inversión — de dónde sale el rendimiento</div>' +
   '<div style="overflow-x:auto">' +
   '<table style="width:100%;min-width:560px;border-collapse:collapse;font-size:11px">' +
@@ -7106,7 +7106,7 @@ function exportPropuestaPartPDF(share) {
   y = drawROIChart(doc, M, y + 2, CW, '¿CUÁNTO GANAS CADA AÑO?', PARTI.roi.map(function(r){return String(r.year);}), PARTI.roi.map(function(r){return r.annual * c.qty;}), null, '', '', partTake);
   doc.text('Sujeto a disponibilidad.', M, y);
   y += 4;
-  var legLines = doc.splitTextToSize('Los cobros para el socio son trimestrales. Ejemplo: el primer trimestre (octubre–diciembre 2027) se recibe en enero de 2028; el segundo trimestre (enero–marzo 2028) se recibe en abril de 2028, y así sucesivamente cada trimestre.', CW);
+  var legLines = doc.splitTextToSize('Los cobros para el socio son trimestrales. Ejemplo: el primer trimestre (octubre–diciembre 2027) se recibe en enero de 2028; el segundo trimestre (enero–marzo 2028) se recibe en abril de 2028, y así sucesivamente cada trimestre. Los rendimientos se empiezan a cobrar solo cuando la participación ya está liquidada en su totalidad; si todavía estás pagando mensualidades, los cobros inician al terminar de pagar.', CW);
   doc.text(legLines, M, y);
   y += legLines.length * 4;
   if (y > 270) { doc.addPage(); y = 20; }
