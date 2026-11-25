@@ -67,6 +67,8 @@ try {
   --radius-lg:10px;
   --radius-xl:14px;
 }
+/* Anti pull-to-refresh (móvil): un desliz accidental hacia abajo no debe recargar la app y borrar el avance. */
+html,body{overscroll-behavior-y:none}
 body{font-family:'IBM Plex Sans',sans-serif;background:var(--paper);color:var(--text-primary);font-size:15px;line-height:1.6;min-height:100vh}
 h1,h2,h3,h4{font-family:'Cormorant Garamond',serif;font-weight:600;line-height:1.25}
 
@@ -485,6 +487,37 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
   .o-step{padding:4px 8px;font-size:11px}
 }
 
+/* ── Ola 3 · Identidad ─────────────────────────────────────────────────────── */
+/* 1. "El sendero": el recorrido de 4 pasos como un camino por el parque.
+   La línea une los pasos; el punto dorado/verde marca lo caminado. */
+.o-path{display:flex;align-items:center;gap:10px;margin-left:auto}
+.o-path-kicker{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-dark);white-space:nowrap}
+.o-steps{position:relative}
+.o-steps::before{content:'';position:absolute;left:14px;right:14px;top:50%;height:2px;background:var(--hairline);z-index:0}
+.o-step{position:relative;z-index:1}
+.o-step .o-step-n{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;border:1px solid var(--hairline);background:var(--white);font-size:10px;margin-right:5px;vertical-align:1px}
+.o-step.done .o-step-n{background:var(--green);border-color:var(--green);color:#fff}
+.o-step.current .o-step-n{background:var(--navy);border-color:var(--navy);color:#fff}
+/* 2. Curvas de nivel: motivo de identidad, solo decorativo (nunca en PDFs). */
+.o-contour{display:block;width:100%;height:44px;color:rgba(14,26,18,0.20)}
+.o-contour path{fill:none;stroke:currentColor;stroke-width:1}
+/* 3. Selector por elevación de torre. */
+.o-elev-tower{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.o-elev-tgl{border:1px solid var(--hairline);background:var(--white);border-radius:999px;padding:6px 14px;font-size:13px;font-weight:600;color:var(--text-muted);cursor:pointer;font-family:inherit}
+.o-elev-tgl.on{background:var(--navy);border-color:var(--navy);color:#fff}
+.o-elev-floor{display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid var(--hairline)}
+.o-elev-floor:last-child{border-bottom:none}
+.o-elev-fl{font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--text-muted);width:64px;flex-shrink:0;padding-top:7px;text-align:right}
+.o-elev-units{display:flex;flex-wrap:wrap;gap:5px}
+.o-elev-u{border:1px solid var(--hairline);background:var(--white);border-radius:6px;padding:5px 7px;font-size:12px;font-weight:600;color:var(--navy);cursor:pointer;font-family:var(--font-mono);line-height:1.2;text-align:center;min-width:62px}
+.o-elev-u .o-elev-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;vertical-align:1px}
+.o-elev-u.sel{border-color:var(--gold);background:var(--gold-pale);box-shadow:inset 0 0 0 1px var(--gold)}
+.o-elev-u.na{opacity:.55}
+@media (max-width:768px){
+  .o-path{margin-left:0}
+  .o-steps::before{display:none}
+}
+
 /* Print / no-screen */
 @media print{.sidebar,.btn,.bottom-nav,.more-menu,.o-strip,.o-modal{display:none}}
 </style>
@@ -656,7 +689,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
   <!-- Ola 2 · 1: franja "Unidad activa" + recorrido guiado de 4 pasos -->
   <div class="o-strip" id="oActiveUnitStrip">
     <button class="o-strip-unit" id="oStripUnit" onclick="oStripGoUnit()" type="button"></button>
-    <div class="o-steps" id="oStripSteps"></div>
+    <div class="o-path"><span class="o-path-kicker">El sendero</span><div class="o-steps" id="oStripSteps"></div></div>
   </div>
 
   <!-- PAGE: Inicio -->
@@ -667,6 +700,8 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
       <h2>¿Qué busca tu cliente?</h2>
       <p>Elige lo que busca tu cliente y la calculadora te lleva paso a paso.</p>
     </div>
+    <!-- Ola 3 · 2: curvas de nivel como motivo de identidad -->
+    <svg class="o-contour" viewBox="0 0 400 48" preserveAspectRatio="none" aria-hidden="true"><path d="M-10 40 C60 22 120 46 190 32 S320 20 410 38"/><path d="M-10 28 C70 12 130 36 200 24 S330 10 410 28"/><path d="M-10 16 C80 2 140 24 210 14 S340 0 410 18"/></svg>
     <div class="card">
       <div class="inicio-rows">
         <button class="inicio-row" onclick="showPage('unit')">
@@ -707,7 +742,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
       <div class="card-title">Buscar unidad en inventario</div>
       <div style="position:relative;margin-bottom:12px">
         <div class="field">
-          <span class="label">Número de departamento <span class="label-hint">ej: 507-B, T2-1603-A, 1201</span></span>
+          <span class="label">Número de departamento <span class="label-hint">ej: 507-B, T2-1603-A o “dos recámaras vista al parque”</span></span>
           <input type="text" id="unitSearch" placeholder="Escribe el número de depto…" autocomplete="off"
             oninput="onSearchInput()" onkeydown="onSearchKey(event)" style="font-size:15px;padding:10px 12px">
         </div>
@@ -725,6 +760,19 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
         </div>
       </div>
       <div id="noUnitMsg" style="display:none;font-size:13px;color:var(--text-muted);margin-bottom:8px">Sin resultados. Prueba con T1-507-B o solo el número.</div>
+    </div>
+
+    <!-- Ola 3 · 3: elegir por elevación de torre -->
+    <div class="card" style="margin-top:16px">
+      <div class="card-title">Elegir por elevación de torre</div>
+      <p style="font-size:13px;color:var(--text-muted);margin:0 0 4px">Mira la torre como se ve desde fuera: cada piso con sus departamentos. Toca una unidad para elegirla.</p>
+      <svg class="o-contour" viewBox="0 0 400 48" preserveAspectRatio="none" aria-hidden="true"><path d="M-10 40 C60 22 120 46 190 32 S320 20 410 38"/><path d="M-10 28 C70 12 130 36 200 24 S330 10 410 28"/><path d="M-10 16 C80 2 140 24 210 14 S340 0 410 18"/></svg>
+      <div class="o-elev-tower">
+        <button type="button" class="o-elev-tgl" id="oElevT1" onclick="oRenderElev('T1')">Torre 1</button>
+        <button type="button" class="o-elev-tgl" id="oElevT2" onclick="oRenderElev('T2')">Torre 2</button>
+        <span style="font-size:12px;color:var(--text-muted)" id="oElevNote"></span>
+      </div>
+      <div id="oElevWrap"></div>
     </div>
 
     <!-- Manual override + down payment -->
@@ -875,7 +923,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
             <input type="number" id="annualTaxes" value="3500" step="100">
           </div>
           <div class="field">
-            <span class="label">Gastos escrituración <span class="gloss" tabindex="0">?<span class="gloss-tip">Gastos de notaría y trámite al cerrar.</span></span> <span class="label-hint">(% del valor futuro)</span></span>
+            <span class="label">Gastos escrituración <span class="gloss" tabindex="0">?<span class="gloss-tip">Gastos de notaría y trámite al cerrar.</span></span> <span class="label-hint">(% del precio con descuento)</span></span>
             <input type="number" id="escrituraCost" value="6" min="0" max="15" step="0.5">
           </div>
         </div>
@@ -1337,13 +1385,13 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
         <div class="field-row" style="margin-bottom:16px">
           <div class="field" style="flex:1;min-width:220px">
             <span class="label">Modelo</span>
-            <select id="pModelSelect" onchange="pOnModelChange()" class="input-lg">
+            <select id="pModelSelect" onchange="pManualModelChange()" class="input-lg">
               <option value="">— Elige un modelo —</option>
             </select>
           </div>
           <div class="field" style="flex:1;min-width:220px">
             <span class="label">Unidad (todas, la más económica primero)</span>
-            <select id="pUnitSelect" onchange="pOnUnitChange()" class="input-lg" disabled>
+            <select id="pUnitSelect" onchange="pManualUnitChange()" class="input-lg" disabled>
               <option value="">— Primero elige un modelo —</option>
             </select>
           </div>
@@ -1852,6 +1900,31 @@ function getJsPDF() {
 </script>
 <script src="./imagenes.js"></script>
 <script>
+// Anti pull-to-refresh (móvil): un desliz accidental hacia abajo no debe
+// recargar la página y borrar el avance. Respaldo para navegadores viejos
+// sin overscroll-behavior (el CSS de arriba cubre los modernos).
+(function(){
+  var startY = 0;
+  function inScrollable(el){
+    while (el && el !== document.body && el !== document.documentElement) {
+      if (el.scrollHeight > el.clientHeight + 1) return true;
+      el = el.parentElement;
+    }
+    return false;
+  }
+  document.addEventListener('touchstart', function(e){
+    if (e.touches.length !== 1) return;
+    startY = e.touches[0].clientY;
+  }, {passive:true});
+  document.addEventListener('touchmove', function(e){
+    if (e.touches.length !== 1) return;
+    if (e.touches[0].clientY - startY <= 0) return;
+    var atTop = (window.scrollY || document.documentElement.scrollTop || 0) <= 0;
+    if (!atTop) return;
+    if (inScrollable(e.target)) return;
+    e.preventDefault();
+  }, {passive:false});
+})();
 const INVENTORY = [
   {num:"401",torre:"T1",tipo:"DEPTO 2 REC.",vista:"OESTE/ACCESO",m2:139.41,precio:5454750},
   {num:"402",torre:"T1",tipo:"DEPTO 3 REC.",vista:"PARQUE/ACCESO",m2:156.48,precio:6272324.21},
@@ -2503,9 +2576,14 @@ function showPage(id) {
 
   if (id === 'inicio') renderInicio();
   refreshActionLabels();
+  // Auto-llenado: si viene del recorrido, la propuesta trae su unidad,
+  // enganche y supuestos; si entra directo, todo queda manual.
+  if (id === 'propuesta') pAutoFillFromFlow();
   // Ola 2 · 1 y 3: la franja viaja contigo y las puertas se actualizan.
   oRenderStrip();
   oRenderDoors(id);
+  // Ola 3 · 3: la elevación se dibuja al entrar a Unidad.
+  if (id === 'unit') oRenderElev();
 
   window.scrollTo(0,0);
 }
@@ -2627,7 +2705,7 @@ function oRenderStrip(){
   stepsBox.innerHTML = defs.map(function(d){
     var cls = d.done ? 'done' : (cur === d.n ? 'current' : 'todo');
     var mark = d.done ? '✓' : d.n;
-    return '<button type="button" class="o-step ' + cls + '" onclick="oGoStep(' + d.n + ')"><span class="o-step-n">' + mark + '</span>' + d.label + '</button>';
+    return '<button type="button" class="o-step ' + cls + '" onclick="oGoStep(' + d.n + ')"><span class="o-step-n">' + mark + '</span><span class="o-step-label">' + d.label + '</span></button>';
   }).join('');
 }
 function oGoStep(n){
@@ -2748,6 +2826,103 @@ function confirmPerfil(){
   if (_oPerfilPending) { var f = _oPerfilPending; _oPerfilPending = null; f(); }
 }
 function oPerfilCambiar(){ hidePerfilModal(); showPage('perfil'); }
+
+// ── Ola 3 · Identidad ───────────────────────────────────────────────────────
+// 1. "El sendero": el recorrido de 4 pasos como un camino por el parque
+//    (la línea y los puntos se dibujan en CSS; la franja ya se dibuja en
+//    oRenderStrip). 2. Curvas de nivel: motivo decorativo (SVG inline) en
+//    Inicio y en la elevación. 3. Selector por elevación de torre
+//    (oRenderElev). 4. Buscar por lo que dice el cliente (oParseClientQuery
+//    + invSearch): recámaras, vista, piso, precio y m² en lenguaje natural.
+
+function oUnitFloor(num){ var n = parseInt(String(num), 10); return isNaN(n) ? 0 : Math.floor(n / 100); }
+
+// 3. Elevación de torre: pisos de arriba a abajo, unidades como botones.
+//    El punto de color marca disponibilidad (verde disponible, ámbar
+//    apartado, rojo vendido, gris bloqueado). Tocar una unidad la elige.
+var oElevTorre = null;
+function oRenderElev(torre){
+  var wrap = _oEl('oElevWrap'); if (!wrap) return;
+  if (!torre) {
+    torre = oElevTorre;
+    if (!torre) { try { torre = (_oEl('tower') && _oEl('tower').value === '1') ? 'T1' : 'T2'; } catch(e){ torre = 'T2'; } }
+  }
+  oElevTorre = torre;
+  var t1 = _oEl('oElevT1'), t2 = _oEl('oElevT2');
+  if (t1) t1.classList.toggle('on', torre === 'T1');
+  if (t2) t2.classList.toggle('on', torre === 'T2');
+  var units = (typeof INVENTORY !== 'undefined' ? INVENTORY : []).filter(function(d){ return d.torre === torre; });
+  var byFloor = {};
+  units.forEach(function(d){ var f = oUnitFloor(d.num); (byFloor[f] = byFloor[f] || []).push(d); });
+  var floors = Object.keys(byFloor).map(Number).sort(function(a,b){ return b - a; });
+  var sel = null;
+  try { var u = oCurrentUnit(); if (u) sel = u.label.replace('Depto ', ''); } catch(e){}
+  var note = _oEl('oElevNote');
+  if (note) note.textContent = units.length + ' departamentos · ' + floors.length + ' pisos · el punto marca disponibilidad';
+  wrap.innerHTML = floors.map(function(f){
+    var list = byFloor[f].slice().sort(function(a,b){
+      var an = parseInt(a.num, 10), bn = parseInt(b.num, 10);
+      if (an !== bn) return an - bn;
+      return String(a.num).localeCompare(String(b.num));
+    });
+    var btns = list.map(function(d){
+      var av = getAvailability(d.torre, d.num);
+      var isSel = sel && (d.torre + '-' + d.num) === sel;
+      var cls = 'o-elev-u' + (isSel ? ' sel' : '') + (av.status !== 'Disponible' ? ' na' : '');
+      var title = d.tipo + ' · Vista ' + d.vista + ' · ' + d.m2 + ' m² · ' + fmtMXN(d.precio) + ' · ' + av.status;
+      return '<button type="button" class="' + cls + '" title="' + title + '" onclick="selectUnit(\'' + d.torre + '\',\'' + d.num + '\')"><span class="o-elev-dot" style="background:' + av.color + '"></span>' + d.num + '</button>';
+    }).join('');
+    return '<div class="o-elev-floor"><div class="o-elev-fl">Piso ' + f + '</div><div class="o-elev-units">' + btns + '</div></div>';
+  }).join('');
+}
+
+// 4. Lenguaje natural: entiende lo que dice el cliente, no solo el número.
+function oNorm(s){ try { return String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); } catch(e){ return String(s || '').toLowerCase(); } }
+function oParseClientQuery(q){
+  var s = ' ' + oNorm(q).replace(/[^a-z0-9.,\s]/g, ' ').replace(/\s+/g, ' ').trim() + ' ';
+  var filters = [], parts = [], torre = null, sortAsc = false, m;
+  if (/\btorre\s*1\b/.test(s)) torre = 'T1';
+  if (/\btorre\s*2\b/.test(s)) torre = 'T2';
+  var words = {una:1, uno:1, dos:2, tres:3, cuatro:4};
+  m = s.match(/\b(una|uno|dos|tres|cuatro|[1-4])\s*(recamaras?|rec\.?|habitaciones?|hab\.?|cuartos?)\b/);
+  if (m) {
+    var n = words[m[1]] || parseInt(m[1], 10);
+    filters.push((function(nn){ return function(d){ return d.tipo.indexOf(nn + ' REC') !== -1; }; })(n));
+    parts.push(n + (n === 1 ? ' recámara' : ' recámaras'));
+  }
+  if (/\bparque\b/.test(s)) { filters.push(function(d){ return d.vista.indexOf('PARQUE') !== -1; }); parts.push('vista al parque'); }
+  else if (/\boeste\b/.test(s)) { filters.push(function(d){ return d.vista.indexOf('OESTE') !== -1; }); parts.push('vista oeste'); }
+  if (/\bacceso\b/.test(s)) { filters.push(function(d){ return d.vista.indexOf('ACCESO') !== -1; }); parts.push('con acceso'); }
+  m = s.match(/\bpiso\s*(\d{1,2})\b/);
+  if (m) { var fl = parseInt(m[1], 10); filters.push((function(ff){ return function(d){ return oUnitFloor(d.num) === ff; }; })(fl)); parts.push('piso ' + fl); }
+  else if (/\bpiso alto|pisos altos|\barriba\b/.test(s)) { filters.push(function(d){ return oUnitFloor(d.num) >= 12; }); parts.push('piso alto'); }
+  else if (/\bpiso bajo|pisos bajos|planta baja|\babajo\b/.test(s)) { filters.push(function(d){ return oUnitFloor(d.num) <= 6; }); parts.push('piso bajo'); }
+  m = s.match(/\bmenos de\s*([\d]+(?:[.,]\d+)?)\s*millones?\b/);
+  if (m) { var mx = parseFloat(m[1].replace(',', '.')) * 1000000; filters.push((function(v){ return function(d){ return d.precio < v; }; })(mx)); parts.push('menos de ' + fmtMXN(mx)); }
+  else {
+    m = s.match(/\bhasta\s*([\d]+(?:[.,]\d+)?)\s*millones?\b/);
+    if (m) { var hx = parseFloat(m[1].replace(',', '.')) * 1000000; filters.push((function(v){ return function(d){ return d.precio <= v; }; })(hx)); parts.push('hasta ' + fmtMXN(hx)); }
+    else {
+      m = s.match(/\bmas de\s*([\d]+(?:[.,]\d+)?)\s*millones?\b/);
+      if (m) { var gx = parseFloat(m[1].replace(',', '.')) * 1000000; filters.push((function(v){ return function(d){ return d.precio > v; }; })(gx)); parts.push('más de ' + fmtMXN(gx)); }
+      else {
+        m = s.match(/\b([\d]+(?:[.,]\d+)?)\s*millones?\b/);
+        if (m) { var bx = parseFloat(m[1].replace(',', '.')) * 1000000; filters.push((function(v){ return function(d){ return d.precio <= v; }; })(bx)); parts.push('presupuesto ' + fmtMXN(bx)); }
+      }
+    }
+  }
+  m = s.match(/\bmas de\s*(\d+)\s*m2\b/);
+  if (m) { var g2 = parseInt(m[1], 10); filters.push((function(v){ return function(d){ return d.m2 >= v; }; })(g2)); parts.push('más de ' + g2 + ' m²'); }
+  else {
+    m = s.match(/\bmenos de\s*(\d+)\s*m2\b/);
+    if (m) { var l2 = parseInt(m[1], 10); filters.push((function(v){ return function(d){ return d.m2 <= v; }; })(l2)); parts.push('menos de ' + l2 + ' m²'); }
+  }
+  if (/\bgrande\b/.test(s)) { filters.push(function(d){ return d.m2 >= 90; }); parts.push('grande (90 m² o más)'); }
+  else if (/\bchico\b|\bpequeno\b/.test(s)) { filters.push(function(d){ return d.m2 <= 55; }); parts.push('chico (55 m² o menos)'); }
+  if (/\bbarato\b|\beconomico\b/.test(s)) { sortAsc = true; parts.push('los más económicos primero'); }
+  if (!filters.length && !torre && !sortAsc) return null;
+  return {torre: torre, filters: filters, parts: parts, sortAsc: sortAsc};
+}
 
 // ── Ola 1 · 3.3: Inicio por el cliente ────────────────────────────────────
 // Los bloques Retomar / Llamadas de hoy solo aparecen si hay algo que mostrar.
@@ -3043,7 +3218,7 @@ function calcScenario2(planIdx) {
   const appreciationGain = futureValue - mktBase;
   const opMonths       = Math.max(0, tenureMonths - opStart + 1);
   const totalNetIncome = netMonthly * opMonths - annualTaxes * Math.ceil(opMonths / 12);
-  const escrituraCostAmt = futureValue * escrituraPct;
+  const escrituraCostAmt = p.finalPrice * escrituraPct;
 
   const netGainAccel   = appreciationGain + totalNetIncome - accelInterests - escrituraCostAmt;
   const roiSimpleAccel = adjustedInvestment > 0 ? (netGainAccel / adjustedInvestment) * 100 : 0;
@@ -3081,7 +3256,7 @@ function calculateROI() {
   const opMonths         = Math.max(0, tenureMonths - opStart + 1);
   const netMonthly       = monthlyIncome - monthlyExpenses;
   const totalNetIncome   = netMonthly * opMonths - annualTaxes * Math.ceil(opMonths / 12);
-  const escrituraCostAmt = futureValue * escrituraPct;
+  const escrituraCostAmt = p.finalPrice * escrituraPct;
   const netGain1         = appreciationGain + totalNetIncome - totalInterests - escrituraCostAmt;
   const roiSimple1       = totalInvestment > 0 ? (netGain1 / totalInvestment) * 100 : 0;
   const roiAnnual1       = roiYears > 0 ? roiSimple1 / roiYears : 0;
@@ -3103,7 +3278,7 @@ function calculateROI() {
     {label:'Ingresos netos totales', val:fmtK(totalNetIncome), cls:totalNetIncome>=0?'green':'red', sub:opMonths+' meses de operación'},
     {label:'Tasa retorno ingresos',  val:fmtPct(roiIncomePct1), cls:roiIncomePct1>=0?'green':'red', sub:'Ingresos / Inversión total'},
     {label:'Ingresos mensuales netos',val:fmtMXN(netMonthly), cls:'blue', sub:'Renta menos gastos'},
-    {label:'Gastos escrituración',   val:fmtK(escrituraCostAmt), cls:'amber', sub:'Al cierre de venta'},
+    {label:'Gastos escrituración',   val:fmtK(escrituraCostAmt), cls:'amber', sub:'Al cierre de compra'},
   ]);
   metricGrid('sc1-total-metrics', [
     {label:'Plusvalía ganada <span class="gloss" tabindex="0">?<span class="gloss-tip">Cuánto sube de valor el departamento con el tiempo.</span></span>',   val:fmtK(appreciationGain), cls:'green', sub:roiYears+' años × '+fmtPct(apprRate*100)+' anual'},
@@ -3344,7 +3519,7 @@ function populateCompareTable() {
     const appGain  = fv - mktBase;
     const opMonths = Math.max(0, tenureMonths - opStart + 1);
     const netInc   = (monthlyIncome-monthlyExpenses)*opMonths - annualTaxes*Math.ceil(opMonths/12);
-    const escCost  = fv * escrituraPct;
+    const escCost  = p.finalPrice * escrituraPct;
     const netGain  = appGain + netInc - totalInt - escCost;
     const roiA     = roiYears > 0 ? (netGain / totalInv * 100) / roiYears : 0;
     const sc2      = calcScenario2(i);
@@ -3402,7 +3577,7 @@ function calcROIForSens(planIdx, testAppr, testIncome) {
   const appGain      = fv - mktBase;
   const opMonths     = Math.max(0, tenureMonths - opStart + 1);
   const netInc       = (testIncome-monthlyExpenses)*opMonths - annualTaxes*Math.ceil(opMonths/12);
-  const escCost      = fv * escrituraPct;
+  const escCost      = p.finalPrice * escrituraPct;
   const netGain      = appGain + netInc - totalInt - escCost;
   return roiYears > 0 ? (netGain / totalInv * 100) / roiYears : 0;
 }
@@ -3656,7 +3831,7 @@ function exportComparePDF() {
     const appGain  = fv - mktBase;
     const opMonths = Math.max(0, tenureMonths-opStart+1);
     const netInc   = (monthlyIncome-monthlyExpenses)*opMonths - annualTaxes*Math.ceil(opMonths/12);
-    const escCost  = fv*escrituraPct;
+    const escCost  = p.finalPrice*escrituraPct;
     const netGain  = appGain+netInc-totalInt-escCost;
     const roiA     = roiYears>0?(netGain/totalInv*100)/roiYears:0;
     const sc2      = calcScenario2(i);
@@ -3692,11 +3867,23 @@ function invSearch(q) {
   const raw = q.toUpperCase().replace(/\s/g,'');
   const torreFilter = raw.startsWith('T1') ? 'T1' : raw.startsWith('T2') ? 'T2' : null;
   const numPart     = raw.replace(/^(T1|T2)-?/,'');
-  return INVENTORY.filter(function(d) {
+  var byNum = INVENTORY.filter(function(d) {
     const k = d.num.toUpperCase().replace(/\s/g,'');
     return (!torreFilter || d.torre===torreFilter) && (k.startsWith(numPart) || k.includes(numPart));
-  }).slice(0, 9);
+  });
+  if (byNum.length) { invSearch.lastHint = null; return byNum.slice(0, 9); }
+  // Ola 3 · 4: si no es un número, entiende lo que dice el cliente.
+  var parsed = oParseClientQuery(q);
+  if (!parsed) { invSearch.lastHint = null; return []; }
+  var hits = INVENTORY.filter(function(d){
+    if (parsed.torre && d.torre !== parsed.torre) return false;
+    return parsed.filters.every(function(f){ return f(d); });
+  });
+  if (parsed.sortAsc) hits = hits.slice().sort(function(a,b){ return a.precio - b.precio; });
+  invSearch.lastHint = hits.length ? ('Entendí: ' + parsed.parts.join(' · ') + ' — ' + hits.length + (hits.length === 1 ? ' unidad' : ' unidades')) : null;
+  return hits.slice(0, 9);
 }
+invSearch.lastHint = null;
 
 function invExact(q) {
   const raw  = q.trim().toUpperCase().replace(/\s/g,'');
@@ -3731,6 +3918,7 @@ function onSearchInput() {
       '<span style="margin-left:auto;font-weight:600;color:var(--navy)">'+fmtMXN(d.precio)+'</span>' +
       '</div>';
   }).join('');
+  if (invSearch.lastHint) dd.innerHTML = '<div style="padding:8px 14px;font-size:12px;color:var(--text-muted);border-bottom:1px solid var(--border);background:var(--surface)">' + invSearch.lastHint + '</div>' + dd.innerHTML;
   const exact = invExact(q);
   if (exact.length === 1) showUnitChip(exact[0]);
 }
@@ -3757,6 +3945,7 @@ function selectUnit(torre, num) {
   var calcBtn = document.getElementById('calcPlansBtnLabel');
   if (calcBtn) calcBtn.textContent = 'Ver planes para ' + torre + '-' + num + ' →';
   oRenderStrip();
+  oRenderElev();
 }
 
 function showUnitChip(d) {
@@ -3840,6 +4029,7 @@ function onQSearchInput() {
       '<span style="margin-left:auto;font-weight:600">'+fmtMXN(d.precio)+'</span>' +
       '</div>';
   }).join('');
+  if (invSearch.lastHint) dd.innerHTML = '<div style="padding:8px 14px;font-size:12px;color:var(--text-muted);border-bottom:1px solid var(--border);background:var(--surface)">' + invSearch.lastHint + '</div>' + dd.innerHTML;
 }
 
 function onQSearchKey(e) {
@@ -3975,11 +4165,11 @@ function calcQuoteROI(u) {
   const fv      = mktBase * Math.pow(1+appr/100, years);
   const appGain = fv - mktBase;
   const netInc  = (rent-exp)*opMonths - taxes*Math.ceil(opMonths/12);
-  const escCost = fv * escPct/100;
 
   return u.plans.map(function(p) {
     const totalInv = p.downPayment + p.monthlyPayment * p.months;
     const totalInt = p.monthlyPayment * p.months - p.financed;
+    const escCost = p.finalPrice * escPct/100;
     const netGain  = appGain + netInc - totalInt - escCost;
     const roiAnn   = years > 0 ? (netGain / totalInv * 100) / years : 0;
     return { totalInv: totalInv, totalInt: totalInt, appGain: appGain, netInc: netInc, netGain: netGain, roiAnn: roiAnn };
@@ -5266,6 +5456,7 @@ function onFichaSearchInput() {
       '<span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:999px;background:'+av.bg+';color:'+av.color+'">'+av.status+'</span>' +
       '<span style="margin-left:auto;font-weight:600">'+fmtMXN(d.precio)+'</span></div>';
   }).join('');
+  if (invSearch.lastHint) dd.innerHTML = '<div style="padding:8px 14px;font-size:12px;color:var(--text-muted);border-bottom:1px solid var(--border);background:var(--surface)">' + invSearch.lastHint + '</div>' + dd.innerHTML;
 }
 
 function onFichaSearchKey(e) {
@@ -5645,6 +5836,9 @@ function pSetMode(mode) {
     pUpdatePartSummary();
   }
   document.getElementById('pPreview').style.display = 'none';
+  // Al cambiar a la pestaña depto, la propuesta también se auto-llena si
+  // el asesor viene del recorrido (misma regla que al entrar a la página).
+  if (mode === 'depto') pAutoFillFromFlow();
   // Ola 2 · 1, 3 y 4: franja, puerta y guía siguen al modo.
   oRenderStrip();
   renderPresentGuide();
@@ -5865,6 +6059,84 @@ function pOnUnitChange() {
   oRenderDoors('propuesta');
 }
 
+// ── Propuesta auto-llenada desde el flujo ────────────────────────────────
+// Cuando el asesor llega a Propuesta después de recorrer Unidad → Planes →
+// ROI, la propuesta se llena sola con esa unidad, el enganche y los
+// supuestos de ROI. Si entra directo a Propuesta sin haber hecho el
+// recorrido, todo queda manual, como antes. Y si el asesor elige el modelo
+// o la unidad a mano en la propuesta, esa elección nunca se sobrescribe:
+// la procedencia se guarda en pAutoFilledFrom ('Depto T1-509' o null).
+var pAutoFilledFrom = null;
+
+// Unidad del flujo principal (la de la página Unidad), leída directo del
+// input unitName + INVENTORY. OJO: oCurrentUnit() no sirve aquí: estando en
+// la página Propuesta devuelve la unidad de la propuesta cuando ya hay una.
+function _pFlowUnitInv(){
+  var name = '';
+  try { name = (_oEl('unitName') ? _oEl('unitName').value : '').trim(); } catch(e){}
+  if (!name) return null;
+  var parts = name.split('-');
+  return _oFindInv(parts[0], parts.slice(1).join('-'));
+}
+function _pUnitLabel(u){ return 'Depto ' + u.torre + '-' + u.num; }
+
+// Cambios a mano en los selectores de la propuesta: la elección pasa a ser
+// manual y ya no se auto-llena por encima. Las llamadas programáticas
+// (auto-llenado, cambio de modo de enganche) usan pOnModelChange /
+// pOnUnitChange directamente y no tocan la procedencia.
+function pManualModelChange(){ pAutoFilledFrom = null; pOnModelChange(); }
+function pManualUnitChange(){ pAutoFilledFrom = null; pOnUnitChange(); }
+
+function pAutoFillFromFlow(){
+  if (typeof pMode !== 'undefined' && pMode !== 'depto') return;
+  var inv = _pFlowUnitInv();
+  if (!inv) return; // sin unidad en el flujo: entrada directa, todo manual
+  var label = _pUnitLabel(inv);
+  var curLabel = (typeof pSelectedUnit !== 'undefined' && pSelectedUnit) ? _pUnitLabel(pSelectedUnit) : null;
+  // Unidad elegida a mano en la propuesta: no tocarla nunca.
+  if (curLabel && (pAutoFilledFrom === null || curLabel !== pAutoFilledFrom)) return;
+  if (curLabel !== label) {
+    // Modelo de la unidad (el mismo mapeo que usan la ficha y la propuesta).
+    var key = getUnitImageKey(inv.torre, inv.num);
+    var m = MODELS.find(function(x){ return x.key === key; });
+    if (!m) return;
+    // La unidad tiene que estar en el modelo; si no está, no tocar nada.
+    var units = pModelAllUnits(m.key);
+    var idx = -1;
+    for (var i = 0; i < units.length; i++){
+      if (units[i].torre === inv.torre && String(units[i].num) === String(inv.num)) { idx = i; break; }
+    }
+    if (idx < 0) return;
+    var modelSel = document.getElementById('pModelSelect');
+    var unitSel = document.getElementById('pUnitSelect');
+    if (!modelSel || !unitSel) return;
+    modelSel.value = m.key;
+    pOnModelChange(); // deja la unidad LIBRE más económica por defecto
+    unitSel.value = String(idx); // ...pero la del flujo es la que manda
+    pOnUnitChange();
+  }
+  // Supuestos de ROI (solo si el ROI ya se calculó en el flujo).
+  var roiDone = false;
+  try { roiDone = (typeof roiData !== 'undefined' && roiData && roiData.some(function(r){ return !!r; })); } catch(e){}
+  if (roiDone) {
+    var pairs = [['roiYears','pRoiYears'],['appreciationRate','pAppr'],['monthlyIncome','pRent'],['monthlyExpenses','pExpenses'],['annualTaxes','pTaxes'],['escrituraCost','pEscritura']];
+    pairs.forEach(function(pr){
+      var src = _oEl(pr[0]), dst = _oEl(pr[1]);
+      if (src && dst && src.value !== '' && src.value != null) dst.value = src.value;
+    });
+    // Enganche: solo en modo % (en modo $ el valor son pesos, no un %).
+    var dpChanged = false;
+    if (typeof pDpMode !== 'undefined' && pDpMode === 'pct') {
+      var dp = _oEl('dpValue'), pdp = _oEl('pDpValue');
+      if (dp && pdp && dp.value !== '' && dp.value != null && pdp.value !== dp.value) { pdp.value = dp.value; dpChanged = true; }
+    }
+    // El enganche alimenta los planes: volver a dibujar la unidad con el nuevo valor.
+    if (dpChanged && pSelectedUnit) pOnUnitChange();
+  }
+  pAutoFilledFrom = label;
+  oRenderDoors('propuesta');
+}
+
 // ── Participaciones ────────────────────────────────────────────────────────
 // Las etiquetas del desplegable se arman desde PARTI.unitPriceByQty (una sola
 // fuente de verdad), para que nunca vuelvan a quedarse con precios viejos.
@@ -5992,10 +6264,10 @@ function calcPropuestaROI(inv, plans, opts) {
   var fv = mktBase * Math.pow(1 + appr/100, years);
   var appGain = fv - mktBase;
   var netInc = (rent - exp) * opMonths - taxes * Math.ceil(opMonths/12);
-  var escCost = fv * escPct/100;
   return plans.map(function(p){
     var totalInv = p.downPayment + p.monthlyPayment * p.months;
     var totalInt = p.monthlyPayment * p.months - p.financed;
+    var escCost = p.finalPrice * escPct/100;
     var netGain = appGain + netInc - totalInt - escCost;
     var roiAnn = years > 0 ? (netGain / totalInv * 100) / years : 0;
     return {totalInv:totalInv, totalInt:totalInt, appGain:appGain, netInc:netInc, netGain:netGain, roiAnn:roiAnn, escCost:escCost, fv:fv};
