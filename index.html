@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script>
+// Versión de la app (una sola fuente): el aviso de actualización compara
+// este valor con el de la versión en vivo. CAMBIARLO EN CADA PUBLICACIÓN;
+// si no cambia, el aviso nunca se muestra.
+var APP_BUILD = '2026-11-25-actualizacion';
 // Vista Web / Móvil: cada quien elige cómo ver la calculadora según el
 // dispositivo que usa. Se aplica antes de pintar la página para que no
 // parpadee el diseño. Guardado por teléfono (localStorage).
@@ -469,6 +473,13 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 .o-guide-cols{list-style:none;margin:0 0 4px;padding:0}
 .o-guide-cols li{font-size:13px;line-height:1.55;color:var(--text-secondary);padding:6px 0;border-bottom:1px solid var(--hairline)}
 .o-guide-cols li:last-child{border-bottom:none}
+/* Aviso de actualización: solo cuando hay una versión nueva en vivo. Nunca recarga sola. */
+.o-update-bar{position:fixed;top:0;left:0;right:0;z-index:9999;background:var(--navy);color:#e8edf5;padding:10px 14px;display:none;align-items:center;gap:10px;flex-wrap:wrap;box-shadow:var(--shadow-lg)}
+.o-update-bar.show{display:flex}
+.o-update-bar .o-update-txt{flex:1;min-width:180px;font-size:13.5px;line-height:1.45}
+.o-update-bar .o-update-txt strong{color:var(--gold-light)}
+.o-update-btn-go{background:var(--gold);color:var(--navy);border:none;border-radius:var(--radius);padding:9px 14px;font-size:13.5px;font-weight:700;font-family:inherit;cursor:pointer}
+.o-update-btn-later{background:transparent;color:#e8edf5;border:1px solid rgba(255,255,255,0.45);border-radius:var(--radius);padding:9px 14px;font-size:13.5px;font-weight:600;font-family:inherit;cursor:pointer}
 /* 6. Confirmación de perfil. */
 .o-modal{display:none;position:fixed;inset:0;background:rgba(10,20,12,.55);z-index:300;align-items:center;justify-content:center;padding:20px}
 .o-modal.open{display:flex}
@@ -683,7 +694,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
     <div id="updateAppStatus" style="font-size:11px;color:#8fb996;padding:2px 12px 0 12px;min-height:14px"></div>
   </nav>
   <div class="sidebar-footer">
-    Disponibilidad actualizada:<br><strong>T1:</strong> 12-Nov-2026 · <strong>T2:</strong> 19-Nov-2026<br><button onclick="toggleVista()" id="vistaToggleSide" style="margin-top:10px;background:none;border:1px solid rgba(255,255,255,0.35);color:#e8edf5;border-radius:8px;padding:7px 12px;font-size:12px;cursor:pointer">Vista: automática</button> <button onclick="toggleModo()" id="modoToggleSide" style="margin-top:10px;background:none;border:1px solid rgba(255,255,255,0.35);color:#e8edf5;border-radius:8px;padding:7px 12px;font-size:12px;cursor:pointer">Modo: completo</button><br><span style="opacity:0.6">Exportar PDF desde cada sección.</span>
+    <span id="oInvFechaSide"></span><br><button onclick="toggleVista()" id="vistaToggleSide" style="margin-top:10px;background:none;border:1px solid rgba(255,255,255,0.35);color:#e8edf5;border-radius:8px;padding:7px 12px;font-size:12px;cursor:pointer">Vista: automática</button> <button onclick="toggleModo()" id="modoToggleSide" style="margin-top:10px;background:none;border:1px solid rgba(255,255,255,0.35);color:#e8edf5;border-radius:8px;padding:7px 12px;font-size:12px;cursor:pointer">Modo: completo</button><br><span style="opacity:0.6">Exportar PDF desde cada sección.</span>
   </div>
 </aside>
 
@@ -764,6 +775,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
         </div>
       </div>
       <div id="noUnitMsg" style="display:none;font-size:13px;color:var(--text-muted);margin-bottom:8px">Sin resultados. Prueba con T1-507-B o solo el número.</div>
+      <div id="oInvFechaUnit" style="font-size:12px;color:var(--text-muted);margin-top:4px"></div>
     </div>
 
     <!-- Ola 3 · 3: elegir por elevación de torre -->
@@ -2847,6 +2859,108 @@ function oToggleSensGuide(){
   g.style.display = open ? 'block' : 'none';
   if (b) b.textContent = open ? 'Ocultar guía para el asesor ↑' : 'Guía para el asesor · Qué pasa si cambian los supuestos →';
 }
+// ── Fechas de inventario (UNA sola fuente) ──
+// La fecha es la referencia de frescura: coincide con cuando el grupo de
+// ventas actualiza la disponibilidad con listas nuevas. Cambiarla aquí
+// actualiza el pie del sidebar y la línea de la página Unidad a la vez.
+var INVENTARIO_FECHAS = {T1: '12-Nov-2026', T2: '19-Nov-2026'};
+function oRenderFechasInventario(){
+  var s = _oEl('oInvFechaSide');
+  if (s) s.innerHTML = 'Disponibilidad actualizada:<br><strong>T1:</strong> ' + INVENTARIO_FECHAS.T1 + ' · <strong>T2:</strong> ' + INVENTARIO_FECHAS.T2;
+  var u = _oEl('oInvFechaUnit');
+  if (u) u.textContent = 'Disponibilidad actualizada: T1: ' + INVENTARIO_FECHAS.T1 + ' · T2: ' + INVENTARIO_FECHAS.T2;
+}
+// ── Última unidad + supuestos ROI guardados (por teléfono) ──
+// Al recargar o actualizar la app, el asesor sigue donde estaba: la unidad
+// vuelve a la franja y los supuestos del ROI vuelven al formulario. Nunca
+// se guardan resultados calculados ni se recalcula solo.
+var LS_ULTIMA_UNIDAD = 'toram_ultima_unidad_v1';
+var LS_ROI_SUPUESTOS = 'toram_roi_supuestos_v1';
+var LS_UPDATE_DISMISSED = 'toram_update_dismissed_v1';
+function oSaveLastUnit(torre, num){
+  try { localStorage.setItem(LS_ULTIMA_UNIDAD, JSON.stringify({torre: torre, num: num})); } catch(e){}
+}
+function oSaveRoiSupuestos(){
+  try {
+    var v = function(id){ var el = _oEl(id); return el ? el.value : ''; };
+    localStorage.setItem(LS_ROI_SUPUESTOS, JSON.stringify({
+      years: v('roiYears'), appr: v('appreciationRate'), rent: v('monthlyIncome'),
+      opStart: v('operationStartMonth'), exp: v('monthlyExpenses'), taxes: v('annualTaxes'),
+      esc: v('escrituraCost'), dpValue: v('dpValue'),
+      dpMode: (typeof dpMode !== 'undefined' ? dpMode : 'pct')
+    }));
+  } catch(e){}
+}
+function oRestoreSavedState(){
+  // Unidad guardada: solo si sigue en el inventario.
+  try {
+    var raw = localStorage.getItem(LS_ULTIMA_UNIDAD);
+    if (raw) {
+      var u = JSON.parse(raw);
+      if (u && u.torre && u.num && typeof INVENTORY !== 'undefined' &&
+          INVENTORY.some(function(x){ return x.torre === u.torre && x.num === u.num; })) {
+        selectUnit(u.torre, u.num);
+      }
+    }
+  } catch(e){}
+  // Supuestos ROI: solo valores del formulario, sin recalcular.
+  try {
+    var raw2 = localStorage.getItem(LS_ROI_SUPUESTOS);
+    if (raw2) {
+      var s2 = JSON.parse(raw2);
+      if (s2) {
+        var set = function(id, val){ if (val !== undefined && val !== '' && val !== null) { var el = _oEl(id); if (el) el.value = val; } };
+        set('roiYears', s2.years); set('appreciationRate', s2.appr); set('monthlyIncome', s2.rent);
+        set('operationStartMonth', s2.opStart); set('monthlyExpenses', s2.exp); set('annualTaxes', s2.taxes);
+        set('escrituraCost', s2.esc); set('dpValue', s2.dpValue);
+        if (s2.dpMode === 'pct' || s2.dpMode === 'mxn') {
+          setDpMode(s2.dpMode);
+          // setDpMode convierte el valor de enganche al cambiar de modo:
+          // se vuelve a poner el valor guardado para que no se altere.
+          set('dpValue', s2.dpValue);
+          syncDpDisplay();
+        }
+      }
+    }
+  } catch(e){}
+}
+// ── Aviso de actualización ──
+// La app NO descarga sola: este aviso solo aparece cuando hay una versión
+// nueva en vivo. Nunca recarga sin que el asesor toque "Actualizar ahora".
+function oShowUpdateNotice(){
+  var b = _oEl('oUpdateBar');
+  if (b) b.classList.add('show');
+}
+function oHideUpdateNotice(){
+  var b = _oEl('oUpdateBar');
+  if (b) b.classList.remove('show');
+}
+function oUpdateLater(){
+  try { sessionStorage.setItem(LS_UPDATE_DISMISSED, '1'); } catch(e){}
+  oHideUpdateNotice();
+}
+function oUpdateNow(){
+  oHideUpdateNotice();
+  try { if (typeof updateApp === 'function') { updateApp(); return; } } catch(e){}
+  try { if (typeof location !== 'undefined' && location.reload) location.reload(); } catch(e){}
+}
+function oCheckUpdate(){
+  try {
+    if (!('serviceWorker' in navigator) || !navigator.serviceWorker.controller) return;
+    try { if (sessionStorage.getItem(LS_UPDATE_DISMISSED) === '1') return; } catch(e){}
+    if (typeof fetch !== 'function') return;
+    fetch('./index.html?ver-check=' + Date.now(), {headers: {'Range': 'bytes=0-2048'}}).then(function(res){
+      if (!res || !res.ok) return null;
+      return res.text();
+    }).then(function(txt){
+      if (!txt) return;
+      var m = txt.match(/APP_BUILD\s*=\s*'([^']+)'/);
+      if (!m) return;
+      var mine = (typeof APP_BUILD !== 'undefined') ? APP_BUILD : null;
+      if (mine && m[1] && m[1] !== mine) oShowUpdateNotice();
+    }).catch(function(){});
+  } catch(e){}
+}
 function renderPresentGuide(){
   var box = _oEl('oPresentSteps');
   if (!box) return;
@@ -3106,6 +3220,7 @@ function setDpMode(mode) {
     document.getElementById('dpValue').step = '1000';
   }
   syncDpDisplay();
+  oSaveRoiSupuestos();
 }
 
 function syncDpDisplay() {
@@ -3312,6 +3427,7 @@ function calcScenario2(planIdx) {
 // ── Calculate ROI ───────────────────────────────────────────────────────────
 function calculateROI() {
   if (plans.length === 0) { alert('Calcula primero los planes de financiamiento.'); return; }
+  oSaveRoiSupuestos();
   const planIdx  = parseInt(document.getElementById('roiPlanSelect').value);
   const p        = plans[planIdx];
   const roiYears = parseInt(document.getElementById('roiYears').value);
@@ -4022,6 +4138,7 @@ function selectUnit(torre, num) {
   if (calcBtn) calcBtn.textContent = 'Ver planes para ' + torre + '-' + num + ' →';
   oRenderStrip();
   oRenderElev();
+  oSaveLastUnit(torre, num);
 }
 
 function showUnitChip(d) {
@@ -8924,6 +9041,13 @@ window.addEventListener('DOMContentLoaded', function() {
   var inicioMap = document.getElementById('inicioMapImg');
   if (inicioMap && typeof PARK_MAP_IMG === 'string') inicioMap.src = PARK_MAP_IMG;
   lPopulateLocales();
+  // Fecha de inventario (una sola fuente) + seguir donde se quedó el asesor.
+  oRenderFechasInventario();
+  oRestoreSavedState();
+  ['roiYears','appreciationRate','monthlyIncome','operationStartMonth','monthlyExpenses','annualTaxes','escrituraCost','dpValue'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (el) el.addEventListener('change', oSaveRoiSupuestos);
+  });
 });
 
 </script>
@@ -8931,7 +9055,21 @@ window.addEventListener('DOMContentLoaded', function() {
 // Instala la calculadora para usarla sin internet (PWA).
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function(){
-    navigator.serviceWorker.register('sw.js').catch(function(){});
+    navigator.serviceWorker.register('sw.js').then(function(reg){
+      try {
+        // Si ya hay un service worker nuevo esperando, avisar.
+        if (reg.waiting) oShowUpdateNotice();
+        reg.addEventListener('updatefound', function(){
+          var nw = reg.installing;
+          if (!nw) return;
+          nw.addEventListener('statechange', function(){
+            if (nw.state === 'installed' && navigator.serviceWorker.controller) oShowUpdateNotice();
+          });
+        });
+      } catch(e){}
+    }).catch(function(){});
+    // Revisa si la versión en vivo es más nueva que esta (una vez por carga).
+    setTimeout(function(){ try { if (typeof oCheckUpdate === 'function') oCheckUpdate(); } catch(e){} }, 5000);
   });
 }
 // Actualización manual de la app (botón "Actualizar app").
@@ -8974,5 +9112,11 @@ function updateApp(){
   }, 15000);
 }
 </script>
+<!-- Aviso de actualización: solo aparece cuando hay una versión nueva en vivo. Nunca recarga sola. -->
+<div class="o-update-bar" id="oUpdateBar" role="status">
+  <div class="o-update-txt"><strong>Hay una versión nueva de la calculadora.</strong><span> Actualiza para usar lo último.</span></div>
+  <button type="button" class="o-update-btn-go" onclick="oUpdateNow()">Actualizar ahora</button>
+  <button type="button" class="o-update-btn-later" onclick="oUpdateLater()">Luego</button>
+</div>
 </body>
 </html>
