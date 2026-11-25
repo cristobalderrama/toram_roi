@@ -7,7 +7,7 @@
 // Versión de la app (una sola fuente): el aviso de actualización compara
 // este valor con el de la versión en vivo. CAMBIARLO EN CADA PUBLICACIÓN;
 // si no cambia, el aviso nunca se muestra.
-var APP_BUILD = '2026-11-25-elev-colapsada';
+var APP_BUILD = '2026-11-25-aviso-sin-marcador';
 // Vista Web / Móvil: cada quien elige cómo ver la calculadora según el
 // dispositivo que usa. Se aplica antes de pintar la página para que no
 // parpadee el diseño. Guardado por teléfono (localStorage).
@@ -2968,7 +2968,9 @@ function oCheckUpdate(){
       var m = txt.match(/APP_BUILD\s*=\s*'([^']+)'/);
       if (!m) return;
       var mine = (typeof APP_BUILD !== 'undefined') ? APP_BUILD : null;
-      if (mine && m[1] && m[1] !== mine) oShowUpdateNotice();
+      // Sin marcador local = versión anterior al aviso: también es vieja, avisar.
+      // (El marcador en vivo es obligatorio: sin él no hay falso positivo.)
+      if (m[1] && (!mine || m[1] !== mine)) oShowUpdateNotice();
     }).catch(function(){});
   } catch(e){}
 }
