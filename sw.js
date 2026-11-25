@@ -3,10 +3,11 @@
 // Solo el botón "Actualizar app" de la calculadora descarga la versión
 // más reciente, y lo hace en primer plano (con WiFi), aunque los datos
 // en segundo plano del teléfono estén apagados.
-var CACHE = 'toram-roi-v1';
+var CACHE = 'toram-roi-v2';
 var CORE = [
   './',
   './index.html',
+  './imagenes.js',
   './manifest.json',
   './icon.svg',
   'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
@@ -45,6 +46,12 @@ self.addEventListener('message', function(e){
       return caches.open(CACHE).then(function(c){
         return c.put('./index.html', res.clone()).then(function(){ return c.put('./', res.clone()); });
       });
+    }).then(function(){
+      // Las imágenes grandes viven en imagenes.js: también se actualizan.
+      return fetch('./imagenes.js', {cache: 'reload'}).then(function(res){
+        if (!res || !res.ok) return;
+        return caches.open(CACHE).then(function(c){ return c.put('./imagenes.js', res); });
+      }).catch(function(){});
     }).then(function(){
       if (client) client.postMessage({type: 'UPDATE_RESULT', ok: true});
     }).catch(function(){
