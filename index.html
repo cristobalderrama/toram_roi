@@ -465,6 +465,10 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 .o-guide-steps li:last-child{border-bottom:none}
 .o-guide-steps li::before{content:counter(o-g,decimal-leading-zero);font-family:var(--font-mono);font-size:12px;color:var(--gold-dark);flex-shrink:0;padding-top:2px}
 .o-guide-steps .o-guide-say{font-size:13px;color:var(--text-secondary);margin-top:2px}
+/* Guía de la comparativa: lista de columnas (mismo sistema visual que .o-guide-steps). */
+.o-guide-cols{list-style:none;margin:0 0 4px;padding:0}
+.o-guide-cols li{font-size:13px;line-height:1.55;color:var(--text-secondary);padding:6px 0;border-bottom:1px solid var(--hairline)}
+.o-guide-cols li:last-child{border-bottom:none}
 /* 6. Confirmación de perfil. */
 .o-modal{display:none;position:fixed;inset:0;background:rgba(10,20,12,.55);z-index:300;align-items:center;justify-content:center;padding:20px}
 .o-modal.open{display:flex}
@@ -1111,6 +1115,36 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
         </table>
       </div>
     </div>
+
+    <!-- Guía del asesor para la comparativa (solo para el asesor; nunca va en el PDF) -->
+    <div style="margin-top:20px">
+      <button class="btn btn-outline btn-action" id="oCompareGuideToggle" onclick="oToggleCompareGuide()">Guía para el asesor · Cómo leer esta comparativa →</button>
+    </div>
+    <div id="oCompareGuide" class="card" style="display:none;margin-top:12px">
+      <div class="card-title">Guía para el asesor · Cómo leer esta comparativa</div>
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px">Guía para ti, el asesor. <strong>La calculadora nunca se comparte con el cliente: lo que se le muestra es la comparativa en PDF, nunca la app.</strong></p>
+      <div class="section-title" style="margin-top:4px">Cada columna</div>
+      <ul class="o-guide-cols">
+        <li><strong>Enganche:</strong> lo que se paga al inicio, 15% del precio con descuento.</li>
+        <li><strong>Mensualidad:</strong> lo que se paga cada mes en ese plan.</li>
+        <li><strong>Total pagado:</strong> todo lo que se paga por el depto en ese plan (enganche + mensualidades).</li>
+        <li><strong>Intereses:</strong> el costo del financiamiento. En contado y en MSI es $0.</li>
+        <li><strong>Plusvalía:</strong> cuánto sube el valor del depto en el plazo (ver abajo por qué es igual en todos los planes).</li>
+        <li><strong>Ingr. Netos:</strong> la renta menos gastos de operación e impuestos en el plazo.</li>
+        <li><strong>Gan. Neta:</strong> Ingr. Netos + Plusvalía − Intereses − Escrituración.</li>
+        <li><strong>ROI Anual:</strong> la ganancia promedio por año sobre lo invertido. Es la columna para comparar planes.</li>
+        <li><strong>Sc2 ROI:</strong> escenario 2, «La renta adelanta capital». No aplica en contado ni en MSI (sale N/A).</li>
+      </ul>
+      <div class="section-title">Por qué la plusvalía es igual en todos los planes</div>
+      <p style="font-size:13px;line-height:1.6;color:var(--text-secondary)">La plusvalía se calcula sobre el <strong>precio de lista</strong>, que es el valor de mercado del depto y no cambia entre planes. El descuento no baja el valor del depto al vender: lo vendes a valor de mercado, no a precio con descuento crecido. El descuento sí se ve en la tabla: enganche más bajo, mensualidad más baja e inversión total más baja, y por eso el ROI % es más alto.</p>
+      <p style="font-size:13px;line-height:1.6;color:var(--text-secondary)"><strong>Escrituración:</strong> se calcula sobre el precio con descuento de cada plan («Al cierre de compra»), no sobre el valor futuro.</p>
+      <div class="section-title">Cómo presentarla</div>
+      <ol class="o-guide-steps">
+        <li><div><strong>Compara por ROI Anual y Gan. Neta.</strong><div class="o-guide-say">Son las dos columnas que deciden: cuánto gana y a qué ritmo.</div></div></li>
+        <li><div><strong>Explica el intercambio.</strong><div class="o-guide-say">Contado: mayor ROI, pero el enganche más grande. Financiamiento: mensualidad más baja, pero más intereses.</div></div></li>
+        <li><div><strong>Lo que nunca se dice.</strong><div class="o-guide-say">Nunca prometas la proyección como garantía: es una proyección con estos supuestos. Y recuerda la vigencia de 3 días de la propuesta.</div></div></li>
+      </ol>
+    </div>
   </div>
 
   <!-- PAGE: Sensitivity -->
@@ -1136,6 +1170,30 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
           <div id="sensIncome"></div>
         </div>
       </div>
+    </div>
+
+    <!-- Guía del asesor para el análisis de sensibilidad (solo para el asesor; nunca va en el PDF) -->
+    <div style="margin-top:20px">
+      <button class="btn btn-outline btn-action" id="oSensGuideToggle" onclick="oToggleSensGuide()">Guía para el asesor · Qué pasa si cambian los supuestos →</button>
+    </div>
+    <div id="oSensGuide" class="card" style="display:none;margin-top:12px">
+      <div class="card-title">Guía para el asesor · Qué pasa si cambian los supuestos</div>
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px">Guía para ti, el asesor. <strong>La calculadora nunca se comparte con el cliente: lo que se le muestra es la propuesta en PDF, nunca la app.</strong></p>
+      <div class="section-title" style="margin-top:4px">Cómo se lee</div>
+      <p style="font-size:13px;line-height:1.6;color:var(--text-secondary)">Cada fila es el ROI anual si <strong>ese supuesto cambia y los demás se quedan fijos</strong>. La fila dorada es tu <strong>supuesto actual</strong>. <strong>Verde = mejor ROI</strong> que el actual; <strong>rojo = menor ROI</strong>. El rango muestra que el resultado depende de los supuestos: no es una sola promesa.</p>
+      <div class="section-title">Los dos bloques</div>
+      <ul class="o-guide-cols">
+        <li><strong>Apreciación anual:</strong> cuánto sube el valor del depto por año. Se calcula sobre el precio de lista, el valor de mercado.</li>
+        <li><strong>Ingresos mensuales:</strong> la renta que cobra el cliente al mes, con los demás supuestos fijos.</li>
+      </ul>
+      <div class="section-title">Ejemplos (con este plan)</div>
+      <p style="font-size:13px;line-height:1.6;color:var(--text-secondary)">Con apreciación del 2% el ROI cae a cerca de -0.7%; con renta de $0/mes, a cerca de -0.1%; y con apreciación del 15%, sube a cerca de 16.6%. Son los extremos del rango: el resultado real depende de lo que pase de verdad.</p>
+      <div class="section-title">Cómo usarla con el cliente</div>
+      <ol class="o-guide-steps">
+        <li><div><strong>Muestra base, mejor y peor.</strong><div class="o-guide-say">Señala la fila dorada, una verde y una roja: el cliente ve que el resultado se mueve con los supuestos.</div></div></li>
+        <li><div><strong>Si pregunta «¿y si rento menos?» o «¿y si sube menos?».</strong><div class="o-guide-say">Apunta directo a la fila: ahí está la respuesta, sin inventar nada.</div></div></li>
+        <li><div><strong>Lo que nunca se dice.</strong><div class="o-guide-say">Nunca prometas el número alto como garantía: todo es una proyección con estos supuestos. Y recuerda la vigencia de 3 días de la propuesta.</div></div></li>
+      </ol>
     </div>
   </div>
 
@@ -2770,6 +2828,24 @@ function oTogglePresentGuide(){
   g.style.display = open ? 'block' : 'none';
   if (b) b.textContent = open ? 'Ocultar guía para presentar ↑' : 'Guía para presentar →';
   if (open) renderPresentGuide();
+}
+// Guía de la comparativa: qué significa cada columna y cómo presentarla.
+// Solo para el asesor; nunca va en ningún PDF.
+function oToggleCompareGuide(){
+  var g = _oEl('oCompareGuide'), b = _oEl('oCompareGuideToggle');
+  if (!g) return;
+  var open = g.style.display === 'none' || g.style.display === '';
+  g.style.display = open ? 'block' : 'none';
+  if (b) b.textContent = open ? 'Ocultar guía para el asesor ↑' : 'Guía para el asesor · Cómo leer esta comparativa →';
+}
+// Guía del análisis de sensibilidad: qué pasa si cambian los supuestos.
+// Solo para el asesor; nunca va en ningún PDF.
+function oToggleSensGuide(){
+  var g = _oEl('oSensGuide'), b = _oEl('oSensGuideToggle');
+  if (!g) return;
+  var open = g.style.display === 'none' || g.style.display === '';
+  g.style.display = open ? 'block' : 'none';
+  if (b) b.textContent = open ? 'Ocultar guía para el asesor ↑' : 'Guía para el asesor · Qué pasa si cambian los supuestos →';
 }
 function renderPresentGuide(){
   var box = _oEl('oPresentSteps');
