@@ -7,7 +7,7 @@
 // Versión de la app (una sola fuente): el aviso de actualización compara
 // este valor con el de la versión en vivo. CAMBIARLO EN CADA PUBLICACIÓN;
 // si no cambia, el aviso nunca se muestra.
-var APP_BUILD = '2026-11-25-actualizacion';
+var APP_BUILD = '2026-11-25-elev-colapsada';
 // Vista Web / Móvil: cada quien elige cómo ver la calculadora según el
 // dispositivo que usa. Se aplica antes de pintar la página para que no
 // parpadee el diseño. Guardado por teléfono (localStorage).
@@ -528,6 +528,11 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 .o-elev-u .o-elev-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;vertical-align:1px}
 .o-elev-u.sel{border-color:var(--gold);background:var(--gold-pale);box-shadow:inset 0 0 0 1px var(--gold)}
 .o-elev-u.na{opacity:.55}
+/* Vista por elevación colapsable: una fila compacta; el listado solo aparece si el asesor la abre. */
+.o-elev-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.o-elev-toggle{border:1px solid var(--hairline);background:var(--white);border-radius:999px;padding:6px 12px;font-size:12px;font-weight:600;color:var(--navy);cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0}
+.o-elev-toggle .o-elev-chev{display:inline-block;transition:transform .2s ease;margin-left:2px}
+.o-elev-toggle.open .o-elev-chev{transform:rotate(180deg)}
 @media (max-width:768px){
   .o-path{margin-left:0}
   .o-steps::before{display:none}
@@ -778,17 +783,22 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
       <div id="oInvFechaUnit" style="font-size:12px;color:var(--text-muted);margin-top:4px"></div>
     </div>
 
-    <!-- Ola 3 · 3: elegir por elevación de torre -->
+    <!-- Ola 3 · 3: elegir por elevación de torre (colapsada por defecto: solo se abre si el asesor la pide) -->
     <div class="card" style="margin-top:16px">
-      <div class="card-title">Elegir por elevación de torre</div>
-      <p style="font-size:13px;color:var(--text-muted);margin:0 0 4px">Mira la torre como se ve desde fuera: cada piso con sus departamentos. Toca una unidad para elegirla.</p>
-      <svg class="o-contour" viewBox="0 0 400 48" preserveAspectRatio="none" aria-hidden="true"><path d="M-10 40 C60 22 120 46 190 32 S320 20 410 38"/><path d="M-10 28 C70 12 130 36 200 24 S330 10 410 28"/><path d="M-10 16 C80 2 140 24 210 14 S340 0 410 18"/></svg>
-      <div class="o-elev-tower">
-        <button type="button" class="o-elev-tgl" id="oElevT1" onclick="oRenderElev('T1')">Torre 1</button>
-        <button type="button" class="o-elev-tgl" id="oElevT2" onclick="oRenderElev('T2')">Torre 2</button>
-        <span style="font-size:12px;color:var(--text-muted)" id="oElevNote"></span>
+      <div class="o-elev-head">
+        <div class="card-title" style="margin:0">Elegir por elevación de torre</div>
+        <button type="button" class="o-elev-toggle" id="oElevToggleBtn" onclick="oToggleElev()" aria-expanded="false">Ver pisos <span class="o-elev-chev">▾</span></button>
       </div>
-      <div id="oElevWrap"></div>
+      <div id="oElevBody" style="display:none">
+        <p style="font-size:13px;color:var(--text-muted);margin:8px 0 4px">Mira la torre como se ve desde fuera: cada piso con sus departamentos. Toca una unidad para elegirla.</p>
+        <svg class="o-contour" viewBox="0 0 400 48" preserveAspectRatio="none" aria-hidden="true"><path d="M-10 40 C60 22 120 46 190 32 S320 20 410 38"/><path d="M-10 28 C70 12 130 36 200 24 S330 10 410 28"/><path d="M-10 16 C80 2 140 24 210 14 S340 0 410 18"/></svg>
+        <div class="o-elev-tower">
+          <button type="button" class="o-elev-tgl" id="oElevT1" onclick="oRenderElev('T1')">Torre 1</button>
+          <button type="button" class="o-elev-tgl" id="oElevT2" onclick="oRenderElev('T2')">Torre 2</button>
+          <span style="font-size:12px;color:var(--text-muted)" id="oElevNote"></span>
+        </div>
+        <div id="oElevWrap"></div>
+      </div>
     </div>
 
     <!-- Manual override + down payment -->
@@ -2652,8 +2662,8 @@ function showPage(id) {
   // Ola 2 · 1 y 3: la franja viaja contigo y las puertas se actualizan.
   oRenderStrip();
   oRenderDoors(id);
-  // Ola 3 · 3: la elevación se dibuja al entrar a Unidad.
-  if (id === 'unit') oRenderElev();
+  // Ola 3 · 3: la elevación se sincroniza al entrar a Unidad (cerrada por defecto; solo se abre si el asesor la pide).
+  if (id === 'unit') oElevSync();
 
   window.scrollTo(0,0);
 }
@@ -2877,6 +2887,7 @@ function oRenderFechasInventario(){
 var LS_ULTIMA_UNIDAD = 'toram_ultima_unidad_v1';
 var LS_ROI_SUPUESTOS = 'toram_roi_supuestos_v1';
 var LS_UPDATE_DISMISSED = 'toram_update_dismissed_v1';
+var LS_ELEV_ABIERTA = 'toram_elev_abierta_v1';
 function oSaveLastUnit(torre, num){
   try { localStorage.setItem(LS_ULTIMA_UNIDAD, JSON.stringify({torre: torre, num: num})); } catch(e){}
 }
@@ -3033,6 +3044,9 @@ function oUnitFloor(num){ var n = parseInt(String(num), 10); return isNaN(n) ? 0
 var oElevTorre = null;
 function oRenderElev(torre){
   var wrap = _oEl('oElevWrap'); if (!wrap) return;
+  // Si la vista está cerrada no se dibuja nada (la pantalla no se llena de pisos).
+  var _body = _oEl('oElevBody');
+  if (_body && _body.style.display === 'none') return;
   if (!torre) {
     torre = oElevTorre;
     if (!torre) { try { torre = (_oEl('tower') && _oEl('tower').value === '1') ? 'T1' : 'T2'; } catch(e){ torre = 'T2'; } }
@@ -3060,11 +3074,42 @@ function oRenderElev(torre){
       var isSel = sel && (d.torre + '-' + d.num) === sel;
       var cls = 'o-elev-u' + (isSel ? ' sel' : '') + (av.status !== 'Disponible' ? ' na' : '');
       var title = d.tipo + ' · Vista ' + d.vista + ' · ' + d.m2 + ' m² · ' + fmtMXN(d.precio) + ' · ' + av.status;
-      return '<button type="button" class="' + cls + '" title="' + title + '" onclick="selectUnit(\'' + d.torre + '\',\'' + d.num + '\')"><span class="o-elev-dot" style="background:' + av.color + '"></span>' + d.num + '</button>';
+      return '<button type="button" class="' + cls + '" title="' + title + '" onclick="oElevPickUnit(\'' + d.torre + '\',\'' + d.num + '\')"><span class="o-elev-dot" style="background:' + av.color + '"></span>' + d.num + '</button>';
     }).join('');
     return '<div class="o-elev-floor"><div class="o-elev-fl">Piso ' + f + '</div><div class="o-elev-units">' + btns + '</div></div>';
   }).join('');
 }
+
+// Vista por elevación colapsable: cerrada por defecto, solo se abre si el
+// asesor la pide. La preferencia se guarda por teléfono.
+function oElevPrefOpen(){
+  try { return localStorage.getItem(LS_ELEV_ABIERTA) === '1'; } catch(e){ return false; }
+}
+function oSetElevOpen(open){
+  var body = _oEl('oElevBody'), btn = _oEl('oElevToggleBtn');
+  if (body) body.style.display = open ? '' : 'none';
+  if (btn) {
+    btn.classList.toggle('open', !!open);
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    btn.innerHTML = (open ? 'Ocultar pisos ' : 'Ver pisos ') + '<span class="o-elev-chev">▾</span>';
+  }
+  try { localStorage.setItem(LS_ELEV_ABIERTA, open ? '1' : '0'); } catch(e){}
+  if (open) oRenderElev();
+  else { var wrap = _oEl('oElevWrap'); if (wrap) wrap.innerHTML = ''; }
+}
+function oToggleElev(){
+  // El estado se lee de la preferencia guardada (que oSetElevOpen mantiene
+  // siempre al día), no del estilo: así funciona aunque el estilo en línea
+  // aún no se haya fijado.
+  oSetElevOpen(!oElevPrefOpen());
+}
+function oElevSync(){
+  // Al entrar a Unidad: respeta la preferencia guardada (cerrada por defecto).
+  oSetElevOpen(oElevPrefOpen());
+}
+// Elegir desde la elevación: selecciona la unidad y vuelve a cerrar la vista
+// (la franja "Unidad activa" ya muestra la elegida).
+function oElevPickUnit(torre, num){ selectUnit(torre, num); oSetElevOpen(false); }
 
 // 4. Lenguaje natural: entiende lo que dice el cliente, no solo el número.
 function oNorm(s){ try { return String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); } catch(e){ return String(s || '').toLowerCase(); } }
